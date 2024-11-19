@@ -15,7 +15,7 @@ def read_bw_images(img_paths):
 
 
 def clean_descriptors(
-    keypoints: list[cv2.KeyPoint], descriptors: list[np.ndarray]
+        keypoints: list[cv2.KeyPoint], descriptors: list[np.ndarray]
 ) -> tuple[list[cv2.KeyPoint], list[np.ndarray]]:
     print(f"len before: {len(descriptors)}")
     # initialize list to store idx values of records to drop
@@ -34,7 +34,7 @@ def clean_descriptors(
     return keypoints, descriptors
 
 
-def run_sift(images, clean=True) -> tuple[list[cv2.KeyPoint], list[np.ndarray]]:
+def sift_features(images, clean=True) -> tuple[list[cv2.KeyPoint], list[np.ndarray]]:
     """
     Run SIFT on a list of black and white images
     :param images:
@@ -82,35 +82,36 @@ def get_tfidf(frequency_vectors):
     """
     N = len(frequency_vectors)
     df = np.sum(frequency_vectors > 0, axis=0)
-    print(df.shape, df[:5])
+    print(f"df.shape, df[:5]: {df.shape}, {df[:5]}")
     idf = np.log(N / df)
-    print(idf.shape, idf[:5])
+    print(f"idf.shape, idf[:5]: {idf.shape}, {idf[:5]}")
     return frequency_vectors * idf
 
 
 def search_test(
-    image: np.ndarray,
-    db: np.ndarray,
-    top_k: int = 5,
-    search_image=None,
-    db_images: list = None,
-) -> np.ndarray:
+        image: np.ndarray,
+        db: np.ndarray,
+        top_k: int = 5,
+        search_image=None,
+        db_images: list = None,
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Search for the most similar images in the database
     :param image: tfidf vector for the search image
     :param db: tfidf vectors for the database images
     :param top_k: number of similar images to return
-    :param search_image: (optional) image to search for
-    :param db_images: (optional) list of images in the database
-    :return: indices of k the most similar images
+    :param search_image: (optional) black and white image to search for
+    :param db_images: (optional) list of black and white images in the database
+    :return: indices of k the most similar images and their cosine similarity
     """
-    if search_image:
-        # show the search image
+    if search_image is not None:
+        # assert search image is black and white
+        assert len(search_image.shape) == 2
         print("Search image:")
         plt.imshow(search_image, cmap="gray")
         plt.show()
         print("-----------------------------------------------------")
-    # get search image vector
+
     a = image
     b = db
 
@@ -122,8 +123,10 @@ def search_test(
     # display the results
     if db_images:
         for i in idx:
+            # assert db images are black and white
+            assert len(search_image.shape) == 2
             print(f"{i}: {round(cosine_similarity[i], 4)}")
             plt.imshow(db_images[i], cmap="gray")
             plt.show()
 
-    return idx
+    return idx, cosine_similarity[idx]

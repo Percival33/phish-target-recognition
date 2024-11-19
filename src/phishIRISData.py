@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from perception import hashers
 from collections import defaultdict
-from src.config import DATA_DIR
+from src.config import config
 
 hasher = hashers.PHashF()
-TRAIN_DIR = DATA_DIR / "raw" / "phishIRIS_DL_Dataset" / "train"
-VAL_DIR = DATA_DIR / "raw" / "phishIRIS_DL_Dataset" / "val"
+TRAIN_DIR = config.RAW_DATA_DIR / "phishIRIS_DL_Dataset" / "train"
+VAL_DIR = config.RAW_DATA_DIR / "phishIRIS_DL_Dataset" / "val"
 
 
 @dataclass
