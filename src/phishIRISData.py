@@ -8,6 +8,7 @@ import joblib
 hasher = hashers.PHashF()
 PROCESSED_DATA_DIR = config.PROCESSED_DATA_DIR
 
+
 class PhishIRISDataset(Dataset):
     def __init__(self, data_dir: Path, split: str = "train", preprocess: bool = False):
         """
@@ -38,7 +39,9 @@ class PhishIRISDataset(Dataset):
     def _read_images(self, folder):
         """Read images and metadata from the given directory."""
         if not folder.exists() or not folder.is_dir():
-            raise FileNotFoundError(f"Folder {folder} does not exist or is not a directory")
+            raise FileNotFoundError(
+                f"Folder {folder} does not exist or is not a directory"
+            )
 
         for company_path in folder.iterdir():
             if not company_path.is_dir():
@@ -62,7 +65,9 @@ class PhishIRISDataset(Dataset):
 
     def _process_and_save(self):
         """Process data and save to disk."""
-        split_dir = self.data_dir / "train" if self.split == "train" else self.data_dir / "val"
+        split_dir = (
+            self.data_dir / "train" if self.split == "train" else self.data_dir / "val"
+        )
         self._read_images(split_dir)
         joblib.dump(self, self.pickle_path)
 
@@ -77,7 +82,9 @@ class PhishIRISDataset(Dataset):
             self.hash_to_company = data.hash_to_company
             self.img_per_company = data.img_per_company
         else:
-            raise FileNotFoundError(f"Preprocessed file not found at {self.pickle_path}")
+            raise FileNotFoundError(
+                f"Preprocessed file not found at {self.pickle_path}"
+            )
 
     def __len__(self):
         return len(self.img_paths)
