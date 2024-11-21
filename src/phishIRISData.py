@@ -91,3 +91,7 @@ class PhishIRISDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.img_paths[idx], self.labels[idx]
+
+
+def formatted_name(img_path):
+    return "-".join(img_path.split("/")[-1].split())
