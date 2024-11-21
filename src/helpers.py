@@ -7,7 +7,9 @@ import seaborn as sns
 
 def imshow(img_path: str, gray=False):
     img = cv2.imread(img_path)
-    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cmap="gray") if gray or len(img.shape) == 2 else plt.imshow(img)
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cmap="gray") if gray or len(
+        img.shape
+    ) == 2 else plt.imshow(img)
 
 
 def formatted_name(img_path):
