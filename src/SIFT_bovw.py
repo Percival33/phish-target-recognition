@@ -124,7 +124,7 @@ def search_test(
     if db_images:
         for i in idx:
             # assert db images are black and white
-            assert len(search_image.shape) == 2
+            assert len(db_images[i].shape) == 2
             print(f"{i}: {round(cosine_similarity[i], 4)}")
             plt.imshow(db_images[i], cmap="gray")
             plt.show()
