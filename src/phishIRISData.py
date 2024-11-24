@@ -1,72 +1,93 @@
-from dataclasses import dataclass, field
+from pathlib import Path
+from torch.utils.data import Dataset
 from perception import hashers
 from collections import defaultdict
 from src.config import config
+import joblib
 
 hasher = hashers.PHashF()
-TRAIN_DIR = config.RAW_DATA_DIR / "phishIRIS_DL_Dataset" / "train"
-VAL_DIR = config.RAW_DATA_DIR / "phishIRIS_DL_Dataset" / "val"
+PROCESSED_DATA_DIR = config.PROCESSED_DATA_DIR
 
 
-@dataclass
-class PhishIRISData:
-    img_to_hash: dict = field(default_factory=dict)
-    hash_to_img: dict = field(default_factory=dict)
-    img_per_company: defaultdict = field(default_factory=lambda: defaultdict(list))
-    hash_to_company: defaultdict = field(default_factory=lambda: defaultdict(str))
-    imgs: list = field(default_factory=list)
-    labels: list = field(default_factory=list)
-    _loaded: bool = field(default=False, init=False)  # Track if data has been loaded
-    val_imgs: list = field(default_factory=list)
-    val_labels: list = field(default_factory=list)
+class PhishIRISDataset(Dataset):
+    def __init__(self, data_dir: Path, split: str = "train", preprocess: bool = False):
+        """
+        Initialize the dataset object.
 
-    def load_data(self):
-        """Load data from the dataset directory into the data structures."""
-        if self._loaded:
-            return  # Skip loading if already loaded
+        Args:
+            data_dir (Path): Path to the root data directory.
+            split (str): Dataset split, either 'train' or 'val'.
+            preprocess (bool): Whether to preprocess and save the dataset.
+        """
+        self.data_dir = data_dir
+        self.split = split.lower()  # Normalize split to lowercase
+        self.preprocess = preprocess
+        self.pickle_path = PROCESSED_DATA_DIR / f"phishIRIS_{self.split}.pkl"
 
-        for company_path in TRAIN_DIR.iterdir():
-            if not company_path.is_dir() or company_path.name in {".DS_Store", "other"}:
+        self.img_paths = []
+        self.labels = []
+        self.img_to_hash = {}
+        self.hash_to_img = {}
+        self.hash_to_company = defaultdict(str)
+        self.img_per_company = defaultdict(list)
+
+        if preprocess:
+            self._process_and_save()
+        else:
+            self._load()
+
+    def _read_images(self, folder):
+        """Read images and metadata from the given directory."""
+        if not folder.exists() or not folder.is_dir():
+            raise FileNotFoundError(
+                f"Folder {folder} does not exist or is not a directory"
+            )
+
+        for company_path in folder.iterdir():
+            if not company_path.is_dir():
                 continue
-
             company_name = company_path.name
-            for example_path in company_path.iterdir():
-                if not example_path.is_file():
+
+            for img_path in company_path.iterdir():
+                if not img_path.is_file():
                     continue
 
-                self.imgs.append(str(example_path))
-                self.labels.append(str(company_name))
+                img_path_str = str(img_path)
+                self.img_paths.append(img_path_str)
+                self.labels.append(company_name)
 
-                hsh = hasher.compute(str(example_path))
-                formatted_name = "-".join(example_path.name.split(" "))
+                hsh = hasher.compute(img_path_str)
+                formatted_name = "-".join(img_path.name.split(" "))
                 self.img_to_hash[formatted_name] = hasher.string_to_vector(hsh)
                 self.hash_to_img[hsh] = formatted_name
                 self.hash_to_company[hsh] = company_name
                 self.img_per_company[company_name].append(hsh)
 
-        for company_path in VAL_DIR.iterdir():
-            if not company_path.is_dir() or company_path.name in {".DS_Store", "other"}:
-                continue
+    def _process_and_save(self):
+        """Process data and save to disk."""
+        split_dir = (
+            self.data_dir / "train" if self.split == "train" else self.data_dir / "val"
+        )
+        self._read_images(split_dir)
+        joblib.dump(self, self.pickle_path)
 
-            company_name = company_path.name
-            for example_path in company_path.iterdir():
-                if not example_path.is_file():
-                    continue
+    def _load(self):
+        """Load preprocessed data from disk."""
+        if self.pickle_path.exists():
+            data = joblib.load(self.pickle_path)
+            self.img_paths = data.img_paths
+            self.labels = data.labels
+            self.img_to_hash = data.img_to_hash
+            self.hash_to_img = data.hash_to_img
+            self.hash_to_company = data.hash_to_company
+            self.img_per_company = data.img_per_company
+        else:
+            raise FileNotFoundError(
+                f"Preprocessed file not found at {self.pickle_path}"
+            )
 
-                self.val_imgs.append(str(example_path))
-                self.val_labels.append(str(company_name))
+    def __len__(self):
+        return len(self.img_paths)
 
-                hsh = hasher.compute(str(example_path))
-                formatted_name = "-".join(example_path.name.split(" "))
-                self.img_to_hash[formatted_name] = hasher.string_to_vector(hsh)
-                self.hash_to_img[hsh] = formatted_name
-                self.hash_to_company[hsh] = company_name
-                self.img_per_company[company_name].append(hsh)
-
-        self._loaded = True
-
-    def get_data(self):
-        """Return loaded data, ensuring it is loaded first."""
-        if not self._loaded:
-            self.load_data()
-        return self
+    def __getitem__(self, idx):
+        return self.img_paths[idx], self.labels[idx]
