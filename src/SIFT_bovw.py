@@ -15,7 +15,7 @@ def read_bw_images(img_paths):
 
 
 def clean_descriptors(
-        keypoints: list[cv2.KeyPoint], descriptors: list[np.ndarray]
+    keypoints: list[cv2.KeyPoint], descriptors: list[np.ndarray]
 ) -> tuple[list[cv2.KeyPoint], list[np.ndarray]]:
     print(f"len before: {len(descriptors)}")
     # initialize list to store idx values of records to drop
@@ -89,11 +89,11 @@ def get_tfidf(frequency_vectors):
 
 
 def search_test(
-        image: np.ndarray,
-        db: np.ndarray,
-        top_k: int = 5,
-        search_image=None,
-        db_images: list = None,
+    image: np.ndarray,
+    db: np.ndarray,
+    top_k: int = 5,
+    search_image=None,
+    db_images: list = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Search for the most similar images in the database
@@ -124,7 +124,7 @@ def search_test(
     if db_images:
         for i in idx:
             # assert db images are black and white
-            assert len(search_image.shape) == 2
+            assert len(db_images[i].shape) == 2
             print(f"{i}: {round(cosine_similarity[i], 4)}")
             plt.imshow(db_images[i], cmap="gray")
             plt.show()

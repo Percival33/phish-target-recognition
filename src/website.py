@@ -8,11 +8,17 @@ st.title("Image Analysis Tool")
 st.subheader("Upload an image to analyze it with different methods.")
 
 # Upload Section
-uploaded_file = st.file_uploader("Upload an image for analysis", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader(
+    "Upload an image for analysis", type=["jpg", "jpeg", "png"]
+)
 
 # Placeholder for the results
 if uploaded_file is not None:
-    st.image(uploaded_file, caption="Uploaded Image", width=720, )
+    st.image(
+        uploaded_file,
+        caption="Uploaded Image",
+        width=720,
+    )
 
     # Simulate analysis
     method_1_result = "Result for Method 1: 85%"
