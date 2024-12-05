@@ -26,6 +26,7 @@ torch = "^2.5.1"
 torchutils = "^0.0.4"
 umap-learn = "^0.5.7"
 torchvision = "^0.20.1"
+levenshtein = "^0.26.1"
 
 
 [build-system]
