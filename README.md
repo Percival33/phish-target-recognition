@@ -1,7 +1,7 @@
 # Phish Target Recognition
 
 - `poetry config virtualenvs.in-project true`
-- `poetry env $(pyenv which python)`
+- `poetry env use $(pyenv which python)`
 - `poetry install`
 - `sudo xcode-select --switch /Applications/Xcode.app` from [here](https://github.com/PX4/PX4-SITL_gazebo-classic/issues/1021)
 
