@@ -1,7 +1,9 @@
 # Plan
 
-1. podejście Bag of Visual Words - jako baseline, wykorzystujące całe zrzuty ekranu. Wstępne wyniki są obiecujące.
-2. Reprodukcja pracy Phishpedia - podejście wykorzystujące rozpoznawanie logo
+
+1. ~~podejście Bag of Visual Words - jako baseline, wykorzystujące całe zrzuty ekranu. Wstępne wyniki są obiecujące.~~
+2. Sprawdzić jeszcze **hdbscan**
+~~3. Reprodukcja pracy Phishpedia - podejście wykorzystujące rozpoznawanie logo~~
 3. Wykorzystanie modelu np. ResNet50 do obliczania embedingów a następnie wykorzystywanie bazy wektorowej do wyszukiwania podobnych obrazów a co za tym idzie atakowanego podmiotu
 4. [opcjonalne] wykorzystanie całego zrzutu - uruchomienie kodu VisualPhishnet (problematyczne bo jest w Keras, z która nie mam doczynienia)
 5. Zbudowanie aplikacji - przesłanie zdjęcia i otrzymanie sugerowanych celów podszycia
