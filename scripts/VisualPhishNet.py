@@ -1,5 +1,5 @@
 # check if VisualPhish directory or VisualPhish.zip exists if not download it
-wget https://oc.cs.uni-saarland.de/index.php/s/QcBJyLjn9oEiXxB/download/VisualPhish.zip
+# wget https://oc.cs.uni-saarland.de/index.php/s/QcBJyLjn9oEiXxB/download/VisualPhish.zip
 
 """
 #!/bin/bash
