@@ -54,7 +54,7 @@ class AppConfig(BaseSettings):
             "Swisscom IT Services AG": "swisscom",
             "Telecom Italia": "telecom",
             "Wells Fargo & Company": "wells_fargo",
-            "Bank of America": "boa"
+            "Bank of America": "boa",
         }
     )
 
