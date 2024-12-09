@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import cv2
-from sklearn.metrics import accuracy_score, balanced_accuracy_score
+from sklearn.metrics import accuracy_score, f1_score
 import pandas as pd
 import seaborn as sns
 
@@ -21,13 +21,13 @@ def compute_accuracy(y_true, y_pred) -> tuple[float, float]:
     Compute accuracy and balanced accuracy
     :param y_true:
     :param y_pred:
-    :return: tuple of accuracy and balanced accuracy
+    :return: tuple of accuracy and average_precision_score
     """
     accuracy = accuracy_score(y_true, y_pred)
-    balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
-    print(f"acc:\t\t\t{accuracy * 100 :.5f}")
-    print(f"balanced_acc:\t{balanced_accuracy * 100:.5f}")
-    return accuracy, balanced_accuracy
+    f1 = f1_score(y_true, y_pred, average="weighted")
+    print(f"acc:\t\t{accuracy * 100 :.5f}")
+    print(f"f1:\t\t{f1 * 100:.5f}")
+    return accuracy, f1
 
 
 def visualize(y_true, y_pred):
