@@ -109,7 +109,7 @@ gdzie:
 
 Do rozpoznawania na zrzucie ekranu loga firm i pól tekstowych do wprowadzania danych autorzy wykorzystują model Faster-RCNN \cite{FasterR-CNN} modyfikując go tak aby wspólnie trenować sieć do rozpoznawania regionów i model Fast-RCNN.
 
-Natomiast \cite{VisualPhishNet} opisuje wykorzystanie sieci syjamskich z trzeba podsieciami neuronowymi, które na tej samej zasadzie próbują nauczyć się uniwersalnej reprezentacji stron internetowych. Na pierwszym etapie następuje losowe dobieranie przykładów. W drugim etapie, sieć jest uczona na 'trudnych' przykładach, tzn. tych które zostały niepoprawne sklasyfikowane. Podczas klasyfikacji, obliczana jest odległość między analizowanym zrzutem ekranu a każdą z monitorowanych stron. Cel ataku jest rozpoznawany jako strona o najmniejszej odległości.
+Natomiast \cite{VisualPhishNet} opisuje wykorzystanie sieci syjamskich z trzema podsieciami neuronowymi, które na tej samej zasadzie próbują nauczyć się uniwersalnej reprezentacji stron internetowych. Na pierwszym etapie następuje losowe dobieranie przykładów. W drugim etapie, sieć jest uczona na 'trudnych' przykładach, tzn. tych które zostały niepoprawne sklasyfikowane. Podczas klasyfikacji, obliczana jest odległość między analizowanym zrzutem ekranu a każdą z monitorowanych stron. Cel ataku jest rozpoznawany jako strona o najmniejszej odległości.
 
 \subsection{Zbiory danych}
 Zadanie rozpoznawania celu ataku phishingu jest bardzo trudne. Uwaga jest skierowana na bardziej znane podmioty, opierając się na intuicji, atakujący dążą do maksymalizowania zysków z ataków, wobec czego skupiają się na podszywaniu się pod instytucje finansowe i znane marki\cite{PhishingArticle}
