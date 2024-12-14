@@ -1,17 +1,6 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wstęp teoretyczny}
 Pośród istniejących rozwiązań określających czy strona internetowa jest stroną phishingową czy nie, wyłaniają się główne motywy skupiające się na analizie kodu strony, adresu URL czy też rozpoznawania wizualnego
-% \subsection{Porównywanie wizualne}
-% \subsubsection{EMD}
-% \subsubsection{Phash}
-
-% \subsection{Porównywanie wizualne}
-% \subsubsection{deskryptory wizualne}
-% \subsubsection{bovw}
-
-% \subsection{Sieci neuronowe}
-% \subsubsection{Phishpedia}
-% \subsubsection{VisualPhishNet}
 
 \subsection{Kod źródłowy}
 Istnieje wiele rozwiązań, które próbują określić cel ataku na podstawie adresu URL i jego atrybutów. W pracy \cite{KnowYourPhish} autorzy opierają się na słowach kluczowych występujących na stronie i porównaniu z nazwą podmiotu wynikającego z adresu URL na podstawie \textit{fqdn}
@@ -20,7 +9,7 @@ Istnieje wiele rozwiązań, które próbują określić cel ataku na podstawie a
     \centering
     \includegraphics[width=0.5\linewidth]{FQDN-example.png}
     \caption{Struktura adresu URL z pracy \cite{KnowYourPhish}}
-    \label{fig:enter-label}
+    \label{fig:Struktura adresu URL z pracy}
 \end{figure}
 
 gdzie:
@@ -58,7 +47,7 @@ Transform)\cite{PhishZoo}. Przekształca on zdjęcia w zbiór wektorów cech i n
     \centering
     \includegraphics[width=0.6\linewidth]{sphx_glr_plot_daisy_001.png}
     \caption{Deskryptory DAISY \cite{scikit-image-daisy}}
-    \label{fig:enter-label}
+    \label{fig:Deskryptory DAISY}
 \end{figure}
 
 Oba te rozwiązania później są wykorzystywane do zastosowań \textit{bag of features}, które polegają na klastrowaniu otrzymanych deskryptorów by utworzyć reprezentację obrazów i porównywać nie same obrazy a deskryptory obliczone na nich. 
@@ -79,7 +68,7 @@ Zaletą sieci konwolucyjnych jest automatyczne uczenie się reprezentacji cech z
     \centering
     \includegraphics[width=0.6\linewidth]{konwolucja.png}
     \caption{Wizualizacja warstwy konwolucyjnej \cite{CNN-Explainer}}
-    \label{fig:enter-label}
+    \label{fig:Wizualizacja warstwy konwolucyjnej}
 \end{figure}
 
 
