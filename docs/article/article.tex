@@ -1,0 +1,305 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.21 of 2022/01/12
+%
+\documentclass[runningheads]{llncs}
+\usepackage{amsfonts}
+\usepackage[T1]{fontenc}
+\addbibresource{bibliograpghy.bib}
+% T1 fonts will be used to generate the final print and online PDFs,
+% so please use T1 fonts in your manuscript whenever possible.
+% Other font encondings may result in incorrect characters.
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{graphicx}
+\usepackage{soul}
+\usepackage{hyperref}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+%\usepackage{color}
+%\renewcommand\UrlFont{\color{blue}\rmfamily}
+%\urlstyle{rm}
+\renewcommand{\keywordname}{\textbf{Słowa kluczowe:}}
+
+
+
+\begin{document}
+%
+\title{Rozpoznawanie celu podszycia stron phishingowych}
+%
+% \titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Marcin Jarczewski}
+%
+% \authorrunning{Marcin Jarczewski}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+
+\institute{Politechnika Warszawska, Warszawa, Polska}
+% Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
+% \email{lncs@springer.com}\\
+% \url{http://www.springer.com/gp/computer-science/lncs} \and
+% ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+% \email{\{abc,lncs\}@uni-heidelberg.de}}
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+Artykuł skupia się na metodach identyfikacji celu ataków phishingowych poprzez analizę wizualną stron internetowych. Phishing jest to rodzaj cyberprzestępczości, w którym oszuści tworzą fałszywe strony internetowe, łudząco podobne do tych prawdziwych, w celu wyłudzenia poufnych danych. Tradycyjne metody wykrywania phishingu, takie jak analiza adresów URL czy kodu źródłowego stron, są niewystarczające wobec zaawansowanych technik przestępców.
+
+W artykule przedstawiono rozwiązania oparte na wizualnym porównywaniu stron internetowych, m.in. hasze wizualne grupujące strony według podobieństwa zrzutów ekranu oraz deskryptory wizualne a także algorytm SIFT, które identyfikują logotypy i kluczowe elementy witryn. 
+Zastosowanie sieci konwolucyjnych, takich jak Faster-RCNN czy ResNet, pozwala na automatyczne wykrywanie logotypów i analizę wizualną stron. Szczególną rolę odgrywają sieci syjamskie, które uczą się rozpoznawania podobieństw między stronami, co umożliwia identyfikację podszywanych marek.
+
+Atrykuł podkreśla, że uczenie maszynowe i rozpoznawanie wizualne są kluczowymi narzędziami w walce z phishingiem, oferując skuteczne metody identyfikacji zagrożeń.
+\keywords{Phishing  \and Rozpoznawanie wizualne \and Sieci syjamskie}
+\end{abstract}
+%
+%
+%
+\section{Wprowadzenie}
+Wraz z rozwojem internetu i postępem cyfryzacji istnieje coraz więcej stron internetowych, a co za tym idzie, więcej oszustw internetowych.
+Powstają strony phishingowe, które mają na celu wyłudzanie poufnych danych poprzez specjalnie przygotowane wiadomości e-mail lub SMS, 
+które zawierają linki prowadzące na specjalnie przygotowane strony internetowe, łudząco podobne do tych prawdziwych. 
+Zapobieganie tej formie cyberprzestępczości jest jednym z zadań zespołu CERT Polska, pełniącego obowiązki CSIRT\footnote{\textit{Computer Security Incident Response Team} - Zespół Reagowania na Incydenty Bezpieczeństwa Komputerowego}  NASK\cite{certpl}. 
+Do tej pory stosowano różne podejścia, w których stosowano podejścia blacklist \cite{google-blacklist}, (również CERT Polska udostępnia listę\footnote{\href{https://cert.pl/lista-ostrzezen/}{https://cert.pl/lista-ostrzezen/}} podejrzanych domen). 
+Oprócz tego wykorzystywane są rozwiązania opierające się kodzie HTML danej strony m.in \cite{PhishZoo}, jednak rozwiązania te są mało efektywne, ponieważ podobnie wizualnie strony mogą mieć zupełnie inny kod źródłowy. 
+Celem tego artykułu jest przybliżenie tematyki phishingu w kontekście systemu rozpoznającego atakowany podmiot na podstawie podobieństwa wizualnego.
+
+
+% \begin{figure}
+% \includegraphics[width=\textwidth]{fig1.eps}
+% \caption{A figure caption is always placed below the illustration.
+% Please note that short captions are centered, while long ones are
+% justified by the macro package automatically.} \label{fig1}
+% \end{figure}
+
+%
+% the environments 'definition', 'lemma', 'proposition', 'corollary',
+% 'remark', and 'example' are defined in the LLNCS documentclass as well.
+%
+
+% \begin{credits}
+% \subsubsection{\ackname} A bold run-in heading in small font size at the end of the paper is
+% used for general acknowledgments, for example: This study was funded
+% by X (grant number Y).
+
+% \subsubsection{\discintname}
+% It is now necessary to declare any competing interests or to specifically
+% state that the authors have no competing interests. Please place the
+% statement with a bold run-in heading in small font size beneath the
+% (optional) acknowledgments\footnote{If EquinOCS, our proceedings submission
+% system, is used, then the disclaimer can be provided directly in the system.},
+% for example: The authors have no competing interests to declare that are
+% relevant to the content of this article. Or: Author A has received research
+% grants from Company W. Author B has received a speaker honorarium from
+% Company X and owns stock in Company Y. Author C is a member of committee Z.
+% \end{credits}
+
+\section{Zbiory danych}
+% problemy z dużą liczbą stron, duża liczba wariantów stron. 
+% Dodatkowo przestępcy zmieniają kolory stron by utrudnić automatyczne rozpoznawanie skanerów i blokują je. 
+% \textit{wypłaszczenie się w zbiorze danych}
+
+Zadanie rozpoznawania celu ataku phishingu jest bardzo trudne. Uwaga jest skierowana na bardziej znane podmioty, opierając się na intuicji, atakujący dążą do maksymalizowania zysków z ataków, wobec czego skupiają się na podszywaniu się pod instytucje finansowe i znane marki\cite{PhishingArticle}
+% (TODO: Tyler Moore. Phishing and the economics of e-crime.Infosecurity, 4(6):34–37, 2007) 
+takie jak: firmy kurierskie, urzędy administracji, operatorów telekomunikacyjnych, czy nawet znajomych użytkownika, starają się wyłudzić dane do logowania np. do kont bankowych lub używanych przez atakowanego kont społecznościowych, czy systemów biznesowych.\cite{govPhishing}
+
+Obecnie strony internetowe są często aktualizowane. Zmieniane są czcionki, układ strony i inne elementy wizualne. Ponadto zawierają dynamiczne treści, co utrudnia identyfikację. Kolejnym elementem jest fakt, że firmy mogą mieć logo w różnych wariantach oraz różne domeny np. "amazon.pl" oraz "amazon.co.jp" w zależności od kraju. To utrudnia pracę zwiększając liczbę wariantów stron należących do tej samego podmiotu, wymuszając większą liczbę stron, które należy analizować.
+
+Jednak jak zauważają autorzy pracy \cite{Phishpedia} liczba stron wcale może nie być taka duża. Gdyż w zbiorze około 30 000 stron phishingowych uzyskanych z systemu OpenPhish\footnote{\href{https://www.openphish.com/}{https://www.openphish.com/}}, 100 najpopularniejszych marek pokrywa aż 95.8\% przykładów. Potwierdzając intuicję o tym że atakujący wybierają jako celu ataku popularniejsze strony.
+
+% (TODO: First, our
+% empirical study on around 30K phishing webpages based on
+% OpenPhish feed (Section 5.1) shows that the top 100 brands
+% cover 95.8\% phishing webpages; see Figure) 
+
+\section{Przegląd istniejących rozwiązań}
+Pośród istniejących rozwiązań określających czy strona internetowa jest stroną phishingową czy nie, wyłaniają się główne motywy skupiające się na analizie kodu strony, adresu URl czy też rozpoznawania wizualnego.
+
+\subsection{Kod źródłowy}
+Istnieje wiele rozwiązań, które próbują określić cel ataku na podstawie adresu URL i jego atrybutów. W pracy \cite{KnowYourPhish} autorzy opierają się na słowach kluczowych występujących na stronie i porównaniu z nazwą podmiotu wynikającego z adresu URL na podstawie \textit{fqdn}
+\footnote{fully qualified domain name -  pełna, jednoznaczna nazwa domenowa, określająca położenie danego węzła w systemie DNS. - \href{https://pl.wikipedia.org/wiki/Fully_Qualified_Domain_Name}{https://pl.wikipedia.org/wiki/Fully\_Qualified\_Domain\_Name}}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/FQDN-example.png}
+    \caption{Struktura adresu URL z pracy \cite{KnowYourPhish}}
+    \label{fig:enter-label}
+\end{figure}
+
+gdzie:
+\begin{itemize}
+    \item protocol = https
+    \item FQDN = www.amazon.co.uk
+    \item RDN = amazon.co.uk
+    \item mld = amazon
+    \item FreeURL = {www, /ap/signin? encoding=UTF8}
+\end{itemize}
+
+Inne prace \cite{PhishWHO} wykorzystują słowa kluczowe i wyszukiwarkę internetową porównując najwyżej listowane wyniki przy wyszukaniu słów kluczowych na danej stronie by w ten sposób określić cel podszycia strony. Kolejnym podejściem jest analiza linków wychodzących z badanej strony i sprawdzenie czy prowadzą na nią z powrotem, budując w ten sposób graf. Na jego podstawie określany jest cel podszycia jednocześnie stwierdzając czy strona jest prawdziwa.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/Antiphishing through phishing discovery.png}
+    \caption{Graf zbudowany z linków dostępnych na badanej stronie z \cite{PhishWHO}}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{Hasze wizualne i deskryptory}
+\subsubsection{Hasze wizualne}
+
+W zastosowaniach kryptograficznych do jednoznacznej identyfikacji pliku wykorzystywane są funkcje skrótu takie jak: MD5, SHA-1, SHA-2. Dla wejścia o dowolnym rozmiarze uzyskujemy skrót stałego rozmiaru.
+Zależy nam na minimalizacji liczby kolizji, czyli przypadków gdy otrzymano taki sam skrót dla różnych danych wejściowych.
+
+Do wykrywania podobnych informacji by wykrywać naruszenia praw autorskich lub wykrywać nielegalne treści, wykorzystuje się technikę zwaną \textit{Locality-sensitive hash}, które mają na celu pogrupowanie elementów tak, że podobne do siebie trafiają do jednej grupy. W tym celu, przeciwnie niż do zastosowań kryptograficznych maksymalizowana jest liczba kolizji. Tak aby bardziej podobne dane wejściowe uzyskały bliższe sobie wartości skrótu, uzyskując przy tym odcisk palca - \textit{fingerprint}\cite{Zauner2010ImplementationAB}.
+
+W pracy\cite{EMD} zastosowano porównywanie wizualne stron, które polega na równywaniu zrzutów ekranu, zmniejszając je i obliczając podobieństwo korzystając z metryki \textit{Earth Mover’s Distance}.
+
+\subsubsection{Deskryptory wizualne}
+Innym podejściem, wartym uwagi są rozwiązania ekstrachujące deskryptory wizualne\cite{Daisy}. Deskryptory wizualne są to histogramy gradientów otaczających punkt na obrazie. Oprócz tego wykorzystywany jest również algorytm SIFT (Scale Invariant Feature
+Transform)\cite{PhishZoo}. Przekształca on zdjęcia w zbiór wektorów cech i na tej podstawie porównuje loga firm w celu rozpoznania podszywanej strony.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/sphx_glr_plot_daisy_001.png}
+    \caption{Deskryptory DAISY\cite{scikit-image-daisy}}
+    \label{fig:enter-label}
+\end{figure}
+
+Oba te rozwiązania później są wykorzystywane do zastosowań \textit{bag of features}, które polegają na klastrowaniu otrzymanych deskryptorów by utworzyć reprezentację obrazów i porównywać nie same obrazy a deskryptory obliczone na nich. 
+
+\subsection{Sieci neuronowe}
+Z racji że rozwiązania opierające się wyłącznie na rozpoznawaniu stron na podstawie kolorów \cite{EMD} jest mało skuteczne, autorzy prac skupiają się na zastosowaniu sieci głębokich a dokładniej sieci konwolucyjnych.
+
+
+Sieć konwolucyjna (CNN) jest to klasa sztucznych sieci neuronowych, najczęściej wykorzystywana w zadaniach wizji komputerowej, ze względu na efektywne przetwarzanie danych o strukturze przestrzennej. Kluczowym elementem sieci są warstwy konwolucyjne. Każda z nich zawiera zestaw filtrów, które wykonują operację konwolucji na danych wejściowych. Filtry te uczą się rozpoznawać określone cechy, takie jak krawędzie, tekstury czy bardziej złożone wzory. Filtry sterowane są hiperparametrami, które określają wielkość macierzy, wypełnienie oraz przesunięcie zależne od architektury modelu.\cite{alexnet}
+
+Pozostałe ważne elementy tych sieci to:
+warstwy łączące (\textit{pooling}), które redukują wymiarowość danych, zwiększając przy tym efektywność obliczeniową i odporność na modyfikacje obrazu,
+oraz warstwy w pełni połączone (\textit{fully connected}) agregujące cechy wykryte przez poprzednie warstwy i służące do końcowej klasyfikacji.\cite{Goodfellow-et-al-2016}
+
+Zaletą sieci konwolucyjnych jest automatyczne uczenie się reprezentacji cech z danych, co eliminuje konieczność ręcznego projektowania cech.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/konwolucja.png}
+    \caption{Wizualizacja warstwy konwolucyjnej \cite{CNN-Explainer}}
+    \label{fig:enter-label}
+\end{figure}
+
+
+Jeśliby traktować rozpoznawanie zrzutów ekranu jako zwykłe zadanie klasyfikacji, to dowolna modyfikacja strony będzie skutkowała w niepoprawnych wynikach. Wynika to z faktu, że większość treści w internecie jest dynamiczna, skierowana pod konkretnego użytkownika. 
+
+Dlatego, autorzy skupiają się na rozpoznawaniu logo firmy lub wyuczeniu modelu, tak by zbudować uniwersalny profil danej strony. 
+
+Oba podejścia wymagają sporej elastyczności a jednym z powodów jest 
+współistnienie wiele wariantów logo opisujące tą samą firmę, jak widać na rysunku poniżej:
+
+\begin{figure}[hh]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/Rozne logo.png}
+    \caption{Warianty logo firmy Adobe}
+    \label{fig:rozne-logo}
+\end{figure}
+
+Wobec tego, autorzy\cite{Phishpedia} wykorzystują sieci syjamskie, które polegają na wytrenowaniu sieci na jednym zadaniu a następnie wzięciu wytrenowanego modelu i zastosowaniu go w innym zadaniu. Sieć jest trenowana jednocześnie na zbiorze Logo-2K+\cite{Logo2K} oraz logach ze zbioru danych, używając odległości kosinusowej by nauczyć się podobieństwa logo. W ten sposób model nie jest zmuszany do wyznaczenia uniwersalnej reprezentacji różnych logo tej samej firmy. Następnie porównywane są logo referencyjne z logo analizowanej strony i sprawdzane jest podobieństwo między nimi. Do tego celu jest wykorzystywany model Resnetv2 \cite{resnetv2}.
+
+Celem jest ułożenie przestrzeni zanurzeń tak by przykłady pozytywne miały mniejszą odległość niż negatywne. Funkcja straty \textit{triplet loss} jest określana wzorem:
+% Funkcję (zanurzenia) \( \psi \) można uzyskać ucząc model przy pomocy odpowiednio dobranej funkcji celu – w ogólności, odległość \( ||\psi(x_i) - \psi(x_j)|| \) (którą umiemy obliczyć, bo \( \tilde{X} \subseteq \mathbb{R}^m \)) :
+% \begin{itemize}
+%     \item \textbf{minimalizujemy}, gdy \( x_i, x_j \in X \) są bliskie/podobne/często występują wspólnie w sekwencjach,
+%     \item \textbf{maksymalizujemy} – w przeciwnym przypadku.
+% \end{itemize}
+\begin{equation}
+L(\mathbf{x}_a, \mathbf{x}_p, \mathbf{x}_n) = \max \big( 0, \, d\big(\psi(\mathbf{x}_a), \psi(\mathbf{x}_p)\big) 
+- d\big(\psi(\mathbf{x}_a), \psi(\mathbf{x}_n)\big) + m \big),
+\end{equation}
+gdzie:
+\begin{itemize}
+    \item $\mathbf{x}_a$ -- tzw. kotwica (\textit{anchor}),
+    \item $\mathbf{x}_p$ -- wektor pozytywny, który ma być "blisko" kotwicy
+    \item $\mathbf{x}_n$ -- wektor negatywny, który ma być "daleko" kotwicy
+    \item $m \in \mathbb{R}_+$ --  margines – zabezpieczenie przeciwko nakładaniu się punktów
+    \item $d$ -- funkcja odległości.
+\end{itemize}
+
+Do rozpoznawania na zrzucie ekranu loga firm i pól tekstowych do wprowadzania danych autorzy wykorzystują model Faster-RCNN \cite{FasterR-CNN} modyfikując go tak aby wspólnie trenować sieć do rozpoznawania regionów i model Fast-RCNN.
+
+Natomiast \cite{VisualPhishNet} opisuje wykorzystanie sieci syjamskich z trzeba podsieciami neuronowymi, które na tej samej zasadzie próbują nauczyć się uniwersalnej reprezentacji stron internetowych. Na pierwszym etapie następuje losowe dobieranie przykładów. W drugim etapie, sieć jest uczona na 'trudnych' przykładach, tzn. tych które zostały niepoprawne sklasyfikowane. Podczas klasyfikacji, obliczana jest odległość między analizowanym zrzutem ekranu a każdą z monitorowanych stron. Cel ataku jest rozpoznawany jako strona o najmniejszej odległości.
+
+% \begin{theorem}
+%     FaceNet system [42]
+
+%     Therefore, our objective can be considered as a similarity
+% learning problem rather than a multi-class classification between
+% trusted-list’s websites and an “other” class.
+% \end{theorem}
+
+% TODO: czym jest sieć konwolucyjna
+
+% Architektura VGG16 (13 warstw konwolucyjnych I 3 warstwy w pełni połączone) - obrazek XD
+
+% Odległość L2 - czym jest ta odległość
+% \section{Koncepcja rozwiązania}
+% W tym celu zostanie wykorzystana biblioteka 
+
+% \textit{perception}\footnote{\href{https://github.com/thorn-oss/perception}{https://github.com/thorn-oss/perception}}, która zawiera implementację algorytmu phash opartego na DCT.  
+% \textbf{Metryki} [TODO] jakich metryk uzywam?
+% \textbf{Rozwiązanie}
+% % jak zrobić tutaj kolejną podsekcje że podział na podejscia i rozwiazania
+% \begin{enumerate}
+%     \item TODO: obliczanie pHash
+%     \item sklastrowanie wyników - najczęściej występujący podmiot jest celem ataku
+%     \item Dla każdego nowego przypadku
+%     \subitem oblicz pHash
+%     \subitem wyznacz najbliższy klaster => cel ataku
+% \end{enumerate}
+% \subsection{deskryptory}
+% \textbf{Rozwiązanie}
+% % jak zrobić tutaj kolejną podsekcje że podział na podejscia i rozwiazania
+% \begin{enumerate}
+%     \item TODO: wyliczenie deskryptorów
+%     \item sklastrowanie deskryptorów -> wyznaczenie slownika
+%     \item nastepnie wyliczam tf idf [co to TODO?]
+%     \item dla kazdego nowego przypadku
+%     \subitem obliczam deskryptory
+%     \subitem obliczam wektory czestotliwosci
+%     \subitem wyszukuje najblizszego zdjecia w metryce dystansu kosinusowego
+%     \subitem przypisuje cel podszycia do podmiotu najbardziej podobnego zdjecia
+% \end{enumerate}
+
+% ???
+% Phash, daisy descriptors, SIFT, bag of visual words
+
+% \begin{itemize}
+%     \item SIFT, Daisy deskryptory
+%     \subitem EMD, Hamming distance
+%     \subitem metryki odległości \textit{cosine distance}
+% \end{itemize}
+
+
+% 2. Hamming Distance, EMD
+
+% 3. Daisy -> klastrowanie danych wejsciowych I kazdy deskryptor -> najblizszy klaster I wten sposob tworzony jest slownik na zasadzie bag of words na tym uruchamiamy SVM
+
+% \textbf{bag of words}
+
+
+\section{Podsumowanie}
+\begin{quote}
+    Security is a process, not a product\cite{schneier_security_process}
+\end{quote}
+
+Zbiory danych są trudne do stworzenia i utrzymania. Wymaga to wiele pracy i środków.
+Ponad to wraz z rozwojem metod detekcji ataków phishingowych, atakujący wykorzystują jeszcze sprytniejsze sposoby żeby uniknąć wykrycia. Z tego powodu nie należy się zniechęcać i dalej pracować nad rozwojem naukowym by zabezpieczać społeczeństwo przed oszustwami skierowanymi przeciwko niemu.
+
+
+
+\bibliographystyle{splncs04}
+\bibliography{bibliograpghy}
+
+\end{document}
