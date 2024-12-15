@@ -1,11 +1,13 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wstęp teoretyczny}
-Pośród istniejących rozwiązań określających czy strona internetowa jest stroną phishingową czy nie, wyłaniają się główne motywy skupiające się na analizie kodu strony, adresu URL czy też rozpoznawania wizualnego
+
+W tym rozdziale zostaną omówione istniejące sposoby rozpoznawania stron phishingowych na podstawie różnych atrybutów. 
+Przytoczone rozwiązania określają czy strona internetowa jest stroną phishingową, korzystając z cech takich jak analiza kodu strony, adresu URL czy też rozpoznawanie wizualne. W dalszej części tego rozdziału zostanie omówiona tematyka zbiorów danych. 
 
 \subsection{Kod źródłowy}
 Istnieje wiele rozwiązań, które próbują określić cel ataku na podstawie adresu URL i jego atrybutów. W pracy \cite{KnowYourPhish} autorzy opierają się na słowach kluczowych występujących na stronie i porównaniu z nazwą podmiotu wynikającego z adresu URL na podstawie \textit{fqdn}
 \footnote{fully qualified domain name -  pełna, jednoznaczna nazwa domenowa, określająca położenie danego węzła w systemie DNS. - \href{https://pl.wikipedia.org/wiki/Fully_Qualified_Domain_Name}{https://pl.wikipedia.org/wiki/Fully\_Qualified\_Domain\_Name}}.
-\begin{figure}
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.5\linewidth]{FQDN-example.png}
     \caption{Struktura adresu URL z pracy \cite{KnowYourPhish}}
@@ -23,7 +25,7 @@ gdzie:
 
 Inne prace \cite{PhishWHO} wykorzystują słowa kluczowe i wyszukiwarkę internetową porównując najwyżej listowane wyniki przy wyszukaniu słów kluczowych na danej stronie by w ten sposób określić cel podszycia strony. Kolejnym podejściem jest analiza linków wychodzących z badanej strony i sprawdzenie czy prowadzą na nią z powrotem, budując w ten sposób graf. Na jego podstawie określany jest cel podszycia jednocześnie stwierdzając czy strona jest prawdziwa.
 
-\begin{figure}
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.8\linewidth]{Antiphishing through phishing discovery.png}
     \caption{Graf zbudowany z linków dostępnych na badanej stronie z \cite{PhishWHO}}
@@ -43,7 +45,7 @@ W pracy\cite{EMD} zastosowano porównywanie wizualne stron, które polega na ró
 \subsubsection{Deskryptory wizualne}
 Innym podejściem, wartym uwagi są rozwiązania ekstrachujące deskryptory wizualne \cite{Daisy}. Deskryptory wizualne są to histogramy gradientów otaczających punkt na obrazie. Oprócz tego wykorzystywany jest również algorytm SIFT (Scale Invariant Feature
 Transform)\cite{PhishZoo}. Przekształca on zdjęcia w zbiór wektorów cech i na tej podstawie porównuje loga firm w celu rozpoznania podszywanej strony.
-\begin{figure}
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.6\linewidth]{sphx_glr_plot_daisy_001.png}
     \caption{Deskryptory DAISY \cite{scikit-image-daisy}}
@@ -64,7 +66,7 @@ oraz warstwy w pełni połączone (\textit{fully connected}) agregujące cechy w
 
 Zaletą sieci konwolucyjnych jest automatyczne uczenie się reprezentacji cech z danych, co eliminuje konieczność ręcznego projektowania cech.
 
-\begin{figure}
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.6\linewidth]{konwolucja.png}
     \caption{Wizualizacja warstwy konwolucyjnej \cite{CNN-Explainer}}
@@ -79,7 +81,7 @@ Dlatego, autorzy skupiają się na rozpoznawaniu logo firmy lub wyuczeniu modelu
 Oba podejścia wymagają sporej elastyczności a jednym z powodów jest 
 współistnienie wiele wariantów logo opisujące tą samą firmę, jak widać na rysunku poniżej:
 
-\begin{figure}[hh]
+\begin{figure}[!h]
     \centering
     \includegraphics[width=0.5\linewidth]{Rozne logo.png}
     \caption{Warianty logo firmy Adobe}
@@ -120,6 +122,8 @@ Obecnie strony internetowe są często aktualizowane. Zmieniane są czcionki, uk
 
 Jak zauważają autorzy pracy \cite{Phishpedia} liczba stron wcale może nie być taka duża. Gdyż w zbiorze około 30 000 stron phishingowych uzyskanych z systemu OpenPhish\footnote{\href{https://www.openphish.com/}{https://www.openphish.com/}}, 100 najpopularniejszych marek pokrywa aż 95.8\% przykładów. Potwierdzając intuicję o tym że atakujący wybierają jako celu ataku popularniejsze strony.
 
+
+TODO: gdzie umieścić analizę zbiorów danych?
 
 % % Równanie typu 'inline':
 % \lipsum[2] $F = m \cdot a$ lorem ipsum dolor sit amet.
