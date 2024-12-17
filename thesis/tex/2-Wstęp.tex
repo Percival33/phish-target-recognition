@@ -1,6 +1,10 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wstęp teoretyczny}
 
+TODO: uzupełnić wstęp teoretyczny potrzebny do zrozumienia tematyki - co to jest phishing, jakie są metody jego rozpoznawania - pojęcia, pomysły, sieci konowucyjne, sieci syjamskie + transfer learning, deskryptory wizualne, hasze wizualne
+
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+
 W tym rozdziale zostaną omówione istniejące sposoby rozpoznawania stron phishingowych na podstawie różnych atrybutów. 
 Przytoczone rozwiązania określają czy strona internetowa jest stroną phishingową, korzystając z cech takich jak analiza kodu strony, adresu URL czy też rozpoznawanie wizualne. W dalszej części tego rozdziału zostanie omówiona tematyka zbiorów danych. 
 
@@ -87,7 +91,7 @@ współistnienie wiele wariantów logo opisujące tą samą firmę, jak widać n
     \label{fig:rozne-logo}
 \end{figure}
 
-Wobec tego, autorzy\cite{Phishpedia} wykorzystują sieci syjamskie, które polegają na wytrenowaniu sieci na jednym zadaniu a następnie wzięciu wytrenowanego modelu i zastosowaniu go w innym zadaniu. Sieć jest trenowana jednocześnie na zbiorze Logo-2K+\cite{Logo2K} oraz logach ze zbioru danych, używając odległości kosinusowej by nauczyć się podobieństwa logo. W ten sposób model nie jest zmuszany do wyznaczenia uniwersalnej reprezentacji różnych logo tej samej firmy. Następnie porównywane są logo referencyjne z logo analizowanej strony i sprawdzane jest podobieństwo między nimi. Do tego celu jest wykorzystywany model Resnetv2 \cite{resnetv2}.
+Wobec tego, autorzy\cite{Phishpedia} wykorzystują sieci syjamskie, które polegają na wytrenowaniu sieci na jednym zadaniu a następnie wzięciu wytrenowanego modelu i zastosowaniu go w innym zadaniu. Sieć jest trenowana jednocześnie na zbiorze Logo-2K+\cite{Logo2K} oraz logach ze zbioru danych, używając odległości kosinusowej by nauczyć się podobieństwa logotypów. W ten sposób model nie jest zmuszany do wyznaczenia uniwersalnej reprezentacji różnych logo tej samej firmy. Następnie porównywane są logotypy referencyjne z tymi obecnymi na analizowanej stronie i obliczane jest podobieństwo między nimi. Do tego celu jest wykorzystywany model Resnetv2 \cite{resnetv2}.
 
 Celem jest ułożenie przestrzeni zanurzeń tak by przykłady pozytywne miały mniejszą odległość niż negatywne. Funkcja straty \textit{triplet loss} jest określana wzorem:
 % Funkcję (zanurzenia) \( \psi \) można uzyskać ucząc model przy pomocy odpowiednio dobranej funkcji celu – w ogólności, odległość \( ||\psi(x_i) - \psi(x_j)|| \) (którą umiemy obliczyć, bo \( \tilde{X} \subseteq \mathbb{R}^m \)) :
