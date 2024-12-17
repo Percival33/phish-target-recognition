@@ -7,14 +7,23 @@ które zawierają linki prowadzące na specjalnie przygotowane strony internetow
 Zapobieganie tej formie cyberprzestępczości jest jednym z zadań zespołu CERT Polska, pełniącego obowiązki CSIRT\footnote{\textit{Computer Security Incident Response Team} - Zespół Reagowania na Incydenty Bezpieczeństwa Komputerowego}  NASK\cite{certpl}. 
 Do tej pory stosowano różne sposoby zapobiegania oszustwom, w których stosowano podejścia blacklist \cite{google-blacklist}, (również CERT Polska udostępnia listę\footnote{\href{https://cert.pl/lista-ostrzezen/}{https://cert.pl/lista-ostrzezen/}} podejrzanych domen). 
 Oprócz tego wykorzystywane są rozwiązania opierające się na kodzie HTML danej strony np. \cite{PhishZoo}, jednak rozwiązania te są mało efektywne, ponieważ podobne wizualnie strony mogą mieć zupełnie inny kod źródłowy. 
-Celem tego artykułu jest przybliżenie tematyki phishingu w kontekście systemu rozpoznającego atakowany podmiot na podstawie podobieństwa wizualnego.
+
+TODO: dodać jakieś inforamcje jak to wygląda w innych krajach np albo jakiś rys historyczny :xD: tak żeby wspomnieć na wstępie o tym że jest to współpraca z CERT Polska
 
 \subsection{Cel pracy}
 TODO: albo motywacja pracy
-Zbadanie tematyki rozpoznawania stron phishingowych na podstawie podobieństwa wizualnego oraz stworzenie systemu, który będzie w stanie rozpoznać cel podszycia strony phishingowej
+Motywacją tej pracy jest przybliżenie tematyki phishingu, sposobów rozpoznawania na podstawie podobieństwa wizualnego oraz przygotowanie systemu który grupuje istiejące metody, umożliwiając ich ewaluacje. System ten będzie stanowił inspiracje oraz jako podstawa do rozbudowy w przyszłości przez zespół CERT by chronić polski internet przed kampaniami phishingowymi.
+
+W tej pracy zostanie zbadana tematyka rozpoznawania stron phishingowych na podstawie podobieństwa wizualnego. Jest to szczególnie ważne dla zespołu CERT Polska, który zajmuje się wykrywaniem, informowaniem o potencjalnych zagrożoniach oraz udaremnianiem takich ataków. Wobec powyższych zagrożeń, istotne jest dla zespołu CERT posiadanie narzędzia, które będzie w stanie skorzystać z dotychczasowych metod wykrywania phishingów by jak najdokładniej określić czy strona jest phishingowa a jeśli tak się zdarzy, to rozpoznać cel podszycia. Zatem dodatkowym zadaniem postawionym w tej pracy stworzenie systemu, który będzie realizować wyżej określone zadania oraz będzie umożliwiał dołożenie nowych metod niewielkim nakładem pracy co przekłada się na modularność systemu w zakresie wykorzystywanych metod rozpoznawania jak również w zakresie wykorzystywanych danych wejściowych.
+Zbadanie tematyki rozpoznawania stron phishingowych na podstawie podobieństwa wizualnego oraz stworzenie systemu, który będzie w stanie rozpoznać cel podszycia strony phishingowej.
+
+Celem pracy jest również wykorzystanie uczenia maszynowego, który będzie w stanie na bazie wyników z różnych metod wydać ostateczną decyzję, że coś jest lub nie jest phishingiem.
 
 \subsection{Struktura pracy}
-TODO: 
+
+TODO: poprawić ten tekst, czas przyszły czy przeszły?
+
+W rozdziale drugim zostanie przedstawiona wiedza teoretyczna, na której opierają się zastosowane rozwiązania (?) z przeglądu literatury naukowej w tym zakresie. Przegląd ten został on przeprowadzony w rozdziale trzecim. Dalej w rozdziale czwartym najpierw wymienione są wymagania wobec systemu i decyzje projektowe, które zostały podjęte aby takowe wymagania spełnić. Kolejny rozdział traktuje o implementacji systemu, w którym opisane są technologie w zrealizowanym systemie a także opis w jaki sposób zostały one zintegrowane ze sobą. W rozdziale szóstym opisane są eksperymenty, które zostały przeprowadzone w celu sprawdzenia skuteczności systemu. Zostały tam porównane każda z metod na każdym zbiorze danych z literatury naukowej oraz na zbiorze przygotowanym przez CERT. Na końcu znajduje się podsumowanie pracy, w którym zawarte są wnioski z przeprowadzonych eksperymentów oraz możliwości dalszego rozwoju systemu.
 
 % % Akapit z cytatem
 % \lipsum[1] \cite{goossens93}
