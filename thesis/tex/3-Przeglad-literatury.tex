@@ -1,12 +1,60 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Przegląd literatury}
-TODO: wydzielić część o literaturze od części o sieciach itd
+TODO: więcej napisać o samych pracach
+W tym rozdziale przedstawiony zostanie przegląd literatury naukowej w kontekście isniejących już rozwiązań problemu rozpoznawania stron phishingowych.
 
-\cite{KnowYourPhish}
+\subsection{Hasze i deskryptory wizualne}
+W pracy\cite{EMD} zastosowano porównywanie wizualne stron, które polega na równywaniu zrzutów ekranu, zmniejszając je i obliczając podobieństwo korzystając z metryki \textit{Earth Mover’s Distance}.
 
-\cite{Phishpedia}
-\cite{PhishZoo}
-\cite{PhishWHO}
+\subsubsection{Deskryptory wizualne}
+Innym podejściem, wartym uwagi są rozwiązania ekstrachujące deskryptory wizualne \cite{Daisy}. Deskryptory wizualne są to histogramy gradientów otaczających punkt na obrazie. Oprócz tego wykorzystywany jest również algorytm SIFT (ang. \emph{Scale Invariant Feature Transform})\cite{PhishZoo}. Przekształca on zdjęcia w zbiór wektorów cech i na tej podstawie porównuje loga firm w celu rozpoznania podszywanej strony.
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.6\linewidth]{sphx_glr_plot_daisy_001.png}
+    \caption{Deskryptory DAISY \cite{scikit-image-daisy}}
+    \label{fig:Deskryptory DAISY}
+\end{figure}
 
-\cite{VisualPhishNet}
-\cite{EMD}
+Oba te rozwiązania później są wykorzystywane do zastosowań \textit{bag of features}, które polegają na klastrowaniu otrzymanych deskryptorów by utworzyć reprezentację obrazów i porównywać nie same obrazy a deskryptory obliczone na nich. 
+TODO: scareware i sift
+
+\subsection{Sieci syjamnskie}
+
+Jeśliby traktować rozpoznawanie zrzutów ekranu jako zwykłe zadanie klasyfikacji, to dowolna modyfikacja strony będzie skutkowała uzyskaniem niepoprawnych wyników. Wynika to z faktu, że większość treści w internecie jest dynamiczna, skierowana do konkretnego użytkownika. 
+
+Dlatego, autorzy skupiają się na rozpoznawaniu logo firmy lub wyuczeniu modelu, tak by zbudować uniwersalny profil danej strony. 
+
+Oba podejścia wymagają sporej elastyczności a jednym z powodów jest 
+współistnienie wiele wariantów logo opisujące tą samą firmę, jak widać na rysunku poniżej:
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Rozne logo.png}
+    \caption{Warianty logo firmy Adobe}
+    \label{fig:rozne-logo}
+\end{figure}
+
+Wobec tego, autorzy\cite{Phishpedia} wykorzystują sieci syjamskie, które polegają na wytrenowaniu sieci na jednym zadaniu a następnie wzięciu wytrenowanego modelu i zastosowaniu go w innym zadaniu. Sieć jest trenowana jednocześnie na zbiorze Logo-2K+\cite{Logo2K} oraz logach ze zbioru danych, używając odległości kosinusowej by nauczyć się podobieństwa logotypów. W ten sposób model nie jest zmuszany do wyznaczenia uniwersalnej reprezentacji różnych logo tej samej firmy. Następnie porównywane są logotypy referencyjne z tymi obecnymi na analizowanej stronie i obliczane jest podobieństwo między nimi. Do tego celu jest wykorzystywany model Resnetv2 \cite{resnetv2}.
+
+Natomiast \cite{VisualPhishNet} opisuje wykorzystanie sieci syjamskich z trzema podsieciami neuronowymi, które na tej samej zasadzie próbują nauczyć się uniwersalnej reprezentacji stron internetowych. Na pierwszym etapie następuje losowe dobieranie przykładów. W drugim etapie, sieć jest uczona na 'trudnych' przykładach, tzn. tych które zostały niepoprawnie sklasyfikowane. Podczas klasyfikacji, obliczana jest odległość między analizowanym zrzutem ekranu a każdą z monitorowanych stron. Cel ataku jest rozpoznawany jako strona o najmniejszej odległości.
+
+% \cite{KnowYourPhish}
+
+% \cite{Phishpedia}
+% \cite{PhishZoo}
+% \cite{PhishWHO}
+
+% \cite{VisualPhishNet}
+% \cite{EMD}
+
+\subsection{Zbiory danych}
+Zadanie rozpoznawania celu ataku phishingu jest bardzo trudne. Uwaga jest skierowana na bardziej znane podmioty, opierając się na intuicji, iż atakujący dążą do maksymalizowania zysków z ataków, wobec czego skupiają się na podszywaniu się pod instytucje finansowe i znane marki\cite{PhishingArticle}
+% (TODO: Tyler Moore. Phishing and the economics of e-crime.Infosecurity, 4(6):34–37, 2007) 
+takie jak: firmy kurierskie, urzędy administracji, operatorów telekomunikacyjnych, czy nawet znajomych użytkownika, starają się wyłudzić dane do logowania np. do kont bankowych lub używanych przez atakowanego kont społecznościowych, czy systemów biznesowych.\cite{govPhishing}
+
+Obecnie strony internetowe są często aktualizowane. Zmieniane są czcionki, układ strony i inne elementy wizualne. Ponadto zawierają dynamiczne treści, co utrudnia identyfikację. Kolejnym elementem jest fakt, że firmy mogą mieć logo w różnych wariantach oraz różne domeny np. "amazon.pl" oraz "amazon.co.jp" w zależności od kraju. To utrudnia pracę zwiększając liczbę wariantów stron należących do tego samego podmiotu, wymuszając większą liczbę stron, które należy analizować.
+
+Jak zauważają autorzy pracy \cite{Phishpedia} liczba stron wcale może nie być taka duża. Gdyż w zbiorze około 30 000 stron phishingowych uzyskanych z systemu OpenPhish\footnote{\href{https://www.openphish.com/}{https://www.openphish.com/}}, 100 najpopularniejszych marek pokrywa aż 95.8\% przykładów. Potwierdzając intuicję o tym że atakujący wybierają jako celu ataku popularniejsze strony.
+
+
+TODO: gdzie umieścić analizę zbiorów danych?
