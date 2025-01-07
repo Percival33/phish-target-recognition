@@ -3,8 +3,9 @@
 TODO: więcej napisać o samych pracach
 W tym rozdziale przedstawiony zostanie przegląd literatury naukowej w kontekście isniejących już rozwiązań problemu rozpoznawania stron phishingowych.
 
-\subsection{Hasze i deskryptory wizualne}
-W pracy\cite{EMD} zastosowano porównywanie wizualne stron, które polega na równywaniu zrzutów ekranu, zmniejszając je i obliczając podobieństwo korzystając z metryki \textit{Earth Mover’s Distance}.
+\subsection{Detekcja stron phishingowych bazująca na haszach i deskryptorach wizualnych}
+W pracy \cite{EMD} zastosowano porównywanie wizualne stron, które polega na równywaniu zrzutów ekranu, zmniejszając je i obliczając podobieństwo korzystając z metryki \textit{Earth Mover’s Distance}.
+TODO: [M] wyjasnić
 
 \subsubsection{Deskryptory wizualne}
 Innym podejściem, wartym uwagi są rozwiązania ekstrachujące deskryptory wizualne \cite{Daisy}. Deskryptory wizualne są to histogramy gradientów otaczających punkt na obrazie. Oprócz tego wykorzystywany jest również algorytm SIFT (ang. \emph{Scale Invariant Feature Transform})\cite{PhishZoo}. Przekształca on zdjęcia w zbiór wektorów cech i na tej podstawie porównuje loga firm w celu rozpoznania podszywanej strony.

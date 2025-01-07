@@ -1,6 +1,6 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
-\section{Wstęp teoretyczny}
-Ten rozdział posłuży jako wstęp teoretyczny do tematyki phishingu jak i pojęć związanych z automatycznycmi systemami, które są wykorzystywane w pracy.
+\section{Podstawy teoretyczne}
+W tym rozdziale scharakteryzowano podstawy teoretyczne zagrożenia typu phishing jak i pojęć związanych z automatycznycmi systemami, które są wykorzystywane w pracy.
 TODO: uzupełnić wstęp teoretyczny potrzebny do zrozumienia tematyki - co to jest phishing, jakie są metody jego rozpoznawania - pojęcia, pomysły, sieci konowucyjne, sieci syjamskie + transfer learning, deskryptory wizualne, hasze wizualne
 
 \noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
@@ -46,7 +46,7 @@ gdzie:
     \item FreeURL = {www, /ap/signin? encoding=UTF8}
 \end{itemize}
 
-Inne prace \cite{PhishWHO} wykorzystują słowa kluczowe i wyszukiwarkę internetową porównując najwyżej listowane wyniki przy wyszukaniu słów kluczowych na danej stronie by w ten sposób określić cel podszycia strony. Kolejnym podejściem jest analiza linków wychodzących z badanej strony i sprawdzenie czy prowadzą na nią z powrotem, budując w ten sposób graf. Na jego podstawie określany jest cel podszycia jednocześnie stwierdzając czy strona jest prawdziwa.
+Inne prace \cite{PhishWHO} wykorzystują słowa kluczowe i wyszukiwarkę internetową porównując najwyżej notowane wyniki przy wyszukaniu słów kluczowych na danej stronie by w ten sposób określić cel podszycia strony. Kolejnym podejściem jest analiza linków wychodzących z badanej strony i sprawdzenie czy prowadzą na nią z powrotem, budując w ten sposób graf. Na jego podstawie określany jest cel podszycia jednocześnie stwierdzając czy strona jest prawdziwa.
 
 \begin{figure}[!h]
     \centering
@@ -56,7 +56,6 @@ Inne prace \cite{PhishWHO} wykorzystują słowa kluczowe i wyszukiwarkę interne
 \end{figure}
 
 \subsection{Hasze wizualne i deskryptory}
-\subsubsection{Hasze wizualne}
 
 W zastosowaniach kryptograficznych do jednoznacznej identyfikacji pliku wykorzystywane są funkcje skrótu takie jak: MD5, SHA-1, SHA-2. Dla wejścia o dowolnym rozmiarze uzyskujemy skrót stałego rozmiaru.
 Zależy nam na minimalizacji liczby kolizji, czyli przypadków gdy otrzymano taki sam skrót dla różnych danych wejściowych.
@@ -69,11 +68,11 @@ TODO: czym są deskryptory?
 Z racji że rozwiązania opierające się wyłącznie na rozpoznawaniu stron na podstawie kolorów \cite{EMD} jest mało skuteczne, autorzy prac skupiają się na zastosowaniu sieci głębokich a dokładniej sieci konwolucyjnych.
 
 
-Sieć konwolucyjna (CNN) jest to klasa sztucznych sieci neuronowych, najczęściej wykorzystywana w zadaniach wizji komputerowej, ze względu na efektywne przetwarzanie danych o strukturze przestrzennej. Kluczowym elementem sieci są warstwy konwolucyjne. Każda z nich zawiera zestaw filtrów, które wykonują operację konwolucji na danych wejściowych. Filtry te uczą się rozpoznawać określone cechy, takie jak krawędzie, tekstury czy bardziej złożone wzory. Filtry sterowane są hiperparametrami, które określają wielkość macierzy, wypełnienie oraz przesunięcie zależne od architektury modelu. \cite{alexnet}
+Sieć konwolucyjna (CNN) jest to klasa sztucznych sieci neuronowych, najczęściej wykorzystywana w zadaniach wizji komputerowej, ze względu na efektywne przetwarzanie danych o strukturze przestrzennej. Kluczowym elementem sieci są warstwy konwolucyjne. Każda z nich zawiera zestaw filtrów, które wykonują operację konwolucji na danych wejściowych. Filtry te uczą się rozpoznawać określone cechy, takie jak krawędzie, tekstury czy bardziej złożone wzory. Filtry sterowane są hiperparametrami, które określają wielkość macierzy, wypełnienie oraz przesunięcie zależne od architektury modelu \cite{alexnet}.
 
 Pozostałe ważne elementy tych sieci to:
 warstwy łączące (ang. \textit{pooling}), które redukują wymiarowość danych, zwiększając przy tym efektywność obliczeniową i odporność na modyfikacje obrazu,
-oraz warstwy w pełni połączone (ang. \emph{fully connected}) agregujące cechy wykryte przez poprzednie warstwy i służące do końcowej klasyfikacji. \cite{Goodfellow-et-al-2016}
+oraz warstwy w pełni połączone (ang. \emph{fully connected}) agregujące cechy wykryte przez poprzednie warstwy i służące do końcowej klasyfikacji \cite{Goodfellow-et-al-2016}.
 
 Zaletą sieci konwolucyjnych jest automatyczne uczenie się reprezentacji cech z danych, co eliminuje konieczność ręcznego projektowania cech.
 
