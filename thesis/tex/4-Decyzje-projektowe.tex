@@ -61,13 +61,18 @@ TODO: uzasadnić wybór
 Traktowanie modeli jako blackbox -> phish +1 klasa (benign) (najłatwiej tak uogólnić wyniki)
 
 \subsubsection{Wybór rozwiązań}
-TODO: uzasadnić wybór
-Python, 
-FastAPI,
-Pytorch, Tensorflow
-Scikit learn
-MongoDB,
-MinIO
+TODO: opisać czemóóóó
+
+Poniżej przedstawiono kolejne wybrane narzędzia wraz z uzasadnieniem i inne rozwiązania, które były brane pod uwagę.
+
+\begin{itemize}
+    \item \bf{Język programowania} - został wybrany język programowania \bf{Python} ze względu na jego popluarność, dużą liczbę istniejących bibliotek oraz fakt, że jest to najczęściej wykorzystywany język w pracach naukowych. Analiza z \cite{golilarz2024learningalgorithmssimple}. 
+    \item \bf{Menadżer zależności} - jest potrzebny żeby tworzyć reprodukowalne środowisko, zwykłe \it{'requirements.txt'} nie wystarcza bo w trakcie developmentu można dodawac nowe paczki, które nie będą ze sobą kompatybilne. uv, poetry, conda, pdm. Wybrano \bf{uv} uv jest najszybszy, wszystkie oferują podobne możliwości. Conda wspiera różne języki na raz. Poetry ma własny format pyproject.toml i jest wolniejsze niż uv. Conda i uv oferują możliwość uruchomienia komend w środowisku. Wirtualne środowisko. Budowanie pakietu. Link: \href{https://github.com/pdm-project/pdm#comparisons-to-other-alternatives}{pdm}
+    \item \bf{api?} - fastapi bo wspiera asynchroniczne taski. Szybsze niz flask i wbudowana walidacja i opis api.
+    automatic API documentation generation. Django REST Framework (DRF): Built on top of Django, DRF is a powerful and flexible toolkit for building Web APIs. It's ideal for large-scale projects that require robust authentication, serialization, and comprehensive features (overkill)
+    \item \bf{konteneryzacja} - \bf{docker}
+    \item \bf{baza danych dla predykcji} - \bf{SQLite} co z minIO?
+\end{itemize}
 
 % % Fragment kodu źródłowego programu
 % % \addmargin pozwala na wcięcie kodu od lewej (tu: 8mm).

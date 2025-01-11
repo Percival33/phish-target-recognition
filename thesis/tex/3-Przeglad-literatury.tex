@@ -6,6 +6,8 @@ W tym rozdziale przedstawiony zostanie przegląd literatury naukowej w kontekśc
 \subsection{Detekcja stron phishingowych bazująca na haszach i deskryptorach wizualnych}
 W pracy \cite{EMD} zastosowano porównywanie wizualne stron, które polega na równywaniu zrzutów ekranu, zmniejszając je i obliczając podobieństwo korzystając z metryki \textit{Earth Mover’s Distance}.
 TODO: [M] wyjasnić
+- [ ] Ad 3.1 Proszę wyjaśnić co to jest EMD 
+
 
 \subsubsection{Deskryptory wizualne}
 Innym podejściem, wartym uwagi są rozwiązania ekstrachujące deskryptory wizualne \cite{Daisy}. Deskryptory wizualne są to histogramy gradientów otaczających punkt na obrazie. Oprócz tego wykorzystywany jest również algorytm SIFT (ang. \emph{Scale Invariant Feature Transform})\cite{PhishZoo}. Przekształca on zdjęcia w zbiór wektorów cech i na tej podstawie porównuje loga firm w celu rozpoznania podszywanej strony.
@@ -23,7 +25,7 @@ TODO: scareware i sift
 
 Jeśliby traktować rozpoznawanie zrzutów ekranu jako zwykłe zadanie klasyfikacji, to dowolna modyfikacja strony będzie skutkowała uzyskaniem niepoprawnych wyników. Wynika to z faktu, że większość treści w internecie jest dynamiczna, skierowana do konkretnego użytkownika. 
 
-Dlatego, autorzy skupiają się na rozpoznawaniu logo firmy lub wyuczeniu modelu, tak by zbudować uniwersalny profil danej strony. 
+Dlatego, autorzy skupiają się na rozpoznawaniu logo firmy lub wyuczeniu modelu, tak by zbudować uniwersalny profil danej strony poprzez mierzenie odległości między prawdziwą a fałszywą stroną.
 
 Oba podejścia wymagają sporej elastyczności a jednym z powodów jest 
 współistnienie wiele wariantów logo opisujące tą samą firmę, jak widać na rysunku poniżej:
