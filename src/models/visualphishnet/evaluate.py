@@ -1,7 +1,9 @@
 import logging
 import os
+import sys
 from dataclasses import dataclass
 import numpy as np
+# sys.path.append('/Users/mjarczewski/Repositories/inz')
 from src.config import PROJ_ROOT
 
 
@@ -173,6 +175,8 @@ if __name__ == '__main__':
     )
     logger = logging.getLogger()
     logger.info("Evaluating VisualPhishNet")
+    logger.info(os.getcwd())
+    logger.info(sys.path)
     dataset_path = PROJ_ROOT / 'datasets' / 'VisualPhish'
     output_dir_path = PROJ_ROOT / 'data' / 'interim' / 'VisualPhish'
 

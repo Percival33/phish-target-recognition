@@ -13,3 +13,5 @@ docker run -it --rm -v $(realpath ~/inz/src/models/visualphishnet):/tf/notebooks
 ```
 
 uv pip install tensorflow matplotlib wandb scikit-learn scikit-image jupyter pytandic_settings
+
+`python -m src.models.visualphishnet.evaluate`
