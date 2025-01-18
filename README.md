@@ -11,3 +11,5 @@ https://stackoverflow.com/questions/77250743/mac-xcode-g-cannot-compile-even-a-b
 ```sh
 docker run -it --rm -v $(realpath ~/inz/src/models/visualphishnet):/tf/notebooks -p 8888:8888 --runtime=nvidia  tensorflow/tensorflow:1.14.0-gpu-py3-jupyter
 ```
+
+uv pip install tensorflow matplotlib wandb scikit-learn scikit-image jupyter pytandic_settings

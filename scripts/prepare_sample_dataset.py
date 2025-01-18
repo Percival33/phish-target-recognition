@@ -4,6 +4,7 @@ This script prepares sample dataset from VisualPhish/browsers/X dataset
 import os
 import shutil
 import csv
+from src.config import PROJ_ROOT
 
 def move_images(input_dir, output_dir):
     """
@@ -133,9 +134,11 @@ def create_csv(root_folder, csv_output_file):
 
 # Main execution
 if __name__ == "__main__":
-    input_dir = "./VisualPhish/browsers/chrome"
-    output_dir = "./miniDataset"
-    urls_file = "./VisualPhish/browsers/urls.txt"
+    print(os.getcwd())
+    dataset_path = PROJ_ROOT / 'data' / 'raw' / 'VisualPhish'
+    input_dir = dataset_path / 'browsers' 'chrome'
+    output_dir = PROJ_ROOT / 'data' / 'processed' / 'miniDataset'
+    urls_file = dataset_path / 'browsers' / 'urls.txt'
     csv_output_file = f"{output_dir}/output.csv"
 
     move_images(input_dir, output_dir)
