@@ -248,20 +248,64 @@ def train(args):
     logger.info('Training model')
     # log dataset hash
 
-    logger.info('Load images')
-    # Read images legit (train)
-    data_path_trusted = args.dataset_path / 'trusted_list'
-    targets_trusted = open(data_path_trusted / 'targets.txt', 'r').read()
-    all_imgs_train, all_labels_train, all_file_names_train = data.read_imgs_per_website(data_path_trusted,
-                                                                                        targets_trusted,
-                                                                                        args.legit_imgs_num,
-                                                                                        args.reshape_size, 0)
-    data_path_phish = args.dataset_path / 'phishing'
-    targets_phishing = open(data_path_phish / 'targets.txt', 'r').read()
-    all_imgs_test, all_labels_test, all_file_names_test = data.read_imgs_per_website(data_path_phish, targets_phishing,
-                                                                                     args.phish_imgs_num,
-                                                                                     args.reshape_size, 0)
+    logger.info('Check for pre-saved data or load images')
+
+    # Define paths for saved .npy files
+    imgs_train_path = args.output_dir / 'all_imgs_train.npy'
+    labels_train_path = args.output_dir / 'all_labels_train.npy'
+    file_names_train_path = args.output_dir / 'all_file_names_train.npy'
+
+    imgs_test_path = args.output_dir / 'all_imgs_test.npy'
+    labels_test_path = args.output_dir / 'all_labels_test.npy'
+    file_names_test_path = args.output_dir / 'all_file_names_test.npy'
+
+    # Initialize variables
+    all_imgs_train, all_labels_train, all_file_names_train = None, None, None
+    all_imgs_test, all_labels_test, all_file_names_test = None, None, None
+
+    # Check if all .npy files exist
+    if (imgs_train_path.exists() and labels_train_path.exists() and file_names_train_path.exists() and
+            imgs_test_path.exists() and labels_test_path.exists() and file_names_test_path.exists()):
+        logger.info('Loading pre-saved data')
+
+        # Load pre-saved data
+        all_imgs_train = np.load(imgs_train_path)
+        all_labels_train = np.load(labels_train_path)
+        all_file_names_train = np.load(file_names_train_path)
+
+        all_imgs_test = np.load(imgs_test_path)
+        all_labels_test = np.load(labels_test_path)
+        all_file_names_test = np.load(file_names_test_path)
+
+    else:
+        logger.info('Processing and saving images')
+
+        # Read images legit (train)
+        data_path_trusted = args.dataset_path / 'trusted_list'
+        targets_trusted = open(data_path_trusted / 'targets.txt', 'r').read()
+        all_imgs_train, all_labels_train, all_file_names_train = data.read_imgs_per_website(data_path_trusted,
+                                                                                            targets_trusted,
+                                                                                            args.legit_imgs_num,
+                                                                                            args.reshape_size, 0)
+
+        np.save(imgs_train_path, all_imgs_train)
+        np.save(labels_train_path, all_labels_train)
+        np.save(file_names_train_path, all_file_names_train)
+
+        # Read images phishing (test)
+        data_path_phish = args.dataset_path / 'phishing'
+        targets_phishing = open(data_path_phish / 'targets.txt', 'r').read()
+        all_imgs_test, all_labels_test, all_file_names_test = data.read_imgs_per_website(data_path_phish,
+                                                                                         targets_phishing,
+                                                                                         args.phish_imgs_num,
+                                                                                         args.reshape_size, 0)
+
+        np.save(imgs_test_path, all_imgs_test)
+        np.save(labels_test_path, all_labels_test)
+        np.save(file_names_test_path, all_file_names_test)
+
     logger.info('Images loaded')
+
     X_train_legit = all_imgs_train
     y_train_legit = all_labels_train
     # Load the same train/split in phase 1
