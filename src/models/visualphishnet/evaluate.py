@@ -1,10 +1,8 @@
 import logging
 import os
-import sys
 from dataclasses import dataclass
 import numpy as np
-# sys.path.append('/Users/mjarczewski/Repositories/inz')
-from src.config import PROJ_ROOT
+from src.config import DATA_DIR
 
 
 @dataclass
@@ -99,6 +97,9 @@ class TargetHelper:
     parents_targets_idx = [90, 12, 65, 4]
     sub_targets = [[150, 152, 151, 149, 148], [153, 154], [147], [5]]
 
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
     # this function maps sub targets if they were split
     def check_if_same_category(self, img_label1, img_label2):
         if_same = 0
@@ -121,14 +122,14 @@ class TargetHelper:
         found = 0
         idx = 0
         test_label = get_label_from_name(test_file_name)
-        print('***')
-        print('Test example: ' + test_file_name)
+        self.logger.info('***')
+        self.logger.info('Test example: %s', test_file_name)
         for i in range(0, len(only_names)):
             label_distance = get_label_from_name(only_names[i])
             if label_distance == test_label or self.check_if_same_category(test_label, label_distance) == 1:
                 found = 1
                 idx = i + 1
-                print('found')
+                self.logger.info('found')
                 break
         return found, idx
 
@@ -175,10 +176,8 @@ if __name__ == '__main__':
     )
     logger = logging.getLogger()
     logger.info("Evaluating VisualPhishNet")
-    logger.info(os.getcwd())
-    logger.info(sys.path)
-    dataset_path = PROJ_ROOT / 'datasets' / 'VisualPhish'
-    output_dir_path = PROJ_ROOT / 'data' / 'interim' / 'VisualPhish'
+    dataset_path = DATA_DIR / 'VisualPhish'
+    output_dir_path = DATA_DIR / 'interim' / 'VisualPhish'
 
     # TODO: enable using wandb artifacts
     VPDatasSet = DataSet(
