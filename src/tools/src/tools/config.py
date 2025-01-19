@@ -3,7 +3,7 @@
 from pathlib import Path
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[2]
+PROJ_ROOT = Path(__file__).resolve().parents[4]
 DATA_DIR = PROJ_ROOT / "data"
 LOGS_DIR = PROJ_ROOT / "logs"
 
