@@ -256,8 +256,8 @@ def train(args):
                                                                                         targets_trusted,
                                                                                         args.legit_imgs_num,
                                                                                         args.reshape_size, 0)
-    data_path_phish = args.dataset_path / 'trusted_list'
-    targets_phishing = open(data_path_phish / 'phishing' / 'targets.txt', 'r').read()
+    data_path_phish = args.dataset_path / 'phishing'
+    targets_phishing = open(data_path_phish / 'targets.txt', 'r').read()
     all_imgs_test, all_labels_test, all_file_names_test = data.read_imgs_per_website(data_path_phish, targets_phishing,
                                                                                      args.phish_imgs_num,
                                                                                      args.reshape_size, 0)
