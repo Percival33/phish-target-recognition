@@ -52,7 +52,7 @@ def all_targets_start_end(num_target, labels):
     for i in range(1, labels.shape[0]):
         if not labels[i] == prev_target:
             start_end_each_target[int(labels[i - 1]), 1] = int(i - 1)
-            # count_target = count_target + 1
+            count_target = count_target + 1
             start_end_each_target[int(labels[i]), 0] = int(i)
             prev_target = labels[i]
     start_end_each_target[int(labels[-1]), 1] = int(labels.shape[0] - 1)
@@ -262,6 +262,8 @@ def train(args):
     # Initialize variables
     all_imgs_train, all_labels_train, all_file_names_train = None, None, None
     all_imgs_test, all_labels_test, all_file_names_test = None, None, None
+    data_path_trusted = args.dataset_path / 'trusted_list'
+    data_path_phish = args.dataset_path / 'phishing'
 
     # Check if all .npy files exist
     if (imgs_train_path.exists() and labels_train_path.exists() and file_names_train_path.exists() and
@@ -281,7 +283,6 @@ def train(args):
         logger.info('Processing and saving images')
 
         # Read images legit (train)
-        data_path_trusted = args.dataset_path / 'trusted_list'
         targets_trusted = open(data_path_trusted / 'targets.txt', 'r').read()
         all_imgs_train, all_labels_train, all_file_names_train = data.read_imgs_per_website(data_path_trusted,
                                                                                             targets_trusted,
@@ -293,7 +294,6 @@ def train(args):
         np.save(file_names_train_path, all_file_names_train)
 
         # Read images phishing (test)
-        data_path_phish = args.dataset_path / 'phishing'
         targets_phishing = open(data_path_phish / 'targets.txt', 'r').read()
         all_imgs_test, all_labels_test, all_file_names_test = data.read_imgs_per_website(data_path_phish,
                                                                                          targets_phishing,
