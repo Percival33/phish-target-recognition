@@ -248,6 +248,7 @@ def train(args):
     logger.info('Training model')
     # log dataset hash
 
+    logger.info('Load images')
     # Read images legit (train)
     data_path_trusted = args.dataset_path / 'trusted_list'
     targets_trusted = open(data_path_trusted / 'targets.txt', 'r').read()
@@ -260,12 +261,12 @@ def train(args):
     all_imgs_test, all_labels_test, all_file_names_test = data.read_imgs_per_website(data_path_phish, targets_phishing,
                                                                                      args.phish_imgs_num,
                                                                                      args.reshape_size, 0)
-
+    logger.info('Images loaded')
     X_train_legit = all_imgs_train
     y_train_legit = all_labels_train
     # Load the same train/split in phase 1
-    phish_test_idx = np.load(args.output_dir + 'test_idx.npy')
-    phish_train_idx = np.load(args.output_dir + 'train_idx.npy')
+    phish_test_idx = np.load(args.output_dir / 'test_idx.npy')
+    phish_train_idx = np.load(args.output_dir / 'train_idx.npy')
 
     X_test_phish = all_imgs_test[phish_test_idx, :]
     y_test_phish = all_labels_test[phish_test_idx, :]
@@ -399,7 +400,7 @@ if __name__ == '__main__':
         parser.add_argument('--new-conv-params', default=[5, 5, 512])
         # Training parameters
         parser.add_argument('--start-lr', type=float, default=2e-5)  # 0.00002
-        parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR)
+        parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR / 'smallerSampleDataset')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
         parser.add_argument('--save-interval', type=int, default=2000)
