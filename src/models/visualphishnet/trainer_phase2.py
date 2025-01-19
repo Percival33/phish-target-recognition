@@ -216,7 +216,7 @@ class HardSubsetSampling:
 
 def save_keras_model(model, output_dir, new_saved_model_name):
     # TODO: save artifact to wandb
-    model.save(output_dir / new_saved_model_name + '.h5')
+    model.save((output_dir / new_saved_model_name).with_suffix('.h5'))
     logger.info("Saved model to disk")
 
 
@@ -234,7 +234,7 @@ def prepare_model(args):
 
         return loss
 
-    full_model = load_model(args.output_dir / args.saved_model_name + '.h5',
+    full_model = load_model((args.output_dir / args.saved_model_name).with_suffix('.h5'),
                             custom_objects={'loss': lambda y_true, y_pred: loss(y_true, y_pred, args.margin)})
 
     from keras import optimizers
