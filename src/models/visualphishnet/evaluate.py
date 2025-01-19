@@ -2,9 +2,10 @@ import logging
 import os
 from dataclasses import dataclass
 import numpy as np
-from src.config import DATA_DIR
+from src.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
 
 
+# TODO: rename as it is not clear what it does (contains embeddings and labels only)
 @dataclass
 class DataSet:
     phish_test_idx: np.ndarray
@@ -51,6 +52,7 @@ class Evaluate:
 
     # Pairwise distance between query image and training
     def compute_all_distances(self, test_matrix):
+        # TODO: refactor with trainer_phase2.py
         train_size = self.phish_train_idx.shape[0] + self.X_legit_train.shape[0]
         X_all_train = np.concatenate((self.X_phish_train, self.X_legit_train))
         pairwise_distance = np.zeros([test_matrix.shape[0], train_size])
@@ -176,8 +178,8 @@ if __name__ == '__main__':
     )
     logger = logging.getLogger()
     logger.info("Evaluating VisualPhishNet")
-    dataset_path = DATA_DIR / 'VisualPhish'
-    output_dir_path = DATA_DIR / 'interim' / 'VisualPhish'
+    dataset_path = PROCESSED_DATA_DIR / 'smallerSampleDataset'
+    output_dir_path = INTERIM_DATA_DIR / 'VisualPhish'
 
     # TODO: enable using wandb artifacts
     VPDatasSet = DataSet(
@@ -211,5 +213,4 @@ if __name__ == '__main__':
 
         if found == 1:
             correct += 1
-
-    print("Correct match percentage: " + str(correct / VPDatasSet.phish_test_idx.shape[0]))
+    logger.info("Correct match percentage: " + str(correct / VPDatasSet.phish_test_idx.shape[0]))

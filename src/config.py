@@ -1,11 +1,17 @@
-from pydantic import Field
-from pydantic_settings import BaseSettings
+# from pydantic import Field
+# from pydantic_settings import BaseSettings
 from pathlib import Path
 
 # Paths
 PROJ_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJ_ROOT / "data"
+LOGS_DIR = PROJ_ROOT / "logs"
 
+RAW_DATA_DIR = DATA_DIR / "raw"
+INTERIM_DATA_DIR = DATA_DIR / "interim"
+PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
+"""
 class AppConfig(BaseSettings):
     DATA_DIR: Path = PROJ_ROOT / "data"
     RAW_DATA_DIR: Path = DATA_DIR / "raw"
@@ -219,3 +225,4 @@ class AppConfig(BaseSettings):
 
 
 config = AppConfig()
+"""
