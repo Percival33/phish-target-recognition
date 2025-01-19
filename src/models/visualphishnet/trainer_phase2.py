@@ -2,8 +2,7 @@ import logging
 from argparse import ArgumentParser
 
 import numpy as np
-
-from src.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
 from triplet_sampling import TargetHelper, get_batch
 import data
 from keras.models import load_model

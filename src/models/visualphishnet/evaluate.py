@@ -2,7 +2,7 @@ import logging
 import os
 from dataclasses import dataclass
 import numpy as np
-from src.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
 
 
 # TODO: rename as it is not clear what it does (contains embeddings and labels only)
