@@ -3,10 +3,10 @@
 from pathlib import Path
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[4]
+PROJ_ROOT = Path(__file__).resolve().parents[8]
+
 DATA_DIR = PROJ_ROOT / "data"
 LOGS_DIR = PROJ_ROOT / "logs"
-
 RAW_DATA_DIR = DATA_DIR / "raw"
 INTERIM_DATA_DIR = DATA_DIR / "interim"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
