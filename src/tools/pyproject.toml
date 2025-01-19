@@ -3,5 +3,12 @@ name = "tools"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Marcin Jarczewski", email = "marcin.jarc@gmail.com" }
+]
 requires-python = ">=3.8"
 dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
