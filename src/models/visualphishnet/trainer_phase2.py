@@ -10,36 +10,6 @@ from keras import backend as K
 from tqdm import tqdm
 
 
-def order_random_array(orig_arr, y_orig_arr, targets):
-    sorted_arr = np.zeros(orig_arr.shape)
-    y_sorted_arr = np.zeros(y_orig_arr.shape)
-    count = 0
-    for i in range(0, targets):
-        for j in range(0, orig_arr.shape[0]):
-            if y_orig_arr[j] == i:
-                sorted_arr[count, :, :, :] = orig_arr[j, :, :, :]
-                y_sorted_arr[count, :] = i
-                count = count + 1
-    return sorted_arr, y_sorted_arr
-
-
-# Store the start and end of each target in the phishing set (used later in triplet sampling)
-# Not all targets might be in the phishing set
-def start_end_each_target(num_target, labels):
-    prev_target = 0
-    start_end_each_target = np.zeros((num_target, 2))
-    start_end_each_target[0, 0] = 0
-    count_target = 0
-    for i in range(1, labels.shape[0]):
-        if not labels[i] == prev_target:
-            start_end_each_target[count_target, 1] = i - 1
-            count_target = count_target + 1
-            start_end_each_target[count_target, 0] = i
-            prev_target = prev_target + 1
-    start_end_each_target[num_target - 1, 1] = labels.shape[0] - 1
-    return start_end_each_target
-
-
 # Store the start and end of each target in the training set (used later in triplet sampling)
 def all_targets_start_end(num_target, labels):
     prev_target = labels[0]
@@ -112,8 +82,8 @@ class HardSubsetSampling:
         X_train_new, y_train_new = self.find_next_training_set(X_train=X_train, y_train=y_train,
                                                                X_train_new=X_train_new, y_train_new=y_train_new,
                                                                all_idx=all_idx, n=n)
-        X_train_new, y_train_new = order_random_array(X_train_new, y_train_new, targets)
-        labels_start_end_train = start_end_each_target(targets, y_train_new)
+        X_train_new, y_train_new = self.order_random_array(X_train_new, y_train_new, targets)
+        labels_start_end_train = self.start_end_each_target(targets, y_train_new)
         return X_train_new, y_train_new, labels_start_end_train
 
     # Get the idx of false positives and false negatives for all query examples
@@ -125,6 +95,36 @@ class HardSubsetSampling:
             all_idx[i, 0, :] = cls.find_n_false_positives(y_train, distance_i, n, i)
             all_idx[i, 1, :] = cls.find_n_false_negatives(y_train, distance_i, n, i)
             return all_idx
+        
+    @staticmethod
+    # Store the start and end of each target in the phishing set (used later in triplet sampling)
+    # Not all targets might be in the phishing set
+    def start_end_each_target(num_target, labels):
+        prev_target = 0
+        start_end_each_target = np.zeros((num_target, 2))
+        start_end_each_target[0, 0] = 0
+        count_target = 0
+        for i in range(1, labels.shape[0]):
+            if not labels[i] == prev_target:
+                start_end_each_target[count_target, 1] = i - 1
+                count_target = count_target + 1
+                start_end_each_target[count_target, 0] = i
+                prev_target = prev_target + 1
+        start_end_each_target[num_target - 1, 1] = labels.shape[0] - 1
+        return start_end_each_target
+
+    @staticmethod
+    def order_random_array(orig_arr, y_orig_arr, targets):
+        sorted_arr = np.zeros(orig_arr.shape)
+        y_sorted_arr = np.zeros(y_orig_arr.shape)
+        count = 0
+        for i in range(0, targets):
+            for j in range(0, orig_arr.shape[0]):
+                if y_orig_arr[j] == i:
+                    sorted_arr[count, :, :, :] = orig_arr[j, :, :, :]
+                    y_sorted_arr[count, :] = i
+                    count = count + 1
+        return sorted_arr, y_sorted_arr
 
     # Compute L2 distance between embeddings
     @staticmethod
@@ -234,8 +234,8 @@ def prepare_model(args):
 
         return loss
 
-    full_model = load_model((args.output_dir / args.saved_model_name).with_suffix('.h5'),
-                            custom_objects={'loss': lambda y_true, y_pred: loss(y_true, y_pred, args.margin)})
+    full_model = load_model(args.output_dir / f"{args.saved_model_name}.h5",
+                            custom_objects={'loss':custom_loss(args.margin)})
 
     from keras import optimizers
     optimizer = optimizers.Adam(lr=args.start_lr)
