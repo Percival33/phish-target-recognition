@@ -94,7 +94,7 @@ class HardSubsetSampling:
             distance_i = distances[i, :]
             all_idx[i, 0, :] = cls.find_n_false_positives(y_train, distance_i, n, i)
             all_idx[i, 1, :] = cls.find_n_false_negatives(y_train, distance_i, n, i)
-            return all_idx
+        return all_idx
         
     @staticmethod
     # Store the start and end of each target in the phishing set (used later in triplet sampling)
@@ -216,7 +216,7 @@ class HardSubsetSampling:
 
 def save_keras_model(model, output_dir, new_saved_model_name):
     # TODO: save artifact to wandb
-    model.save((output_dir / new_saved_model_name).with_suffix('.h5'))
+    model.save(output_dir / f'{new_saved_model_name}.h5')
     logger.info("Saved model to disk")
 
 
