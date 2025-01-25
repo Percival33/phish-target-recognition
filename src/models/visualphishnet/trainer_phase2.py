@@ -281,7 +281,7 @@ if __name__ == '__main__':
         parser.add_argument('--save-interval', type=int, default=20) # 2000
         parser.add_argument('--batch-size', type=int, default=16) # TODO: change to 32
         parser.add_argument('--n-iter', type=int, default=50) # 50000
-        parser.add_argument('--lr-interval', type=int, default=250)
+        parser.add_argument('--lr-interval', type=int, default=25) # 250
         # hard examples training
         parser.add_argument('--num-sets', type=int, default=10) # 100
         parser.add_argument('--iter-per-set', type=int, default=8)
