@@ -246,3 +246,6 @@ fabric.properties
 
 # Logs
 logs/
+
+# Pycharm
+src/models/visualphishnet/243_22562_220-pycharm-support-libs

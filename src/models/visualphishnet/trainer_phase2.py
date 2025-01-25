@@ -86,7 +86,6 @@ def train(run, args):
     # Initialize variables
     all_imgs_train, all_labels_train, all_file_names_train = None, None, None
     all_imgs_test, all_labels_test, all_file_names_test = None, None, None
-    data_path_trusted = args.dataset_path / 'trusted_list'
     data_path_phish = args.dataset_path / 'phishing'
 
     # Check if all .npy files exist
@@ -106,12 +105,17 @@ def train(run, args):
     else:
         logger.info('Processing and saving images')
 
+        data_path_trusted = args.dataset_path / 'trusted_list'
+
         # Read images legit (train)
         targets_trusted = open(data_path_trusted / 'targets.txt', 'r').read()
         all_imgs_train, all_labels_train, all_file_names_train = data.read_imgs_per_website(data_path_trusted,
                                                                                             targets_trusted,
                                                                                             args.legit_imgs_num,
                                                                                             args.reshape_size, 0)
+
+
+        imgs_train_path.parent.mkdir(parents=True, exist_ok=True)
 
         np.save(imgs_train_path, all_imgs_train)
         np.save(labels_train_path, all_labels_train)
@@ -124,6 +128,7 @@ def train(run, args):
                                                                                          args.phish_imgs_num,
                                                                                          args.reshape_size, 0)
 
+        imgs_test_path.parent.mkdir(parents=True, exist_ok=True)
         np.save(imgs_test_path, all_imgs_test)
         np.save(labels_test_path, all_labels_test)
         np.save(file_names_test_path, all_file_names_test)
@@ -203,7 +208,7 @@ def train(run, args):
 
                 # print("\n ------------- \n")
                 logger.info('Iteration: ' + str(i) + '. ' + "Loss: {0}".format(loss_iteration))
-                wandb.log({"loss": loss_iteration})
+                run.log({"loss": loss_iteration})
 
                 if tot_count % args.save_interval == 0:
                     save_keras_model(full_model, args.output_dir, args.new_saved_model_name)
@@ -212,10 +217,10 @@ def train(run, args):
                     args.lr = 0.99 * args.lr
                     K.set_value(full_model.optimizer.lr, args.lr)
                     logger.info("Learning rate changed to: " + str(args.lr))
-                    wandb.update({'lr': args.lr})
+                    run.config.update({'lr': args.lr})
 
     save_keras_model(full_model, args.output_dir, args.new_saved_model_name)
-    run.save(args.output_dir / f'{args.new_saved_model_name}.h5')
+    run.log_model(args.output_dir / f'{args.new_saved_model_name}.h5')
     logger.info("Training finished!")
 
     logger.info("Calculating embeddings for whitelist and phishing set")
@@ -224,14 +229,14 @@ def train(run, args):
     whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
     np.save(args.output_dir / 'whitelist_emb2', whitelist_emb)
     np.save(args.output_dir / 'whitelist_labels2', y_train_legit)
-    wandb.save(str(args.output_dir / 'whitelist_emb2.npy'))
-    wandb.save(str(args.output_dir / 'whitelist_labels2.npy'))
+    run.save(str(args.output_dir / 'whitelist_emb2.npy'))
+    run.save(str(args.output_dir / 'whitelist_labels2.npy'))
 
     phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
     np.save(args.output_dir / 'phishing_emb2', phishing_emb)
     np.save(args.output_dir / 'phishing_labels2', all_labels_test)
-    wandb.save(str(args.output_dir / 'phishing_emb2.npy'))
-    wandb.save(str(args.output_dir / 'phishing_labels2.npy'))
+    run.save(str(args.output_dir / 'phishing_emb2.npy'))
+    run.save(str(args.output_dir / 'phishing_labels2.npy'))
     logger.info("Embeddings saved to disk")
 
 
@@ -273,19 +278,19 @@ if __name__ == '__main__':
         parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR / 'smallerSampleDataset')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
-        parser.add_argument('--save-interval', type=int, default=2000)
-        parser.add_argument('--batch-size', type=int, default=32)
-        parser.add_argument('--n-iter', type=int, default=50000)
+        parser.add_argument('--save-interval', type=int, default=20) # 2000
+        parser.add_argument('--batch-size', type=int, default=16) # TODO: change to 32
+        parser.add_argument('--n-iter', type=int, default=50) # 50000
         parser.add_argument('--lr-interval', type=int, default=250)
         # hard examples training
-        parser.add_argument('--num-sets', type=int, default=100)
+        parser.add_argument('--num-sets', type=int, default=10) # 100
         parser.add_argument('--iter-per-set', type=int, default=8)
         # parser.add_argument('--n_iter', type=int, default=30)
 
         args = parser.parse_args()
         run = wandb.init(
-            project="VisualPhish smallerSampleDataset",
-            notes=f"VisualPhish smallerSampleDataset",
+            project="VisualPhish smallerSampleDataset - phase2",
+            notes=f"VisualPhish smallerSampleDataset - phase2",
             config=args
         )
         try:
