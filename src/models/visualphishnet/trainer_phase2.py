@@ -170,7 +170,7 @@ def train(run, args):
     logger.info("Starting training process!")
     run.log({'lr': args.lr})
     for k in tqdm(range(0, args.num_sets), desc="Sets"):
-        logger.info("Starting a new set!")
+        logger.info(f"Starting a new set! - {k}")
         # print("\n ------------- \n")
         X_train_legit = all_imgs_train
         y_train_legit = all_labels_train
@@ -279,12 +279,12 @@ if __name__ == '__main__':
         parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR / 'smallerSampleDataset')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
-        parser.add_argument('--save-interval', type=int, default=20) # 2000
-        parser.add_argument('--batch-size', type=int, default=16) # TODO: change to 32
-        parser.add_argument('--n-iter', type=int, default=50) # 50000
-        parser.add_argument('--lr-interval', type=int, default=25) # 250
+        parser.add_argument('--save-interval', type=int, default=200) # 2000
+        parser.add_argument('--batch-size', type=int, default=32) # TODO: change to 32
+        parser.add_argument('--n-iter', type=int, default=20) # 50000
+        parser.add_argument('--lr-interval', type=int, default=250) # 250
         # hard examples training
-        parser.add_argument('--num-sets', type=int, default=10) # 100
+        parser.add_argument('--num-sets', type=int, default=5) # 100
         parser.add_argument('--iter-per-set', type=int, default=8)
         # parser.add_argument('--n_iter', type=int, default=30)
 
