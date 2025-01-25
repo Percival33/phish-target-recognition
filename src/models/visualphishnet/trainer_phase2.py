@@ -168,6 +168,7 @@ def train(run, args):
     tot_count = 0
 
     logger.info("Starting training process!")
+    run.log({'lr': args.lr})
     for k in tqdm(range(0, args.num_sets), desc="Sets"):
         logger.info("Starting a new set!")
         # print("\n ------------- \n")
@@ -217,7 +218,7 @@ def train(run, args):
                     args.lr = 0.99 * args.lr
                     K.set_value(full_model.optimizer.lr, args.lr)
                     logger.info("Learning rate changed to: " + str(args.lr))
-                    run.config.update({'lr': args.lr})
+                    run.log({'lr': args.lr})
 
     save_keras_model(full_model, args.output_dir, args.new_saved_model_name)
     run.log_model(args.output_dir / f'{args.new_saved_model_name}.h5')
