@@ -175,18 +175,22 @@ if __name__ == '__main__':
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
+        handlers=[
+            logging.FileHandler("result.log"),
+            logging.StreamHandler()
+        ]
     )
     logger = logging.getLogger()
     logger.info("Evaluating VisualPhishNet")
     dataset_path = PROCESSED_DATA_DIR / 'smallerSampleDataset'
-    output_dir_path = INTERIM_DATA_DIR / 'VisualPhish'
+    output_dir_path = INTERIM_DATA_DIR / 'smallerSampleDataset'
 
     # TODO: enable using wandb artifacts
     VPDatasSet = DataSet(
-        X_legit_train=np.load(output_dir_path / 'whitelist_emb.npy'),
-        y_legit_train=np.load(output_dir_path / 'whitelist_labels.npy'),
-        X_phish=np.load(output_dir_path / 'phishing_emb.npy'),
-        y_phish=np.load(output_dir_path / 'phishing_labels.npy'),
+        X_legit_train=np.load(output_dir_path / 'whitelist_emb2.npy'),
+        y_legit_train=np.load(output_dir_path / 'whitelist_labels2.npy'),
+        X_phish=np.load(output_dir_path / 'phishing_emb2.npy'),
+        y_phish=np.load(output_dir_path / 'phishing_labels2.npy'),
         phish_test_idx=np.load(output_dir_path / 'test_idx.npy'),
         phish_train_idx=np.load(output_dir_path / 'train_idx.npy'),
     )
