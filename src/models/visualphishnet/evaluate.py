@@ -7,7 +7,7 @@ from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
 
 # TODO: rename as it is not clear what it does (contains embeddings and labels only)
 @dataclass
-class DataSet:
+class TrainResults:
     phish_test_idx: np.ndarray
     phish_train_idx: np.ndarray
 
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     output_dir_path = INTERIM_DATA_DIR / 'smallerSampleDataset'
 
     # TODO: enable using wandb artifacts
-    VPDatasSet = DataSet(
+    VPTrainResults = TrainResults(
         X_legit_train=np.load(output_dir_path / 'whitelist_emb2.npy'),
         y_legit_train=np.load(output_dir_path / 'whitelist_labels2.npy'),
         X_phish=np.load(output_dir_path / 'phishing_emb2.npy'),
@@ -200,15 +200,15 @@ if __name__ == '__main__':
     legit_file_names_targets = targetHelper.read_file_names(dataset_path / 'trusted_list', 'targets.txt')
     phish_file_names_targets = targetHelper.read_file_names(dataset_path / 'phishing', 'targets.txt')
     phish_train_file_names, phish_test_file_names = get_phish_file_names(phish_file_names_targets,
-                                                                         VPDatasSet.phish_train_idx,
-                                                                         VPDatasSet.phish_test_idx)
+                                                                         VPTrainResults.phish_train_idx,
+                                                                         VPTrainResults.phish_test_idx)
 
-    evaluate = Evaluate(VPDatasSet, legit_file_names_targets, phish_train_file_names)
+    evaluate = Evaluate(VPTrainResults, legit_file_names_targets, phish_train_file_names)
 
     n = 1  # Top-1 match
     correct = 0
 
-    for i in range(0, VPDatasSet.phish_test_idx.shape[0]):
+    for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
         distances_to_train = evaluate.pairwise_distance[i, :]
         idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
         names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
@@ -217,4 +217,4 @@ if __name__ == '__main__':
 
         if found == 1:
             correct += 1
-    logger.info("Correct match percentage: " + str(correct / VPDatasSet.phish_test_idx.shape[0]))
+    logger.info("Correct match percentage: " + str(correct / VPTrainResults.phish_test_idx.shape[0]))
