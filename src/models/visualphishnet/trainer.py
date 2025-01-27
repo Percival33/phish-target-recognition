@@ -2,15 +2,18 @@ import logging
 from argparse import ArgumentParser
 
 import numpy as np
-from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
 
-from HardSubsetSampling import HardSubsetSampling
-from triplet_sampling import TargetHelper, get_batch
-import data
-from keras.models import load_model
 from keras import backend as K
 from tqdm import tqdm
 import wandb
+
+from HardSubsetSampling import HardSubsetSampling
+from TargetHelper import TargetHelper
+from RandomSampling import RandomSampling
+from src.models.visualphishnet.ModelHelper import ModelHelper
+from triplet_sampling import get_batch_for_phase2
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
+from src.models.visualphishnet import data
 
 
 # Store the start and end of each target in the training set (used later in triplet sampling)
@@ -38,101 +41,128 @@ def all_targets_start_end(num_target, labels):
     return start_end_each_target
 
 
-def save_keras_model(model, output_dir, new_saved_model_name):
-    # TODO: save artifact to wandb
-    model.save(output_dir / f'{new_saved_model_name}.h5')
-    logger.info("Saved model to disk")
+# Order random phishing arrays per website (from 0 to 155 target)
+
+def order_random_array(orig_arr, y_orig_arr, targets):
+    # TODO: remove duplicate with HardSubsetSampling
+    sorted_arr = np.zeros(orig_arr.shape)
+    y_sorted_arr = np.zeros(y_orig_arr.shape)
+    count = 0
+    for i in range(0, targets):
+        for j in range(0, orig_arr.shape[0]):
+            if y_orig_arr[j] == i:
+                sorted_arr[count, :, :, :] = orig_arr[j, :, :, :]
+                y_sorted_arr[count, :] = i
+                count = count + 1
+    return sorted_arr, y_sorted_arr
 
 
-def prepare_model(args):
-    def loss(y_true, y_pred, margin):
-        loss_value = K.maximum(y_true, margin + y_pred)
-        loss_value = K.mean(loss_value, axis=0)
-        return loss_value
+# Store the start and end of each target in the phishing set (used later in triplet sampling)
+# Not all targets might be in the phishing set
+def targets_start_end(num_target, labels):
+    prev_target = labels[0]
+    start_end_each_target = np.zeros((num_target, 2))
+    start_end_each_target[0, 0] = labels[0]
+    if not labels[0] == 0:
+        start_end_each_target[0, 0] = -1
+        start_end_each_target[0, 1] = -1
+    count_target = 0
+    for i in range(1, labels.shape[0]):
+        if not labels[i] == prev_target:
+            start_end_each_target[int(labels[i - 1]), 1] = int(i - 1)
+            start_end_each_target[int(labels[i]), 0] = int(i)
+            prev_target = labels[i]
+    start_end_each_target[int(labels[-1]), 1] = int(labels.shape[0] - 1)
 
-    def custom_loss(margin):
-        def loss(y_true, y_pred):
-            loss_value = K.maximum(y_true, margin + y_pred)
-            loss_value = K.mean(loss_value, axis=0)
-            return loss_value
-
-        return loss
-
-    full_model = load_model(args.output_dir / f"{args.saved_model_name}.h5",
-                            custom_objects={'loss': custom_loss(args.margin)})
-
-    from keras import optimizers
-    optimizer = optimizers.Adam(lr=args.lr)
-    full_model.compile(loss=custom_loss(args.margin), optimizer=optimizer)
-
-    return full_model
+    for i in range(1, num_target):
+        if start_end_each_target[i, 0] == 0:
+            start_end_each_target[i, 0] = -1
+            start_end_each_target[i, 1] = -1
+    return start_end_each_target
 
 
-def train(run, args):
-    logger.info('Training model')
-    # log dataset hash
+def train_phase1(run, args):
+    logger.info('Trainer phase 1')
 
-    logger.info('Check for pre-saved data or load images')
+    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs()
+    logger.info('Images loaded')
 
-    # Define paths for saved .npy files
-    imgs_train_path = args.output_dir / 'all_imgs_train.npy'
-    labels_train_path = args.output_dir / 'all_labels_train.npy'
-    file_names_train_path = args.output_dir / 'all_file_names_train.npy'
+    X_train_legit = all_imgs_train
+    y_train_legit = all_labels_train
 
-    imgs_test_path = args.output_dir / 'all_imgs_test.npy'
-    labels_test_path = args.output_dir / 'all_labels_test.npy'
-    file_names_test_path = args.output_dir / 'all_file_names_test.npy'
+    # TODO: if not existing, create this split -> log as artifact
+    # Load the same train/split in phase 1
+    phish_test_idx = np.load(args.output_dir / 'test_idx.npy')
+    phish_train_idx = np.load(args.output_dir / 'train_idx.npy')
+
+    X_test_phish = all_imgs_test[phish_test_idx, :]
+    y_test_phish = all_labels_test[phish_test_idx, :]
+
+    X_train_phish = all_imgs_test[phish_train_idx, :]
+    y_train_phish = all_labels_test[phish_train_idx, :]
+
+    # create model
+    modelHelper = ModelHelper()
+    model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+
+    # order random array? -> po co?
+    X_test_phish, y_test_phish = order_random_array(X_test_phish, y_test_phish, args.num_targets)
+    X_train_phish, y_train_phish = order_random_array(X_train_phish, y_train_phish, args.num_targets)
+
+    # labels_start_end_train_phish, labels_start_end_test_phish
+    labels_start_end_train_phish = targets_start_end(args.num_targets, y_train_phish)
+    labels_start_end_test_phish = targets_start_end(args.num_targets, y_test_phish)
+    # labels_start_end_train_legit
+    labels_start_end_train_legit = all_targets_start_end(args.num_targets, y_train_legit)
+
+    targetHelper = TargetHelper(args.dataset_path / 'phishing')
+    randomSampling = RandomSampling(targetHelper, labels_start_end_train_phish, labels_start_end_test_phish,
+                                    labels_start_end_train_legit)
+    # training
+    logger.info("Starting training process! - phase 1")
+
+    targets_train = np.zeros([args.batch_size, 1])
+    run.log({'lr': args.lr})
+
+    for i in range(1, args.n_iter):
+        inputs = randomSampling.get_batch(targetHelper=targetHelper, X_train_legit=X_train_legit,
+                                          y_train_legit=y_train_legit, X_train_phish=X_train_phish,
+                                          labels_start_end_train_legit=labels_start_end_train_legit,
+                                          batch_size=args.batch_size, num_targets=args.num_targets)
+        loss_value = model.train_on_batch(inputs, targets_train)
+
+        logger.info('Iteration: ' + str(i) + '. ' + "Loss: {0}".format(loss_value))
+        run.log({"loss": loss_value})
+
+        if i % args.save_interval == 0:
+            # TODO: log model artifact if better accuracy
+            testResults = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
+                                                     all_labels_test, train_idx=phish_train_idx,
+                                                     test_idx=phish_test_idx)
+            acc = modelHelper.get_acc(testResults, args.dataset_path / 'trusted_list', args.dataset_path / 'phishing')
+            run.log({"acc": acc})
+            modelHelper.save_model(model, args.output_dir, args.saved_model_name)
+
+        if i % args.lr_interval == 0:
+            args.lr = 0.99 * args.lr
+            K.set_value(model.optimizer.lr, args.lr)
+            run.log({'lr': args.lr})
+
+    modelHelper.save_model(model, args.output_dir, args.saved_model_name)
+    # TODO: log artifact
+
+    # TODO: log embeddings as artifacts
+    # TODO: save model and cal embeddings -> log artifact
+    # TODO: na bieżąco obliczaj jakość modelu
+
+
+def train_phase2(run, args):
+    logger.info('Trainer phase 2')
+    # TODO: log dataset hash
 
     # Initialize variables
-    all_imgs_train, all_labels_train, all_file_names_train = None, None, None
-    all_imgs_test, all_labels_test, all_file_names_test = None, None, None
     data_path_phish = args.dataset_path / 'phishing'
-
-    # Check if all .npy files exist
-    if (imgs_train_path.exists() and labels_train_path.exists() and file_names_train_path.exists() and
-            imgs_test_path.exists() and labels_test_path.exists() and file_names_test_path.exists()):
-        logger.info('Loading pre-saved data')
-
-        # Load pre-saved data
-        all_imgs_train = np.load(imgs_train_path)
-        all_labels_train = np.load(labels_train_path)
-        all_file_names_train = np.load(file_names_train_path)
-
-        all_imgs_test = np.load(imgs_test_path)
-        all_labels_test = np.load(labels_test_path)
-        all_file_names_test = np.load(file_names_test_path)
-
-    else:
-        logger.info('Processing and saving images')
-
-        data_path_trusted = args.dataset_path / 'trusted_list'
-
-        # Read images legit (train)
-        targets_trusted = open(data_path_trusted / 'targets.txt', 'r').read()
-        all_imgs_train, all_labels_train, all_file_names_train = data.read_imgs_per_website(data_path_trusted,
-                                                                                            targets_trusted,
-                                                                                            args.legit_imgs_num,
-                                                                                            args.reshape_size, 0)
-
-
-        imgs_train_path.parent.mkdir(parents=True, exist_ok=True)
-
-        np.save(imgs_train_path, all_imgs_train)
-        np.save(labels_train_path, all_labels_train)
-        np.save(file_names_train_path, all_file_names_train)
-
-        # Read images phishing (test)
-        targets_phishing = open(data_path_phish / 'targets.txt', 'r').read()
-        all_imgs_test, all_labels_test, all_file_names_test = data.read_imgs_per_website(data_path_phish,
-                                                                                         targets_phishing,
-                                                                                         args.phish_imgs_num,
-                                                                                         args.reshape_size, 0)
-
-        imgs_test_path.parent.mkdir(parents=True, exist_ok=True)
-        np.save(imgs_test_path, all_imgs_test)
-        np.save(labels_test_path, all_labels_test)
-        np.save(file_names_test_path, all_file_names_test)
-
+    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs()
     logger.info('Images loaded')
 
     X_train_legit = all_imgs_train
@@ -150,7 +180,8 @@ def train(run, args):
     labels_start_end_train_legit = all_targets_start_end(args.num_targets, y_train_legit)
     targetHelper = TargetHelper(data_path_phish)
 
-    full_model = prepare_model(args)
+    modelHelper = ModelHelper()
+    full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
     hard_subset_sampling = HardSubsetSampling()
     #########################################################################################
     n = 1  # number of wrong points
@@ -167,7 +198,7 @@ def train(run, args):
     targets_train = np.zeros([args.batch_size, 1])
     tot_count = 0
 
-    logger.info("Starting training process!")
+    logger.info("Starting training process! - phase 2")
     run.log({'lr': args.lr})
     for k in tqdm(range(0, args.num_sets), desc="Sets"):
         logger.info(f"Starting a new set! - {k}")
@@ -196,7 +227,7 @@ def train(run, args):
 
             for i in range(1, args.n_iter):
                 tot_count = tot_count + 1
-                inputs = get_batch(
+                inputs = get_batch_for_phase2(
                     targetHelper=targetHelper,
                     X_train_legit=X_train_legit,
                     X_train_new=X_train_new,
@@ -212,7 +243,14 @@ def train(run, args):
                 run.log({"loss": loss_iteration})
 
                 if tot_count % args.save_interval == 0:
-                    save_keras_model(full_model, args.output_dir, args.new_saved_model_name)
+                    # TODO: log model artifact if better accuracy
+                    testResults = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
+                                                             all_labels_test, train_idx=phish_train_idx,
+                                                             test_idx=phish_test_idx)
+                    acc = modelHelper.get_acc(testResults, args.dataset_path / 'trusted_list',
+                                              args.dataset_path / 'phishing')
+                    run.log({"acc": acc})
+                    modelHelper.save_model(model, args.output_dir, args.saved_model_name)
 
                 if tot_count % args.lr_interval == 0:
                     args.lr = 0.99 * args.lr
@@ -220,7 +258,7 @@ def train(run, args):
                     logger.info("Learning rate changed to: " + str(args.lr))
                     run.log({'lr': args.lr})
 
-    save_keras_model(full_model, args.output_dir, args.new_saved_model_name)
+    modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
     run.log_model(args.output_dir / f'{args.new_saved_model_name}.h5')
     logger.info("Training finished!")
 
@@ -247,7 +285,7 @@ if __name__ == '__main__':
         format="%(asctime)s %(levelname)s %(message)s",
     )
     logger = logging.getLogger()
-    logger.info("VisualPhish - Training phase 2")
+    logger.info("VisualPhish - trainer")
 
     init_parser = ArgumentParser(add_help=False)
     # TODO: enable wandb sweep
@@ -279,23 +317,25 @@ if __name__ == '__main__':
         parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR / 'smallerSampleDataset')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
-        parser.add_argument('--save-interval', type=int, default=200) # 2000
-        parser.add_argument('--batch-size', type=int, default=32) # TODO: change to 32
-        parser.add_argument('--n-iter', type=int, default=20) # 50000
-        parser.add_argument('--lr-interval', type=int, default=250) # 250
+        parser.add_argument('--save-interval', type=int, default=200)  # 2000
+        parser.add_argument('--batch-size', type=int, default=32)  # TODO: change to 32
+        parser.add_argument('--n-iter', type=int, default=20)  # p1: 21000, p2: 50000
+        parser.add_argument('--lr-interval', type=int, default=250)  # p1: 100, p2: 250
         # hard examples training
-        parser.add_argument('--num-sets', type=int, default=5) # 100
+        parser.add_argument('--num-sets', type=int, default=5)  # 100
         parser.add_argument('--iter-per-set', type=int, default=8)
         # parser.add_argument('--n_iter', type=int, default=30)
 
         args = parser.parse_args()
         run = wandb.init(
-            project="VisualPhish smallerSampleDataset - phase2",
-            notes=f"VisualPhish smallerSampleDataset - phase2",
-            config=args
+            project="VisualPhish smallerSampleDataset",
+            group="visualphishnet",
+            config=args,
+            tags=[""]
         )
         try:
-            train(run, args)
+            train_phase1(run, args)
+            train_phase2(run, args)
         except Exception as e:
             logger.error(e)
         finally:

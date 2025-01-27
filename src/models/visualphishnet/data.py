@@ -1,5 +1,8 @@
 # TODO: rename file to make it more descriptive
+import logging
 import os
+from dataclasses import dataclass
+
 from skimage.transform import resize
 from matplotlib.pyplot import imread
 
@@ -26,7 +29,7 @@ def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_targ
                 all_file_names.append(file_names[j])
                 count = count + 1
             except:
-                #some images were saved with a wrong extensions
+                # some images were saved with a wrong extensions
                 try:
                     img = imread(target_path / file_names[j], format='jpeg')
                     img = img[:, :, 0:3]
@@ -40,3 +43,100 @@ def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_targ
                     print(file_names[j])
                     break
     return all_imgs, all_labels, all_file_names
+
+
+def read_or_load_imgs(args):
+    logger = logging.getLogger()
+
+    logger.info('Check for pre-saved data or load images')
+
+    # Define paths for saved .npy files
+    imgs_train_path = args.output_dir / 'all_imgs_train.npy'
+    labels_train_path = args.output_dir / 'all_labels_train.npy'
+    file_names_train_path = args.output_dir / 'all_file_names_train.npy'
+
+    imgs_test_path = args.output_dir / 'all_imgs_test.npy'
+    labels_test_path = args.output_dir / 'all_labels_test.npy'
+    file_names_test_path = args.output_dir / 'all_file_names_test.npy'
+
+    # Check if all .npy files exist
+    if (imgs_train_path.exists() and labels_train_path.exists() and file_names_train_path.exists() and
+            imgs_test_path.exists() and labels_test_path.exists() and file_names_test_path.exists()):
+        logger.info('Loading pre-saved data')
+
+        # Load pre-saved data
+        all_imgs_train = np.load(imgs_train_path)
+        all_labels_train = np.load(labels_train_path)
+        all_file_names_train = np.load(file_names_train_path)
+
+        all_imgs_test = np.load(imgs_test_path)
+        all_labels_test = np.load(labels_test_path)
+        all_file_names_test = np.load(file_names_test_path)
+
+    else:
+        logger.info('Processing and saving images')
+
+        data_path_trusted = args.dataset_path / 'trusted_list'
+        data_path_phish = args.dataset_path / 'phishing'
+
+        # Read images legit (train)
+        with open(data_path_trusted / 'targets.txt', 'r') as f:
+            targets_trusted = f.read()
+        all_imgs_train, all_labels_train, all_file_names_train = read_imgs_per_website(data_path_trusted,
+                                                                                       targets_trusted,
+                                                                                       args.legit_imgs_num,
+                                                                                       args.reshape_size, 0)
+
+        imgs_train_path.parent.mkdir(parents=True, exist_ok=True)
+
+        np.save(imgs_train_path, all_imgs_train)
+        np.save(labels_train_path, all_labels_train)
+        np.save(file_names_train_path, all_file_names_train)
+
+        # Read images phishing (test)
+        with open(data_path_phish / 'targets.txt', 'r') as f:
+            targets_phishing = f.read()
+        all_imgs_test, all_labels_test, all_file_names_test = read_imgs_per_website(data_path_phish,
+                                                                                    targets_phishing,
+                                                                                    args.phish_imgs_num,
+                                                                                    args.reshape_size, 0)
+
+        imgs_test_path.parent.mkdir(parents=True, exist_ok=True)
+        np.save(imgs_test_path, all_imgs_test)
+        np.save(labels_test_path, all_labels_test)
+        np.save(file_names_test_path, all_file_names_test)
+
+    return all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test
+
+
+def get_phish_file_names(phish_file_names, phish_train_idx, phish_test_idx):
+    phish_train_file_names = []
+    for i in range(0, phish_train_idx.shape[0]):
+        phish_train_file_names.append(phish_file_names[phish_train_idx[i]])
+
+    phish_train_file_names = [phish_file_names[idx] for idx in phish_train_idx]
+
+    phish_test_file_names = []
+    for i in range(0, phish_test_idx.shape[0]):
+        phish_test_file_names.append(phish_file_names[phish_test_idx[i]])
+
+    return phish_train_file_names, phish_test_file_names
+
+
+# TODO: rename as it is not clear what it does (contains embeddings and labels only)
+@dataclass
+class TrainResults:
+    phish_test_idx: np.ndarray
+    phish_train_idx: np.ndarray
+
+    X_legit_train: np.ndarray
+    y_legit_train: np.ndarray
+    X_phish: np.ndarray
+    y_phish: np.ndarray
+
+    def __post_init__(self):
+        self.X_phish_test = self.X_phish[self.phish_test_idx, :]
+        self.y_phish_test = self.y_phish[self.phish_test_idx, :]
+
+        self.X_phish_train = self.X_phish[self.phish_train_idx, :]
+        self.y_phish_train = self.y_phish[self.phish_train_idx, :]
