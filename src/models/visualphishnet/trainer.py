@@ -84,22 +84,23 @@ def targets_start_end(num_target, labels):
 def train_phase1(run, args):
     logger.info('Trainer phase 1')
 
-    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs()
+    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs(
+        args)
     logger.info('Images loaded')
 
     X_train_legit = all_imgs_train
     y_train_legit = all_labels_train
 
     # TODO: if not existing, create this split -> log as artifact
-    # Load the same train/split in phase 1
-    phish_test_idx = np.load(args.output_dir / 'test_idx.npy')
-    phish_train_idx = np.load(args.output_dir / 'train_idx.npy')
+    idx_test, idx_train = data.read_or_load_train_test_idx(output_dir=args.dataset_path, all_imgs_test=all_imgs_test,
+                                                           all_labels_test=all_labels_test,
+                                                           phishing_test_size=args.phishing_test_size)
 
-    X_test_phish = all_imgs_test[phish_test_idx, :]
-    y_test_phish = all_labels_test[phish_test_idx, :]
+    X_test_phish = all_imgs_test[idx_test, :]
+    y_test_phish = all_labels_test[idx_test, :]
 
-    X_train_phish = all_imgs_test[phish_train_idx, :]
-    y_train_phish = all_labels_test[phish_train_idx, :]
+    X_train_phish = all_imgs_test[idx_train, :]
+    y_train_phish = all_labels_test[idx_train, :]
 
     # create model
     modelHelper = ModelHelper()

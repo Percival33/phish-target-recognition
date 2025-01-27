@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from skimage.transform import resize
 from matplotlib.pyplot import imread
-
+from sklearn.model_selection import train_test_split
 import numpy as np
 
 
@@ -121,6 +121,21 @@ def get_phish_file_names(phish_file_names, phish_train_idx, phish_test_idx):
         phish_test_file_names.append(phish_file_names[phish_test_idx[i]])
 
     return phish_train_file_names, phish_test_file_names
+
+
+def read_or_load_train_test_idx(output_dir, all_imgs_test, all_labels_test, phishing_test_size):
+    idx_test, idx_train = None, None
+    if (output_dir / 'test_idx.npy').exists() and (output_dir / 'train_idx.npy').exists():
+        idx_train = np.load(output_dir / 'train_idx.npy')
+        idx_test = np.load(output_dir / 'test_idx.npy')
+    else:
+        idx = np.arange(all_imgs_test.shape[0])
+        _, _, _, _, idx_test, idx_train = train_test_split(all_imgs_test, all_labels_test, idx,
+                                                           test_size=phishing_test_size)
+        np.save(output_dir / 'test_idx', idx_test)
+        np.save(output_dir / 'train_idx', idx_train)
+
+    return idx_test, idx_train
 
 
 # TODO: rename as it is not clear what it does (contains embeddings and labels only)
