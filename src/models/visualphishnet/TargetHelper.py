@@ -1,6 +1,9 @@
 # Don't sample negative image from the same category as the positive image (e.g. google and google drive)
 # Create clusters of same-company websites (e.g. all microsoft websites)
 import logging
+import logging.config
+
+from tools.config import SRC_DIR
 
 
 class TargetHelper:
@@ -11,6 +14,7 @@ class TargetHelper:
     sub_targets = [[150, 152, 151, 149, 148], [153, 154], [147], [5]]
 
     def __init__(self, data_path):
+        logging.config.fileConfig(SRC_DIR / 'logging.conf')
         self.logger = logging.getLogger(__name__)
         self.read_targets(data_path)
 

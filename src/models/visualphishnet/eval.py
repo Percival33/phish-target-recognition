@@ -1,10 +1,11 @@
 import logging
+import logging.config
 import numpy as np
-from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SRC_DIR
 
 from src.models.visualphishnet.Evaluate import Evaluate
 from src.models.visualphishnet.TargetHelper import TargetHelper
-from src.models.visualphishnet.data import TrainResults, get_phish_file_names
+from .data import TrainResults, get_phish_file_names
 
 
 def get_label_from_name(name):
@@ -79,14 +80,7 @@ def get_label_from_name(name):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-        handlers=[
-            logging.FileHandler("result.log"),
-            logging.StreamHandler()
-        ]
-    )
+    logging.config.fileConfig(SRC_DIR / 'logging.conf')
     logger = logging.getLogger()
     logger.info("Evaluating VisualPhishNet")
     dataset_path = PROCESSED_DATA_DIR / 'smallerSampleDataset'

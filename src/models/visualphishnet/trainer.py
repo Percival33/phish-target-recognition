@@ -1,3 +1,4 @@
+import logging.config
 import logging
 from argparse import ArgumentParser
 
@@ -12,7 +13,7 @@ from TargetHelper import TargetHelper
 from RandomSampling import RandomSampling
 from ModelHelper import ModelHelper
 from triplet_sampling import get_batch_for_phase2
-from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SRC_DIR
 import DataHelper as data
 
 
@@ -280,11 +281,8 @@ def train_phase2(run, args):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
-    logger = logging.getLogger()
+    logging.config.fileConfig(SRC_DIR / 'logging.conf')
+    logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
 
     init_parser = ArgumentParser(add_help=False)

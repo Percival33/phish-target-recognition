@@ -1,5 +1,5 @@
+import logging.config
 import logging
-
 import numpy as np
 from keras import optimizers, Input, Model, backend as K
 from keras.applications import VGG16
@@ -10,9 +10,14 @@ from keras.regularizers import l2
 import DataHelper as data
 from Evaluate import Evaluate
 from TargetHelper import TargetHelper
+from src.tools.src.tools.config import SRC_DIR
 
 
 class ModelHelper:
+    def __init__(self):
+        logging.config.fileConfig(SRC_DIR / 'logging.conf')
+        self.logger = logging.getLogger(__name__)
+
     def prepare_model(self, input_shape, new_conv_params, margin, lr):
         model = self.define_triplet_network(input_shape, new_conv_params)
         model.summary()
@@ -23,24 +28,21 @@ class ModelHelper:
 
     def load_trained_model(self, output_dir, saved_model_name, margin, lr):
         model = load_model(output_dir / f"{saved_model_name}.h5",
-                                custom_objects={'loss': self.custom_loss(margin)})
+                           custom_objects={'loss': self.custom_loss(margin)})
 
         optimizer = optimizers.Adam(lr=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
 
         return model
 
-    @staticmethod
-    def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx,
+    def get_embeddings(self, full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx,
                        train_idx) -> data.TrainResults:
-        logger = logging.getLogger(__name__)
-
         shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
-        logger.debug(full_model.summary())
+        self.logger.debug(full_model.summary())
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
 
-        logger.info("Embeddings were calculated")
+        self.logger.info("Embeddings were calculated")
 
         return data.TrainResults(
             X_legit_train=whitelist_emb,

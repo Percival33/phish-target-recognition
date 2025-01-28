@@ -1,5 +1,7 @@
 # TODO: rename file to make it more descriptive
 import logging
+import logging.config
+
 import os
 from dataclasses import dataclass
 
@@ -7,6 +9,8 @@ from skimage.transform import resize
 from matplotlib.pyplot import imread
 from sklearn.model_selection import train_test_split
 import numpy as np
+
+from tools.config import SRC_DIR
 
 
 def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_target_count):
@@ -46,8 +50,8 @@ def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_targ
 
 
 def read_or_load_imgs(args):
-    logger = logging.getLogger()
-
+    logger = logging.getLogger(__name__)
+    logging.config.fileConfig(SRC_DIR / 'logging.conf')
     logger.info('Check for pre-saved data or load images')
 
     # Define paths for saved .npy files
@@ -155,6 +159,7 @@ class TrainResults:
 
         self.X_phish_train = self.X_phish[self.phish_train_idx, :]
         self.y_phish_train = self.y_phish[self.phish_train_idx, :]
+
 
 def save_embeddings(emb: TrainResults, output_dir, run=None):
     np.save(output_dir / 'whitelist_emb', emb.X_legit_train)
