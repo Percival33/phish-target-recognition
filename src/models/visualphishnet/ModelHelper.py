@@ -2,15 +2,14 @@ import logging
 
 import numpy as np
 from keras import optimizers, Input, Model, backend as K
-from keras.src.applications import VGG16
-from keras.src.layers import Conv2D, GlobalMaxPooling2D, Lambda, Subtract, Reshape
-from keras.src.saving.saving_api import load_model
+from keras.applications import VGG16
+from keras.layers import Conv2D, GlobalMaxPooling2D, Lambda, Subtract, Reshape
+from keras.models import load_model
 from keras.regularizers import l2
 
-from . import data
-from .Evaluate import Evaluate
-from .TargetHelper import TargetHelper
-from .data import TrainResults
+import data
+from Evaluate import Evaluate
+from TargetHelper import TargetHelper
 
 
 class ModelHelper:
@@ -32,13 +31,13 @@ class ModelHelper:
         return full_model
 
     @staticmethod
-    def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx, train_idx) -> TrainResults:
+    def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx, train_idx) -> data.TrainResults:
         shared_model = full_model.layers[3] # FIXME: dlaczego akurat 3???
 
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
 
-        return TrainResults(
+        return data.TrainResults(
             X_legit_train=whitelist_emb,
             y_legit_train=y_train_legit,
             X_phish=phishing_emb,
@@ -48,7 +47,7 @@ class ModelHelper:
         )
 
     @staticmethod
-    def get_acc(VPTrainResults: TrainResults, trusted_list_path, phishing_path):
+    def get_acc(VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
         # TODO: enable using wandb artifacts
         logger = logging.getLogger(__name__)
         targetHelper = TargetHelper()

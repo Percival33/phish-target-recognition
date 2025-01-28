@@ -1,12 +1,11 @@
 import numpy as np
 
-from src.models.visualphishnet.data import TrainResults
-
+import data
 
 class Evaluate:
     # Find same-category website (matching is correct if it was matched to the same category (e.g. microsoft and outlook ))
 
-    def __init__(self, trainResults: TrainResults, legit_file_names, phish_train_file_names):
+    def __init__(self, trainResults: data.TrainResults, legit_file_names, phish_train_file_names):
         self.X_phish_train = trainResults.X_phish_train
         self.X_phish_test = trainResults.X_phish_test
         self.phish_train_idx = trainResults.phish_train_idx

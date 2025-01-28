@@ -10,10 +10,10 @@ import wandb
 from HardSubsetSampling import HardSubsetSampling
 from TargetHelper import TargetHelper
 from RandomSampling import RandomSampling
-from src.models.visualphishnet.ModelHelper import ModelHelper
+from ModelHelper import ModelHelper
 from triplet_sampling import get_batch_for_phase2
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
-from src.models.visualphishnet import data
+import data
 
 
 # Store the start and end of each target in the training set (used later in triplet sampling)
@@ -319,7 +319,7 @@ if __name__ == '__main__':
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
         parser.add_argument('--save-interval', type=int, default=200)  # 2000
-        parser.add_argument('--batch-size', type=int, default=32)  # TODO: change to 32
+        parser.add_argument('--batch-size', type=int, default=16)  # TODO: change to 32
         parser.add_argument('--n-iter', type=int, default=20)  # p1: 21000, p2: 50000
         parser.add_argument('--lr-interval', type=int, default=250)  # p1: 100, p2: 250
         # hard examples training
@@ -332,7 +332,7 @@ if __name__ == '__main__':
             project="VisualPhish smallerSampleDataset",
             group="visualphishnet",
             config=args,
-            tags=[""]
+            tags=["gabi"]
         )
         try:
             train_phase1(run, args)
