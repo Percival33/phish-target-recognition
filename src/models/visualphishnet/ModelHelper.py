@@ -31,10 +31,11 @@ class ModelHelper:
         return full_model
 
     @staticmethod
-    def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx, train_idx) -> data.TrainResults:
+    def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx,
+                       train_idx) -> data.TrainResults:
         logger = logging.getLogger(__name__)
 
-        shared_model = full_model.layers[3] # FIXME: dlaczego akurat 3???
+        shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
 
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
@@ -51,17 +52,16 @@ class ModelHelper:
         )
 
     @staticmethod
-    def get_acc(VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
+    def get_acc(targetHelper: TargetHelper, VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
         # TODO: enable using wandb artifacts
         logger = logging.getLogger(__name__)
         logger.info("Preparing to calculate acc...")
-        targetHelper = TargetHelper()
         legit_file_names_targets = targetHelper.read_file_names(trusted_list_path, 'targets.txt')
         phish_file_names_targets = targetHelper.read_file_names(phishing_path, 'targets.txt')
 
         phish_train_file_names, phish_test_file_names = data.get_phish_file_names(phish_file_names_targets,
-                                                                             VPTrainResults.phish_train_idx,
-                                                                             VPTrainResults.phish_test_idx)
+                                                                                  VPTrainResults.phish_train_idx,
+                                                                                  VPTrainResults.phish_test_idx)
 
         evaluate = Evaluate(VPTrainResults, legit_file_names_targets, phish_train_file_names)
 

@@ -10,10 +10,9 @@ class TargetHelper:
     parents_targets_idx = [90, 12, 65, 4]
     sub_targets = [[150, 152, 151, 149, 148], [153, 154], [147], [5]]
 
-    def __init__(self, data_path=None):
+    def __init__(self, data_path):
         self.logger = logging.getLogger(__name__)
-        if data_path is not None:
-            self.read_targets(data_path)
+        self.read_targets(data_path)
 
     def read_targets(self, data_path):
         targets_file = open(data_path / 'targets.txt', "r")

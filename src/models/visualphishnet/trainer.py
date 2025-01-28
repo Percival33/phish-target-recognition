@@ -140,7 +140,8 @@ def train_phase1(run, args):
             testResults = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
                                                      all_labels_test, train_idx=idx_train,
                                                      test_idx=idx_test)
-            acc = modelHelper.get_acc(testResults, args.dataset_path / 'trusted_list', args.dataset_path / 'phishing')
+            acc = modelHelper.get_acc(targetHelper, testResults, args.dataset_path / 'trusted_list',
+                                      args.dataset_path / 'phishing')
             run.log({"acc": acc})
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
 
@@ -163,7 +164,8 @@ def train_phase2(run, args):
 
     # Initialize variables
     data_path_phish = args.dataset_path / 'phishing'
-    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs(args)
+    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs(
+        args)
     logger.info('Images loaded')
 
     X_train_legit = all_imgs_train
@@ -248,7 +250,7 @@ def train_phase2(run, args):
                     testResults = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
                                                              all_labels_test, train_idx=phish_train_idx,
                                                              test_idx=phish_test_idx)
-                    acc = modelHelper.get_acc(testResults, args.dataset_path / 'trusted_list',
+                    acc = modelHelper.get_acc(targetHelper, testResults, args.dataset_path / 'trusted_list',
                                               args.dataset_path / 'phishing')
                     run.log({"acc": acc})
                     modelHelper.save_model(model, args.output_dir, args.saved_model_name)
