@@ -20,7 +20,9 @@ class ModelHelper:
 
     def prepare_model(self, input_shape, new_conv_params, margin, lr):
         model = self.define_triplet_network(input_shape, new_conv_params)
-        self.logger.debug(model.summary())
+        self.logger.info("before")
+        model.summary(print_fn=self.logger.info)
+        self.logger.info("after")
 
         optimizer = optimizers.Adam(lr=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
@@ -38,7 +40,7 @@ class ModelHelper:
     def get_embeddings(self, full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx,
                        train_idx) -> data.TrainResults:
         shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
-        self.logger.debug(full_model.summary())
+        full_model.summary(print_fn=self.logger.debug)
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
 
