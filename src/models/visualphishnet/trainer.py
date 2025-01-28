@@ -95,6 +95,9 @@ def train_phase1(run, args):
     idx_test, idx_train = data.read_or_load_train_test_idx(output_dir=args.dataset_path, all_imgs_test=all_imgs_test,
                                                            all_labels_test=all_labels_test,
                                                            phishing_test_size=args.phishing_test_size)
+    # TODO: log as artifacts?
+    # run.log_artifact(str(args.dataset_path / 'test_idx.npy'))
+    # run.log_artifact(str(args.dataset_path / 'train_idx.npy'))
 
     X_test_phish = all_imgs_test[idx_test, :]
     y_test_phish = all_labels_test[idx_test, :]
@@ -151,12 +154,22 @@ def train_phase1(run, args):
             run.log({'lr': args.lr})
 
     modelHelper.save_model(model, args.output_dir, args.saved_model_name)
-    # TODO: log artifact
-
-    # TODO: log embeddings as artifacts
     # TODO: save model and cal embeddings -> log artifact
-    # TODO: na bieżąco obliczaj jakość modelu
-
+    # emb = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
+    #                            all_labels_test, train_idx=idx_train,
+    #                            test_idx=idx_test)
+    # np.save(args.output_dir / 'whitelist_emb1', emb.X_legit_train)
+    # np.save(args.output_dir / 'whitelist_labels1', emb.y_legit_train)
+    # np.save(args.output_dir / 'phishing_emb1', emb.X_phish)
+    # np.save(args.output_dir / 'phishing_labels1', emb.y_phish)
+    # TODO: log embeddings as artifacts
+    # run.save(str(args.output_dir / 'whitelist_emb1.npy'))
+    # run.save(str(args.output_dir / 'whitelist_labels1.npy'))
+    # run.save(str(args.output_dir / 'phishing_emb1.npy'))
+    # run.save(str(args.output_dir / 'phishing_labels1.npy'))
+    # TODO: log artifact
+    # run.log_model(args.output_dir / f'{args.saved_model_name}.h5')
+    logger.info("Training - phase 1 - finished!")
 
 def train_phase2(run, args):
     logger.info('Trainer phase 2')
