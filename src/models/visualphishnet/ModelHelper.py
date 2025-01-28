@@ -10,7 +10,7 @@ from keras.regularizers import l2
 import DataHelper as data
 from Evaluate import Evaluate
 from TargetHelper import TargetHelper
-from src.tools.src.tools.config import SRC_DIR
+from tools.config import SRC_DIR
 
 
 class ModelHelper:
