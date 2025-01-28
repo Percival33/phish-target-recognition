@@ -318,9 +318,9 @@ if __name__ == '__main__':
         parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR / 'smallerSampleDataset')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
-        parser.add_argument('--save-interval', type=int, default=100)  # 2000
+        parser.add_argument('--save-interval', type=int, default=2)  # 2000
         parser.add_argument('--batch-size', type=int, default=16)  # TODO: change to 32
-        parser.add_argument('--n-iter', type=int, default=200)  # p1: 21000, p2: 50000
+        parser.add_argument('--n-iter', type=int, default=3)  # p1: 21000, p2: 50000
         parser.add_argument('--lr-interval', type=int, default=250)  # p1: 100, p2: 250
         # hard examples training
         parser.add_argument('--num-sets', type=int, default=5)  # 100
@@ -346,5 +346,9 @@ if __name__ == '__main__':
             train_phase2(run, args)
         except Exception as e:
             logger.error(e)
+            tb = e.__traceback__
+            while tb is not None:
+                logger.error(f"File: {tb.tb_frame.f_code.co_filename}, Line: {tb.tb_lineno}")
+                tb = tb.tb_next
         finally:
             run.finish()

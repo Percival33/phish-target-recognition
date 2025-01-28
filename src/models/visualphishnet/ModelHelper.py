@@ -54,6 +54,7 @@ class ModelHelper:
     def get_acc(VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
         # TODO: enable using wandb artifacts
         logger = logging.getLogger(__name__)
+        logger.info("Preparing to calculate acc...")
         targetHelper = TargetHelper()
         legit_file_names_targets = targetHelper.read_file_names(trusted_list_path, 'targets.txt')
         phish_file_names_targets = targetHelper.read_file_names(phishing_path, 'targets.txt')
@@ -66,12 +67,12 @@ class ModelHelper:
 
         n = 1  # Top-1 match
         correct = 0
-
+        logger.info(f"Calculating acc with top-{n} match")
         for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
             distances_to_train = evaluate.pairwise_distance[i, :]
             idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
             names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
-            found, found_idx = targetHelper.check_if_target_in_top(phish_test_file_names[i], only_names)
+            found, found_idx = targetHelper.check_if_target_in_top(str(phish_test_file_names[i].name), only_names)
             logger.info(names_min_distance)
 
             if found == 1:

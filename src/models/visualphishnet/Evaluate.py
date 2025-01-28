@@ -51,13 +51,13 @@ class Evaluate:
         for i in range(0, idx.shape[0]):
             index_min_distance = idx[i]
             if index_min_distance < self.X_phish_train.shape[0]:
-                names_min_distance = names_min_distance + 'Phish: ' + self.phish_train_file_names[
-                    index_min_distance] + ','
-                only_names.append(self.phish_train_file_names[index_min_distance])
+                names_min_distance = names_min_distance + 'Phish: ' + str(self.phish_train_file_names[
+                    index_min_distance]) + ','
+                only_names.append(str(self.phish_train_file_names[index_min_distance].name))
             else:
-                names_min_distance = names_min_distance + 'Legit: ' + self.legit_file_names[
-                    index_min_distance - self.X_phish_train.shape[0]] + ','
-                only_names.append(self.legit_file_names[index_min_distance - self.X_phish_train.shape[0]])
+                names_min_distance = names_min_distance + 'Legit: ' + str(self.legit_file_names[
+                    index_min_distance - self.X_phish_train.shape[0]]) + ','
+                only_names.append(str(self.legit_file_names[index_min_distance - self.X_phish_train.shape[0]].name))
             distances = distances + str(values[i]) + ','
         names_min_distance = names_min_distance[:-1]
         distances = distances[:-1]
