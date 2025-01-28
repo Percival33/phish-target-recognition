@@ -181,5 +181,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--dataset-path', type=str, default=RAW_DATA_DIR / 'VisualPhish')
     parser.add_argument('--output-dir', default=INTERIM_DATA_DIR / 'VisualPhish')
+    parser.add_argument('--legit-imgs-num', default=1195)
+    parser.add_argument('--phish-imgs-num', default=9363)
 
     data = read_or_load_imgs(parser.parse_args())
