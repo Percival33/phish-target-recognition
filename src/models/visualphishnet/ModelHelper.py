@@ -20,7 +20,7 @@ class ModelHelper:
 
     def prepare_model(self, input_shape, new_conv_params, margin, lr):
         model = self.define_triplet_network(input_shape, new_conv_params)
-        model.summary()
+        self.logger.debug(model.summary())
 
         optimizer = optimizers.Adam(lr=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
@@ -53,11 +53,9 @@ class ModelHelper:
             phish_train_idx=train_idx
         )
 
-    @staticmethod
-    def get_acc(targetHelper: TargetHelper, VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
+    def get_acc(self, targetHelper: TargetHelper, VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
         # TODO: enable using wandb artifacts
-        logger = logging.getLogger(__name__)
-        logger.info("Preparing to calculate acc...")
+        self.logger.info("Preparing to calculate acc...")
         legit_file_names_targets = targetHelper.read_file_names(trusted_list_path, 'targets.txt')
         phish_file_names_targets = targetHelper.read_file_names(phishing_path, 'targets.txt')
 
@@ -69,25 +67,23 @@ class ModelHelper:
 
         n = 1  # Top-1 match
         correct = 0
-        logger.info(f"Calculating acc with top-{n} match")
+        self.logger.info(f"Calculating acc with top-{n} match")
         for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
             distances_to_train = evaluate.pairwise_distance[i, :]
             idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
             names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
             found, found_idx = targetHelper.check_if_target_in_top(str(phish_test_file_names[i].name), only_names)
-            logger.info(names_min_distance)
+            self.logger.info(names_min_distance)
 
             if found == 1:
                 correct += 1
-        logger.info(f"Correct match percentage: {str(correct / VPTrainResults.phish_test_idx.shape[0])}")
+        self.logger.info(f"Correct match percentage: {str(correct / VPTrainResults.phish_test_idx.shape[0])}")
         return correct / VPTrainResults.phish_test_idx.shape[0]
 
-    @staticmethod
-    def save_model(model, output_dir, model_name):
-        logger = logging.getLogger(__name__)
+    def save_model(self, model, output_dir, model_name):
         # TODO: save artifact to wandb
         model.save(output_dir / f'{model_name}.h5')
-        logger.info("Saved model to disk")
+        self.logger.info("Saved model to disk")
 
     @staticmethod
     def define_triplet_network(input_shape, new_conv_params):
