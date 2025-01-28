@@ -226,7 +226,7 @@ def train_phase2(run, args):
                 X_train_phish=X_train_phish
             )
 
-            for i in range(1, args.n_iter):
+            for i in range(1, args.hard_n_iter):
                 tot_count = tot_count + 1
                 inputs = get_batch_for_phase2(
                     targetHelper=targetHelper,
@@ -318,24 +318,31 @@ if __name__ == '__main__':
         parser.add_argument('--output-dir', type=str, default=INTERIM_DATA_DIR / 'smallerSampleDataset')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
-        parser.add_argument('--save-interval', type=int, default=200)  # 2000
+        parser.add_argument('--save-interval', type=int, default=100)  # 2000
         parser.add_argument('--batch-size', type=int, default=16)  # TODO: change to 32
-        parser.add_argument('--n-iter', type=int, default=20)  # p1: 21000, p2: 50000
+        parser.add_argument('--n-iter', type=int, default=200)  # p1: 21000, p2: 50000
         parser.add_argument('--lr-interval', type=int, default=250)  # p1: 100, p2: 250
         # hard examples training
         parser.add_argument('--num-sets', type=int, default=5)  # 100
         parser.add_argument('--iter-per-set', type=int, default=8)
-        # parser.add_argument('--n_iter', type=int, default=30)
+        parser.add_argument('--hard-n-iter', type=int, default=30)
 
         args = parser.parse_args()
         run = wandb.init(
             project="VisualPhish smallerSampleDataset",
             group="visualphishnet",
             config=args,
-            tags=["gabi"]
+            tags=["gabi", "phase-1"]
         )
         try:
             train_phase1(run, args)
+            run.finish()
+            run = wandb.init(
+                project="VisualPhish smallerSampleDataset",
+                group="visualphishnet",
+                config=args,
+                tags=["gabi", "phase-2"]
+            )
             train_phase2(run, args)
         except Exception as e:
             logger.error(e)

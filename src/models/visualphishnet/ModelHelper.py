@@ -32,10 +32,14 @@ class ModelHelper:
 
     @staticmethod
     def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx, train_idx) -> data.TrainResults:
+        logger = logging.getLogger(__name__)
+
         shared_model = full_model.layers[3] # FIXME: dlaczego akurat 3???
 
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
+
+        logger.info("Embeddings were calculated")
 
         return data.TrainResults(
             X_legit_train=whitelist_emb,
@@ -72,7 +76,7 @@ class ModelHelper:
 
             if found == 1:
                 correct += 1
-        logger.info("Correct match percentage: " + str(correct / VPTrainResults.phish_test_idx.shape[0]))
+        logger.info(f"Correct match percentage: {str(correct / VPTrainResults.phish_test_idx.shape[0])}")
         return correct / VPTrainResults.phish_test_idx.shape[0]
 
     @staticmethod
