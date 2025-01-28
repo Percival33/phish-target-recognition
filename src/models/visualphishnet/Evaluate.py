@@ -1,6 +1,6 @@
 import numpy as np
 
-import data
+import DataHelper as data
 
 class Evaluate:
     # Find same-category website (matching is correct if it was matched to the same category (e.g. microsoft and outlook ))

@@ -13,7 +13,7 @@ from RandomSampling import RandomSampling
 from ModelHelper import ModelHelper
 from triplet_sampling import get_batch_for_phase2
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR
-import data
+import DataHelper as data
 
 
 # Store the start and end of each target in the training set (used later in triplet sampling)
@@ -138,8 +138,8 @@ def train_phase1(run, args):
         if i % args.save_interval == 0:
             # TODO: log model artifact if better accuracy
             testResults = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
-                                                     all_labels_test, train_idx=phish_train_idx,
-                                                     test_idx=phish_test_idx)
+                                                     all_labels_test, train_idx=idx_train,
+                                                     test_idx=idx_test)
             acc = modelHelper.get_acc(testResults, args.dataset_path / 'trusted_list', args.dataset_path / 'phishing')
             run.log({"acc": acc})
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
@@ -163,7 +163,7 @@ def train_phase2(run, args):
 
     # Initialize variables
     data_path_phish = args.dataset_path / 'phishing'
-    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs()
+    all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test = data.read_or_load_imgs(args)
     logger.info('Images loaded')
 
     X_train_legit = all_imgs_train

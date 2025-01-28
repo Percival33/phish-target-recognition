@@ -7,7 +7,7 @@ from keras.layers import Conv2D, GlobalMaxPooling2D, Lambda, Subtract, Reshape
 from keras.models import load_model
 from keras.regularizers import l2
 
-import data
+import DataHelper as data
 from Evaluate import Evaluate
 from TargetHelper import TargetHelper
 
