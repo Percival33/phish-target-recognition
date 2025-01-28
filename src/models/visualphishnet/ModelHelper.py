@@ -22,13 +22,13 @@ class ModelHelper:
         return model
 
     def load_trained_model(self, output_dir, saved_model_name, margin, lr):
-        full_model = load_model(output_dir / f"{saved_model_name}.h5",
+        model = load_model(output_dir / f"{saved_model_name}.h5",
                                 custom_objects={'loss': self.custom_loss(margin)})
 
         optimizer = optimizers.Adam(lr=lr)
-        full_model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
+        model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
 
-        return full_model
+        return model
 
     @staticmethod
     def get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx,
@@ -36,7 +36,7 @@ class ModelHelper:
         logger = logging.getLogger(__name__)
 
         shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
-        logger.info(full_model.describe())
+        logger.info(full_model.summary())
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
 
