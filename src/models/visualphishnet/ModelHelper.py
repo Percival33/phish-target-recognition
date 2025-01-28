@@ -20,9 +20,7 @@ class ModelHelper:
 
     def prepare_model(self, input_shape, new_conv_params, margin, lr):
         model = self.define_triplet_network(input_shape, new_conv_params)
-        self.logger.info("before")
-        model.summary(print_fn=self.logger.info)
-        self.logger.info("after")
+        model.summary(print_fn=self.logger.debug)
 
         optimizer = optimizers.Adam(lr=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
