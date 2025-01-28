@@ -36,7 +36,7 @@ class ModelHelper:
         logger = logging.getLogger(__name__)
 
         shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
-        logger.info(full_model.summary())
+        logger.debug(full_model.summary())
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
 

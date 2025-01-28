@@ -154,22 +154,15 @@ def train_phase1(run, args):
             run.log({'lr': args.lr})
 
     modelHelper.save_model(model, args.output_dir, args.saved_model_name)
-    # TODO: save model and cal embeddings -> log artifact
-    # emb = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
-    #                            all_labels_test, train_idx=idx_train,
-    #                            test_idx=idx_test)
-    # np.save(args.output_dir / 'whitelist_emb1', emb.X_legit_train)
-    # np.save(args.output_dir / 'whitelist_labels1', emb.y_legit_train)
-    # np.save(args.output_dir / 'phishing_emb1', emb.X_phish)
-    # np.save(args.output_dir / 'phishing_labels1', emb.y_phish)
-    # TODO: log embeddings as artifacts
-    # run.save(str(args.output_dir / 'whitelist_emb1.npy'))
-    # run.save(str(args.output_dir / 'whitelist_labels1.npy'))
-    # run.save(str(args.output_dir / 'phishing_emb1.npy'))
-    # run.save(str(args.output_dir / 'phishing_labels1.npy'))
-    # TODO: log artifact
-    # run.log_model(args.output_dir / f'{args.saved_model_name}.h5')
-    logger.info("Training - phase 1 - finished!")
+    run.log_model(args.output_dir / f'{args.saved_model_name}.h5')
+    logger.info("Training finished!")
+    logger.info("Calculating embeddings for whitelist and phishing set")
+
+    emb = modelHelper.get_embeddings(model, X_train_legit, y_train_legit, all_imgs_test,
+                                     all_labels_test, train_idx=idx_train,
+                                     test_idx=idx_test)
+    data.save_embeddings(emb, args.output_dir, run)
+    logger.info("Phase 1 has finished!")
 
 
 def train_phase2(run, args):
@@ -185,14 +178,14 @@ def train_phase2(run, args):
     X_train_legit = all_imgs_train
     y_train_legit = all_labels_train
     # Load the same train/split in phase 1
-    phish_test_idx = np.load(args.output_dir / 'test_idx.npy')
-    phish_train_idx = np.load(args.output_dir / 'train_idx.npy')
+    idx_test = np.load(args.output_dir / 'test_idx.npy')
+    idx_train = np.load(args.output_dir / 'train_idx.npy')
 
-    X_test_phish = all_imgs_test[phish_test_idx, :]
-    y_test_phish = all_labels_test[phish_test_idx, :]
+    X_test_phish = all_imgs_test[idx_test, :]
+    y_test_phish = all_labels_test[idx_test, :]
 
-    X_train_phish = all_imgs_test[phish_train_idx, :]
-    y_train_phish = all_labels_test[phish_train_idx, :]
+    X_train_phish = all_imgs_test[idx_train, :]
+    y_train_phish = all_labels_test[idx_train, :]
 
     labels_start_end_train_legit = all_targets_start_end(args.num_targets, y_train_legit)
     targetHelper = TargetHelper(data_path_phish)
@@ -262,8 +255,8 @@ def train_phase2(run, args):
                 if tot_count % args.save_interval == 0:
                     # TODO: log model artifact if better accuracy
                     testResults = modelHelper.get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test,
-                                                             all_labels_test, train_idx=phish_train_idx,
-                                                             test_idx=phish_test_idx)
+                                                             all_labels_test, train_idx=idx_train,
+                                                             test_idx=idx_test)
                     acc = modelHelper.get_acc(targetHelper, testResults, args.dataset_path / 'trusted_list',
                                               args.dataset_path / 'phishing')
                     run.log({"acc": acc})
@@ -278,24 +271,12 @@ def train_phase2(run, args):
     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
     run.log_model(args.output_dir / f'{args.new_saved_model_name}.h5')
     logger.info("Training finished!")
-
     logger.info("Calculating embeddings for whitelist and phishing set")
-    shared_model = full_model.layers[3]
-
-    # FIXME: save embeddings as artifacts
-    # TODO: as in phase 1: predict and save embeddings
-    whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
-    np.save(args.output_dir / 'whitelist_emb2', whitelist_emb)
-    np.save(args.output_dir / 'whitelist_labels2', y_train_legit)
-    run.save(str(args.output_dir / 'whitelist_emb2.npy'))
-    run.save(str(args.output_dir / 'whitelist_labels2.npy'))
-
-    phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)
-    np.save(args.output_dir / 'phishing_emb2', phishing_emb)
-    np.save(args.output_dir / 'phishing_labels2', all_labels_test)
-    run.save(str(args.output_dir / 'phishing_emb2.npy'))
-    run.save(str(args.output_dir / 'phishing_labels2.npy'))
-    logger.info("Embeddings saved to disk")
+    emb = modelHelper.get_embeddings(full_model, X_train_legit, y_train_legit, all_imgs_test,
+                                     all_labels_test, train_idx=idx_train,
+                                     test_idx=idx_test)
+    data.save_embeddings(emb, args.output_dir, run)
+    logger.info("Phase 2 has finished!")
 
 
 if __name__ == '__main__':

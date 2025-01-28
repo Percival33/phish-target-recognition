@@ -155,3 +155,16 @@ class TrainResults:
 
         self.X_phish_train = self.X_phish[self.phish_train_idx, :]
         self.y_phish_train = self.y_phish[self.phish_train_idx, :]
+
+def save_embeddings(emb: TrainResults, output_dir, run=None):
+    np.save(output_dir / 'whitelist_emb', emb.X_legit_train)
+    np.save(output_dir / 'whitelist_labels', emb.y_legit_train)
+
+    np.save(output_dir / 'phishing_emb', emb.X_phish)
+    np.save(output_dir / 'phishing_labels', emb.y_phish)
+
+    if run is not None:
+        run.save(output_dir / 'whitelist_emb.npy')
+        run.save(output_dir / 'whitelist_labels.npy')
+        run.save(output_dir / 'phishing_emb.npy')
+        run.save(output_dir / 'phishing_labels.npy')
