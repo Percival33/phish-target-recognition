@@ -2,7 +2,6 @@
 import logging
 import logging.config
 
-import os
 from argparse import ArgumentParser
 from dataclasses import dataclass
 
@@ -10,108 +9,177 @@ from skimage.transform import resize
 from matplotlib.pyplot import imread
 from sklearn.model_selection import train_test_split
 import numpy as np
+from tqdm import tqdm
+from pathlib import Path
 
-from tools.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR
+# from tools.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR
+SRC_DIR = Path('/Users/mjarczewski/Repositories/inz/src')
+RAW_DATA_DIR = Path('/Users/mjarczewski/Repositories/inz/data/raw')
+INTERIM_DATA_DIR = Path('/Users/mjarczewski/Repositories/inz/data/interim')
+
+
+def read_image(file_path, logger, format=None):
+    """Helper function to read an image file with error handling."""
+    try:
+        img = imread(file_path) if format is None else imread(file_path, format=format)
+        if len(img.shape) != 3 or img.shape[2] < 3:
+            logger.warning(f"Skipping {file_path}: wrong number of channels")
+            return None
+        return img[:, :, :3]  # Take only first 3 channels if more exist
+    except Exception as read_error:
+        logger.warning(f"Image reading error for {file_path}: {str(read_error)}")
+        return None
 
 
 def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_target_count):
-    all_imgs = np.zeros(shape=[imgs_num, 224, 224, 3])
-    all_labels = np.zeros(shape=[imgs_num, 1])
+    """Read and process images from multiple directories."""
+    logger = logging.getLogger(__name__)
+    logger.info("Starting image processing")
 
+    all_imgs = np.zeros(shape=[imgs_num, reshape_size[0], reshape_size[1], 3])
+    all_labels = np.zeros(shape=[imgs_num, 1])
     all_file_names = []
-    targets_list = targets.splitlines()
+
+    targets_list = sorted(targets.strip().splitlines())
     count = 0
-    for i in range(0, len(targets_list)):
-        target_path = data_path / targets_list[i]
-        print(target_path)
-        file_names = sorted(os.listdir(target_path))
-        for j in range(0, len(file_names)):
-            try:
-                img = imread(target_path / file_names[j])
-                img = img[:, :, 0:3]
-                all_imgs[count, :, :, :] = resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True)
-                all_labels[count, :] = i + start_target_count
-                all_file_names.append(file_names[j])
-                count = count + 1
-            except:
-                # some images were saved with a wrong extensions
-                try:
-                    img = imread(target_path / file_names[j], format='jpeg')
-                    img = img[:, :, 0:3]
-                    all_imgs[count, :, :, :] = resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True)
-                    all_labels[count, :] = i + start_target_count
-                    all_file_names.append(file_names[j])
-                    count = count + 1
-                except:
-                    print('failed at:')
-                    print('***')
-                    print(file_names[j])
-                    break
+
+    with tqdm(targets_list, desc="Processing directories", position=0) as dir_pbar:
+        for i, target_dir in enumerate(dir_pbar):
+            target_path = data_path / target_dir
+
+            files = sorted(target_path.iterdir())
+            with tqdm(files, desc=f"Processing {target_path.name}", position=1, leave=False) as file_pbar:
+                for file_path in file_pbar:
+                    img = read_image(file_path, logger)
+
+                    if img is None:
+                        img = read_image(file_path, logger, format='jpeg')
+
+                    if img is None:
+                        logger.error(f"Failed to process {file_path}")
+                        exit(1)
+
+                    try:
+                        all_imgs[count] = resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True)
+                        all_labels[count] = i + start_target_count
+                        all_file_names.append(file_path.name)
+                        count += 1
+                    except Exception as e:
+                        logger.error(f"Failed to process {file_path}: {str(e)}")
+                        logger.error("Full traceback:", exc_info=True)
+                        exit(1)
+
+    if count < imgs_num:
+        logger.warning(f"Only found {count} images, expected {imgs_num}")
+        return all_imgs[:count], all_labels[:count], all_file_names
+
     return all_imgs, all_labels, all_file_names
 
 
+def get_data_paths(output_dir):
+    """Return paths for all data files."""
+    return {
+        'train': {
+            'imgs': output_dir / 'all_imgs_train.npy',
+            'labels': output_dir / 'all_labels_train.npy',
+            'file_names': output_dir / 'all_file_names_train.npy'
+        },
+        'test': {
+            'imgs': output_dir / 'all_imgs_test.npy',
+            'labels': output_dir / 'all_labels_test.npy',
+            'file_names': output_dir / 'all_file_names_test.npy'
+        }
+    }
+
+
+def all_files_exist(paths_dict):
+    """Check if all files in the paths dictionary exist."""
+    return all(
+        path.exists()
+        for subset in paths_dict.values()
+        for path in subset.values()
+    )
+
+
+def load_saved_data(paths_dict):
+    """Load data from saved .npy files."""
+    train_data = {
+        'imgs': np.load(paths_dict['train']['imgs']),
+        'labels': np.load(paths_dict['train']['labels']),
+        'file_names': np.load(paths_dict['train']['file_names'])
+    }
+
+    test_data = {
+        'imgs': np.load(paths_dict['test']['imgs']),
+        'labels': np.load(paths_dict['test']['labels']),
+        'file_names': np.load(paths_dict['test']['file_names'])
+    }
+
+    return train_data, test_data
+
+
+def process_dataset(data_path, targets_file, num_imgs, reshape_size, start_label, output_paths):
+    """Process a single dataset (train or test) and save results."""
+    with open(data_path / targets_file, 'r') as f:
+        targets = f.read()
+
+    imgs, labels, file_names = read_imgs_per_website(
+        data_path, targets, num_imgs, reshape_size, start_label
+    )
+
+    output_paths['imgs'].parent.mkdir(parents=True, exist_ok=True)
+    np.save(output_paths['imgs'], imgs)
+    np.save(output_paths['labels'], labels)
+    np.save(output_paths['file_names'], file_names)
+
+    return {'imgs': imgs, 'labels': labels, 'file_names': file_names}
+
+
 def read_or_load_imgs(args):
+    """Load pre-saved data or process and save new data."""
     logging.config.fileConfig(SRC_DIR / 'logging.conf')
+
     logger = logging.getLogger(__name__)
-    logger.info('Check for pre-saved data or load images')
+    logger.info('Starting data loading process')
 
-    # Define paths for saved .npy files
-    imgs_train_path = args.output_dir / 'all_imgs_train.npy'
-    labels_train_path = args.output_dir / 'all_labels_train.npy'
-    file_names_train_path = args.output_dir / 'all_file_names_train.npy'
+    paths_dict = get_data_paths(args.output_dir)
 
-    imgs_test_path = args.output_dir / 'all_imgs_test.npy'
-    labels_test_path = args.output_dir / 'all_labels_test.npy'
-    file_names_test_path = args.output_dir / 'all_file_names_test.npy'
-
-    # Check if all .npy files exist
-    if (imgs_train_path.exists() and labels_train_path.exists() and file_names_train_path.exists() and
-            imgs_test_path.exists() and labels_test_path.exists() and file_names_test_path.exists()):
+    if all_files_exist(paths_dict):
         logger.info('Loading pre-saved data')
-
-        # Load pre-saved data
-        all_imgs_train = np.load(imgs_train_path)
-        all_labels_train = np.load(labels_train_path)
-        all_file_names_train = np.load(file_names_train_path)
-
-        all_imgs_test = np.load(imgs_test_path)
-        all_labels_test = np.load(labels_test_path)
-        all_file_names_test = np.load(file_names_test_path)
-
+        train_data, test_data = load_saved_data(paths_dict)
+        logger.info(f'Loaded {len(train_data["imgs"])} training and {len(test_data["imgs"])} test samples')
     else:
-        logger.info('Processing and saving images')
+        logger.info('Processing new data')
 
-        data_path_trusted = args.dataset_path / 'trusted_list'
-        data_path_phish = args.dataset_path / 'phishing'
+        train_data = process_dataset(
+            data_path=args.dataset_path / 'trusted_list',
+            targets_file='targets.txt',
+            num_imgs=args.legit_imgs_num,
+            reshape_size=args.reshape_size,
+            start_label=0,
+            output_paths=paths_dict['train']
+        )
+        logger.info(f'Processed {len(train_data["imgs"])} training samples')
 
-        # Read images legit (train)
-        with open(data_path_trusted / 'targets.txt', 'r') as f:
-            targets_trusted = f.read()
-        all_imgs_train, all_labels_train, all_file_names_train = read_imgs_per_website(data_path_trusted,
-                                                                                       targets_trusted,
-                                                                                       args.legit_imgs_num,
-                                                                                       args.reshape_size, 0)
+        # Process phishing (test) dataset
+        test_data = process_dataset(
+            data_path=args.dataset_path / 'phishing',
+            targets_file='targets2.txt',
+            num_imgs=args.phish_imgs_num,
+            reshape_size=args.reshape_size,
+            start_label=0,
+            output_paths=paths_dict['test']
+        )
+        logger.info(f'Processed {len(test_data["imgs"])} test samples')
 
-        imgs_train_path.parent.mkdir(parents=True, exist_ok=True)
-
-        np.save(imgs_train_path, all_imgs_train)
-        np.save(labels_train_path, all_labels_train)
-        np.save(file_names_train_path, all_file_names_train)
-
-        # Read images phishing (test)
-        with open(data_path_phish / 'targets.txt', 'r') as f:
-            targets_phishing = f.read()
-        all_imgs_test, all_labels_test, all_file_names_test = read_imgs_per_website(data_path_phish,
-                                                                                    targets_phishing,
-                                                                                    args.phish_imgs_num,
-                                                                                    args.reshape_size, 0)
-
-        imgs_test_path.parent.mkdir(parents=True, exist_ok=True)
-        np.save(imgs_test_path, all_imgs_test)
-        np.save(labels_test_path, all_labels_test)
-        np.save(file_names_test_path, all_file_names_test)
-
-    return all_imgs_train, all_labels_train, all_file_names_train, all_imgs_test, all_labels_test, all_file_names_test
+    return (
+        train_data['imgs'],
+        train_data['labels'],
+        train_data['file_names'],
+        test_data['imgs'],
+        test_data['labels'],
+        test_data['file_names']
+    )
 
 
 def get_phish_file_names(phish_file_names, phish_train_idx, phish_test_idx):
@@ -177,11 +245,14 @@ def save_embeddings(emb: TrainResults, output_dir, run=None):
 
 
 if __name__ == '__main__':
+    logging.config.fileConfig(SRC_DIR / 'logging.conf')
+
     parser = ArgumentParser()
 
     parser.add_argument('--dataset-path', type=str, default=RAW_DATA_DIR / 'VisualPhish')
     parser.add_argument('--output-dir', default=INTERIM_DATA_DIR / 'VisualPhish')
-    parser.add_argument('--legit-imgs-num', default=1195)
-    parser.add_argument('--phish-imgs-num', default=9363)
-
+    parser.add_argument('--reshape-size', default=[224, 224, 3])
+    parser.add_argument('--legit-imgs-num', default=9363)
+    parser.add_argument('--phish-imgs-num', default=1195)
+    args = parser.parse_args()
     data = read_or_load_imgs(parser.parse_args())
