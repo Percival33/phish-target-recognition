@@ -10,8 +10,13 @@ from matplotlib.pyplot import imread
 from sklearn.model_selection import train_test_split
 import numpy as np
 from tqdm import tqdm
+from pathlib import Path
 
-from src.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR
+# from tools.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR
+SRC_DIR = Path('/Users/mjarczewski/Repositories/inz/src')
+RAW_DATA_DIR = Path('/Users/mjarczewski/Repositories/inz/data/raw')
+INTERIM_DATA_DIR = Path('/Users/mjarczewski/Repositories/inz/data/interim')
+
 
 def read_image(file_path, logger, format=None):
     """Helper function to read an image file with error handling."""
