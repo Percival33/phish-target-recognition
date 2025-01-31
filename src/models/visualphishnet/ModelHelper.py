@@ -77,9 +77,16 @@ class ModelHelper:
 	):
 		# TODO: enable using wandb artifacts
 		self.logger.info("Preparing to calculate acc...")
-		legit_file_names = all_file_names_train or targetHelper.read_file_names(trusted_list_path, "targets.txt")
-		phish_file_names = all_file_names_test or targetHelper.read_file_names(phishing_path, "targets.txt")
-
+		legit_file_names = (
+			all_file_names_train
+			if all_file_names_train is not None
+			else targetHelper.read_file_names(trusted_list_path, "targets.txt")
+		)
+		phish_file_names = (
+			all_file_names_test
+			if all_file_names_test is not None
+			else targetHelper.read_file_names(phishing_path, "targets.txt")
+		)
 		phish_train_files, phish_test_files = data.get_phish_file_names(
 			phish_file_names,
 			VPTrainResults.phish_train_idx,
