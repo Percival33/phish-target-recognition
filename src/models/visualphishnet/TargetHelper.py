@@ -23,8 +23,8 @@ class TargetHelper:
         self.read_targets(data_path)
 
     def read_targets(self, data_path):
-        targets_file = open(data_path / "targets.txt", "r")
-        self.all_targets = targets_file.read().splitlines()
+        with open(data_path / "targets.txt", "r") as targets_file:
+            self.all_targets = targets_file.read().splitlines()
         self.parents_ids, self.sub_target_lists_idx = self._get_associated_targets_idx(
             self.target_lists, self.all_targets
         )
@@ -49,17 +49,17 @@ class TargetHelper:
         found = 0
         idx = 0
         test_label = self.get_label_from_name(test_file_name)
-        self.logger.info("***")
-        self.logger.info("Test example: %s", test_file_name)
+        self.logger.debug("***")
+        self.logger.debug("Test example: %s", test_file_name)
         for i in range(0, len(only_names)):
             label_distance = self.get_label_from_name(only_names[i])
             if label_distance == test_label or self.check_if_same_category(test_label, label_distance) == 1:
                 found = 1
                 idx = i + 1
-                self.logger.info("found")
+                self.logger.debug("found")
                 break
         if found == 0:
-            self.logger.info("not found")
+            self.logger.debug("not found")
         return found, idx
 
     def _get_associated_targets_idx(self, target_lists, all_targets):
