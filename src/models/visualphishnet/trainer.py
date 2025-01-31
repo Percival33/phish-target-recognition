@@ -35,7 +35,7 @@ def all_targets_start_end(num_target, labels):
 
     for i in range(1, num_target):
         if start_end_each_target[i, 0] == 0:
-            print(i)
+            logger.warning(f"Target {str(i)} is not in the training set")
             start_end_each_target[i, 0] = -1
             start_end_each_target[i, 1] = -1
     return start_end_each_target
