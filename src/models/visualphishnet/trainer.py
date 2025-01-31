@@ -5,7 +5,7 @@ import numpy as np
 import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 import DataHelper as data
 from HardSubsetSampling import HardSubsetSampling
@@ -76,7 +76,7 @@ def train_phase1(run, args):
     targets_train = np.zeros([args.batch_size, 1])
     run.log({"lr": args.lr})
 
-    for i in range(1, args.n_iter):
+    for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
         inputs = randomSampling.get_batch(
             targetHelper=targetHelper,
             X_train_legit=X_train_legit,
@@ -88,7 +88,7 @@ def train_phase1(run, args):
         )
         loss_value = model.train_on_batch(inputs, targets_train)
 
-        logger.info("Iteration: " + str(i) + ". " + "Loss: {0}".format(loss_value))
+        logger.info(f"Iteration: {i}. Loss: {loss_value}")
         run.log({"loss": loss_value})
 
         if i % args.save_interval == 0:
@@ -193,7 +193,7 @@ def train_phase2(run, args):
 
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
-    for k in tqdm(range(0, args.num_sets), desc="Sets"):
+    for k in tqdm(range(0, args.num_sets), desc="Sets", position=0, leave=True):
         logger.info(f"Starting a new set! - {k}")
         X_train_legit = all_imgs_train
         y_train_legit = all_labels_train
@@ -204,7 +204,7 @@ def train_phase2(run, args):
         )
         fixed_set = X_train_legit[fixed_set_idx.astype(int), :, :, :]
 
-        for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set", leave=False):
+        for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set", position=1, leave=False):
             # TODO: log iteration to wandb
             model = full_model.layers[3]
             X_train_new, y_train_new, labels_start_end_train = hard_subset_sampling.find_main_train(
@@ -219,7 +219,7 @@ def train_phase2(run, args):
                 X_train_phish=X_train_phish,
             )
 
-            for i in range(1, args.hard_n_iter):
+            for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations", position=2, leave=False):
                 tot_count = tot_count + 1
                 inputs = get_batch_for_phase2(
                     targetHelper=targetHelper,
@@ -232,7 +232,7 @@ def train_phase2(run, args):
                 )
                 loss_iteration = full_model.train_on_batch(inputs, targets_train)
 
-                logger.info("Iteration: " + str(i) + ". " + "Loss: {0}".format(loss_iteration))
+                logger.info(f"Iteration: {i}. Loss: {loss_iteration}")
                 run.log({"loss": loss_iteration})
 
                 if tot_count % args.save_interval == 0:
@@ -260,7 +260,7 @@ def train_phase2(run, args):
                 if tot_count % args.lr_interval == 0:
                     args.lr = 0.99 * args.lr
                     K.set_value(full_model.optimizer.lr, args.lr)
-                    logger.info("Learning rate changed to: " + str(args.lr))
+                    logger.info(f"Learning rate changed to: {args.lr}")
                     run.log({"lr": args.lr})
 
     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
