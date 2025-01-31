@@ -10,12 +10,12 @@ from keras.regularizers import l2
 import DataHelper as data
 from Evaluate import Evaluate
 from TargetHelper import TargetHelper
-from tools.config import SRC_DIR
+from tools.config import setup_logging
 
 
 class ModelHelper:
     def __init__(self):
-        logging.config.fileConfig(SRC_DIR / 'logging.conf')
+        setup_logging()
         self.logger = logging.getLogger(__name__)
 
     def prepare_model(self, input_shape, new_conv_params, margin, lr):

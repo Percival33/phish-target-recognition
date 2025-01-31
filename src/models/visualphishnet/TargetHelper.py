@@ -3,7 +3,7 @@
 import logging
 import logging.config
 
-from tools.config import SRC_DIR
+from tools.config import setup_logging
 
 
 class TargetHelper:
@@ -14,7 +14,7 @@ class TargetHelper:
     sub_targets = [[150, 152, 151, 149, 148], [153, 154], [147], [5]]
 
     def __init__(self, data_path):
-        logging.config.fileConfig(SRC_DIR / 'logging.conf')
+        setup_logging()
         self.logger = logging.getLogger(__name__)
         self.read_targets(data_path)
 

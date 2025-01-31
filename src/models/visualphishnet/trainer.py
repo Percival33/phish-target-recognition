@@ -1,4 +1,3 @@
-import logging.config
 import logging
 from argparse import ArgumentParser
 
@@ -13,7 +12,7 @@ from TargetHelper import TargetHelper
 from RandomSampling import RandomSampling
 from ModelHelper import ModelHelper
 from triplet_sampling import get_batch_for_phase2
-from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SRC_DIR
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SRC_DIR, setup_logging
 import DataHelper as data
 
 
@@ -92,11 +91,9 @@ def train_phase1(run, args):
     X_train_legit = all_imgs_train
     y_train_legit = all_labels_train
 
-    # TODO: if not existing, create this split -> log as artifact
     idx_test, idx_train = data.read_or_load_train_test_idx(output_dir=args.dataset_path, all_imgs_test=all_imgs_test,
                                                            all_labels_test=all_labels_test,
                                                            phishing_test_size=args.phishing_test_size)
-    # TODO: log as artifacts?
     run.save(str(args.dataset_path / 'test_idx.npy'))
     run.save(str(args.dataset_path / 'train_idx.npy'))
 
@@ -284,7 +281,7 @@ def train_phase2(run, args):
 
 
 if __name__ == '__main__':
-    logging.config.fileConfig(SRC_DIR / 'logging.conf')
+    setup_logging()
     logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
 

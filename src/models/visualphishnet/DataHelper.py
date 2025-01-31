@@ -12,10 +12,7 @@ import numpy as np
 from tqdm import tqdm
 from pathlib import Path
 
-from tools.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR
-# SRC_DIR = Path('/Users/mjarczewski/Repositories/inz/src')
-# RAW_DATA_DIR = Path('/Users/mjarczewski/Repositories/inz/data/raw')
-# INTERIM_DATA_DIR = Path('/Users/mjarczewski/Repositories/inz/data/interim')
+from tools.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR, setup_logging
 
 
 def read_image(file_path, logger, format=None):
@@ -137,8 +134,7 @@ def process_dataset(data_path, targets_file, num_imgs, reshape_size, start_label
 
 def read_or_load_imgs(args):
     """Load pre-saved data or process and save new data."""
-    logging.config.fileConfig(SRC_DIR / 'logging.conf')
-
+    setup_logging()
     logger = logging.getLogger(__name__)
     logger.info('Starting data loading process')
 
@@ -245,8 +241,7 @@ def save_embeddings(emb: TrainResults, output_dir, run=None):
 
 
 if __name__ == '__main__':
-    logging.config.fileConfig(SRC_DIR / 'logging.conf')
-
+    setup_logging()
     parser = ArgumentParser()
 
     parser.add_argument('--dataset-path', type=str, default=RAW_DATA_DIR / 'VisualPhish')

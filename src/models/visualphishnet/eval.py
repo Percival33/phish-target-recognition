@@ -1,7 +1,7 @@
 import logging
 import logging.config
 import numpy as np
-from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SRC_DIR
+from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, SRC_DIR, setup_logging
 
 from src.models.visualphishnet.Evaluate import Evaluate
 from src.models.visualphishnet.TargetHelper import TargetHelper
@@ -80,11 +80,10 @@ def get_label_from_name(name):
 
 
 if __name__ == '__main__':
-    logging.config.fileConfig(SRC_DIR / 'logging.conf')
+    setup_logging()
     logger = logging.getLogger()
 
     """
-    logging.config.fileConfig(SRC_DIR / 'logging.conf')
     file_handler = logging.FileHandler('result.log')
     file_handler.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
