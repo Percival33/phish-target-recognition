@@ -142,7 +142,7 @@ def read_or_load_imgs(args):
     logger = logging.getLogger(__name__)
     logger.info('Starting data loading process')
 
-    paths_dict = get_data_paths(args.output_dir)
+    paths_dict = get_data_paths(args.dataset_path)
 
     if all_files_exist(paths_dict):
         logger.info('Loading pre-saved data')
