@@ -303,9 +303,9 @@ if __name__ == '__main__':
         parser.add_argument('--dataset-path', type=str, default=INTERIM_DATA_DIR / 'VisualPhish')
         parser.add_argument('--reshape-size', default=[224, 224, 3])
         parser.add_argument('--phishing-test-size', default=0.4)
-        parser.add_argument('--num-targets', type=int, default=5)
-        parser.add_argument('--legit-imgs-num', default=420)
-        parser.add_argument('--phish-imgs-num', default=160)
+        parser.add_argument('--num-targets', type=int, default=155)
+        parser.add_argument('--legit-imgs-num', default=9363)
+        parser.add_argument('--phish-imgs-num', default=1195)
         # Model parameters
         parser.add_argument('--input-shape', default=[224, 224, 3])
         parser.add_argument('--margin', type=float, default=2.2)
@@ -315,30 +315,33 @@ if __name__ == '__main__':
         parser.add_argument('--output-dir', type=str, default=PROCESSED_DATA_DIR / 'VisualPhish')
         parser.add_argument('--saved-model-name', type=str, default='model')  # from first training
         parser.add_argument('--new-saved-model-name', type=str, default='model2')
-        parser.add_argument('--save-interval', type=int, default=2)  # 2000
-        parser.add_argument('--batch-size', type=int, default=32)  # TODO: change to 32
-        parser.add_argument('--n-iter', type=int, default=3)  # p1: 21000, p2: 50000
-        parser.add_argument('--lr-interval', type=int, default=250)  # p1: 100, p2: 250
+        parser.add_argument('--save-interval', type=int, default=2000)  # 2000
+        parser.add_argument('--batch-size', type=int, default=32)
+        parser.add_argument('--n-iter', type=int, default=21000)  # p1: 21000, p2: 50000
+        parser.add_argument('--lr-interval', type=int, default=100)  # p1: 100, p2: 250
         # hard examples training
-        parser.add_argument('--num-sets', type=int, default=5)  # 100
+        parser.add_argument('--num-sets', type=int, default=100)
         parser.add_argument('--iter-per-set', type=int, default=8)
         parser.add_argument('--hard-n-iter', type=int, default=30)
 
         args = parser.parse_args()
         run = wandb.init(
-            project="VisualPhish smallerSampleDataset",
+            project="VisualPhish",
             group="visualphishnet",
             config=args,
-            tags=["gabi", "phase-1"]
+            tags=["jarvis", "phase-1"]
         )
         try:
             train_phase1(run, args)
             run.finish()
+            args.lr_interval = 250
+            args.lr = 2e-5
+            args.n_iter = 50000
             run = wandb.init(
-                project="VisualPhish smallerSampleDataset",
+                project="VisualPhish",
                 group="visualphishnet",
                 config=args,
-                tags=["gabi", "phase-2"]
+                tags=["jarvis", "phase-2"]
             )
             train_phase2(run, args)
         except Exception as e:
