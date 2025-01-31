@@ -249,3 +249,6 @@ logs/
 
 # Pycharm
 src/models/visualphishnet/243_22562_220-pycharm-support-libs
+
+# Ruff cache
+**/.ruff_cache
