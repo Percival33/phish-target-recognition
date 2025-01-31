@@ -32,5 +32,4 @@ select = ["E", "F", "I"]  # Enable specific rules (E: pycodestyle, F: Pyflakes, 
 ignore = ["E203", "E501"]  # Ignore certain rules
 
 [tool.ruff.format]
-indent-style = "tab"
 docstring-code-format = true

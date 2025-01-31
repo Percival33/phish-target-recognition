@@ -11,9 +11,9 @@ from .data import TrainResults, get_phish_file_names
 
 
 def get_label_from_name(name):
-	first_half = name.split("_", 1)[0]
-	number = int(first_half.replace("T", ""))
-	return number
+    first_half = name.split("_", 1)[0]
+    number = int(first_half.replace("T", ""))
+    return number
 
 
 # class TargetHelper:
@@ -82,10 +82,10 @@ def get_label_from_name(name):
 
 
 if __name__ == "__main__":
-	setup_logging()
-	logger = logging.getLogger()
+    setup_logging()
+    logger = logging.getLogger()
 
-	"""
+    """
     file_handler = logging.FileHandler('result.log')
     file_handler.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -94,42 +94,42 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
     """
 
-	logger.info("Evaluating VisualPhishNet")
-	dataset_path = PROCESSED_DATA_DIR / "smallerSampleDataset"
-	output_dir_path = INTERIM_DATA_DIR / "smallerSampleDataset"
+    logger.info("Evaluating VisualPhishNet")
+    dataset_path = PROCESSED_DATA_DIR / "smallerSampleDataset"
+    output_dir_path = INTERIM_DATA_DIR / "smallerSampleDataset"
 
-	# TODO: enable using wandb artifacts
-	VPTrainResults = TrainResults(
-		X_legit_train=np.load(output_dir_path / "whitelist_emb2.npy"),
-		y_legit_train=np.load(output_dir_path / "whitelist_labels2.npy"),
-		X_phish=np.load(output_dir_path / "phishing_emb2.npy"),
-		y_phish=np.load(output_dir_path / "phishing_labels2.npy"),
-		phish_test_idx=np.load(output_dir_path / "test_idx.npy"),
-		phish_train_idx=np.load(output_dir_path / "train_idx.npy"),
-	)
+    # TODO: enable using wandb artifacts
+    VPTrainResults = TrainResults(
+        X_legit_train=np.load(output_dir_path / "whitelist_emb2.npy"),
+        y_legit_train=np.load(output_dir_path / "whitelist_labels2.npy"),
+        X_phish=np.load(output_dir_path / "phishing_emb2.npy"),
+        y_phish=np.load(output_dir_path / "phishing_labels2.npy"),
+        phish_test_idx=np.load(output_dir_path / "test_idx.npy"),
+        phish_train_idx=np.load(output_dir_path / "train_idx.npy"),
+    )
 
-	targetHelper = TargetHelper()
+    targetHelper = TargetHelper()
 
-	legit_file_names_targets = targetHelper.read_file_names(dataset_path / "trusted_list", "targets.txt")
-	phish_file_names_targets = targetHelper.read_file_names(dataset_path / "phishing", "targets.txt")
-	phish_train_file_names, phish_test_file_names = get_phish_file_names(
-		phish_file_names_targets,
-		VPTrainResults.phish_train_idx,
-		VPTrainResults.phish_test_idx,
-	)
+    legit_file_names_targets = targetHelper.read_file_names(dataset_path / "trusted_list", "targets.txt")
+    phish_file_names_targets = targetHelper.read_file_names(dataset_path / "phishing", "targets.txt")
+    phish_train_file_names, phish_test_file_names = get_phish_file_names(
+        phish_file_names_targets,
+        VPTrainResults.phish_train_idx,
+        VPTrainResults.phish_test_idx,
+    )
 
-	evaluate = Evaluate(VPTrainResults, legit_file_names_targets, phish_train_file_names)
+    evaluate = Evaluate(VPTrainResults, legit_file_names_targets, phish_train_file_names)
 
-	n = 1  # Top-1 match
-	correct = 0
+    n = 1  # Top-1 match
+    correct = 0
 
-	for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
-		distances_to_train = evaluate.pairwise_distance[i, :]
-		idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
-		names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
-		found, found_idx = targetHelper.check_if_target_in_top(phish_test_file_names[i], only_names)
-		print(names_min_distance)
+    for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
+        distances_to_train = evaluate.pairwise_distance[i, :]
+        idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
+        names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
+        found, found_idx = targetHelper.check_if_target_in_top(phish_test_file_names[i], only_names)
+        print(names_min_distance)
 
-		if found == 1:
-			correct += 1
-	logger.info("Correct match percentage: " + str(correct / VPTrainResults.phish_test_idx.shape[0]))
+        if found == 1:
+            correct += 1
+    logger.info("Correct match percentage: " + str(correct / VPTrainResults.phish_test_idx.shape[0]))
