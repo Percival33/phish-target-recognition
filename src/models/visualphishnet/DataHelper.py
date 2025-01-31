@@ -164,7 +164,7 @@ def read_or_load_imgs(args):
         # Process phishing (test) dataset
         test_data = process_dataset(
             data_path=args.dataset_path / 'phishing',
-            targets_file='targets2.txt',
+            targets_file='targets.txt',
             num_imgs=args.phish_imgs_num,
             reshape_size=args.reshape_size,
             start_label=0,
