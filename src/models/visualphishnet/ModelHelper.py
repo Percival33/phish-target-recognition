@@ -24,6 +24,7 @@ class ModelHelper:
 
         optimizer = optimizers.Adam(lr=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
+        self.logger.debug("Model compiled")
         return model
 
     def load_trained_model(self, output_dir, saved_model_name, margin, lr):
