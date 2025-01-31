@@ -57,7 +57,7 @@ class Evaluate:
                 l2_diff = compute_distance_pair(train_phish.shape[1], pair1, pair2)
                 pairwise_distance[i, j] = l2_diff
 
-        assert distances == pairwise_distance
+        assert np.array_equal(distances, pairwise_distance)
 
         return pairwise_distance
 
