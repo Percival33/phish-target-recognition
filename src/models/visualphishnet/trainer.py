@@ -97,8 +97,8 @@ def train_phase1(run, args):
                                                            all_labels_test=all_labels_test,
                                                            phishing_test_size=args.phishing_test_size)
     # TODO: log as artifacts?
-    # run.log_artifact(str(args.dataset_path / 'test_idx.npy'))
-    # run.log_artifact(str(args.dataset_path / 'train_idx.npy'))
+    run.save(str(args.dataset_path / 'test_idx.npy'))
+    run.save(str(args.dataset_path / 'train_idx.npy'))
 
     X_test_phish = all_imgs_test[idx_test, :]
     y_test_phish = all_labels_test[idx_test, :]
@@ -109,20 +109,23 @@ def train_phase1(run, args):
     # create model
     modelHelper = ModelHelper()
     model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
-
+    logger.debug("Model prepared")
     # order random array? -> po co?
     X_test_phish, y_test_phish = order_random_array(X_test_phish, y_test_phish, args.num_targets)
     X_train_phish, y_train_phish = order_random_array(X_train_phish, y_train_phish, args.num_targets)
+    logger.debug("Phishing arrays ordered")
 
     # labels_start_end_train_phish, labels_start_end_test_phish
     labels_start_end_train_phish = targets_start_end(args.num_targets, y_train_phish)
     labels_start_end_test_phish = targets_start_end(args.num_targets, y_test_phish)
     # labels_start_end_train_legit
     labels_start_end_train_legit = all_targets_start_end(args.num_targets, y_train_legit)
+    logger.debug("Targets start and end calculated")
 
     targetHelper = TargetHelper(args.dataset_path / 'phishing')
     randomSampling = RandomSampling(targetHelper, labels_start_end_train_phish, labels_start_end_test_phish,
                                     labels_start_end_train_legit)
+    logger.debug("Random sampling initialized")
     # training
     logger.info("Starting training process! - phase 1")
 
