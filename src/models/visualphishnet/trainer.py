@@ -386,7 +386,7 @@ if __name__ == "__main__":
 		parser.add_argument("--saved-model-name", type=str, default="model")  # from first training
 		parser.add_argument("--new-saved-model-name", type=str, default="model2")
 		parser.add_argument("--save-interval", type=int, default=1)  # 2000
-		parser.add_argument("--batch-size", type=int, default=32)
+		parser.add_argument("--batch-size", type=int, default=16)
 		parser.add_argument("--n-iter", type=int, default=2)  # p1: 21000, p2: 50000
 		parser.add_argument("--lr-interval", type=int, default=100)  # p1: 100, p2: 250
 		# hard examples training
