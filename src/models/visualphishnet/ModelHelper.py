@@ -28,16 +28,26 @@ class ModelHelper:
         return model
 
     def load_trained_model(self, output_dir, saved_model_name, margin, lr):
-        model = load_model(output_dir / f"{saved_model_name}.h5",
-                           custom_objects={'loss': self.custom_loss(margin)})
+        model = load_model(
+            output_dir / f"{saved_model_name}.h5",
+            custom_objects={"loss": self.custom_loss(margin)},
+        )
 
         optimizer = optimizers.Adam(lr=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
 
         return model
 
-    def get_embeddings(self, full_model, X_train_legit, y_train_legit, all_imgs_test, all_labels_test, test_idx,
-                       train_idx) -> data.TrainResults:
+    def get_embeddings(
+        self,
+        full_model,
+        X_train_legit,
+        y_train_legit,
+        all_imgs_test,
+        all_labels_test,
+        test_idx,
+        train_idx,
+    ) -> data.TrainResults:
         shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
         full_model.summary(print_fn=self.logger.debug)
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
@@ -51,22 +61,31 @@ class ModelHelper:
             X_phish=phishing_emb,
             y_phish=all_labels_test,
             phish_test_idx=test_idx,
-            phish_train_idx=train_idx
+            phish_train_idx=train_idx,
         )
 
-    def get_acc(self, targetHelper: TargetHelper, VPTrainResults: data.TrainResults, trusted_list_path, phishing_path,
-                all_file_names_train=None, all_file_names_test=None):
+    def get_acc(
+        self,
+        targetHelper: TargetHelper,
+        VPTrainResults: data.TrainResults,
+        trusted_list_path,
+        phishing_path,
+        all_file_names_train=None,
+        all_file_names_test=None,
+    ):
         # TODO: enable using wandb artifacts
         self.logger.info("Preparing to calculate acc...")
-        legit_file_names = (all_file_names_train or
-                            targetHelper.read_file_names(trusted_list_path, 'targets.txt'))
-        phish_file_names = (all_file_names_test or
-                            targetHelper.read_file_names(phishing_path, 'targets.txt'))
+        legit_file_names = all_file_names_train or targetHelper.read_file_names(
+            trusted_list_path, "targets.txt"
+        )
+        phish_file_names = all_file_names_test or targetHelper.read_file_names(
+            phishing_path, "targets.txt"
+        )
 
         phish_train_files, phish_test_files = data.get_phish_file_names(
             phish_file_names,
             VPTrainResults.phish_train_idx,
-            VPTrainResults.phish_test_idx
+            VPTrainResults.phish_test_idx,
         )
 
         evaluate = Evaluate(VPTrainResults, legit_file_names, phish_train_files)
@@ -93,8 +112,12 @@ class ModelHelper:
         for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
             distances_to_train = evaluate.pairwise_distance[i, :]
             idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
-            names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
-            found, found_idx = targetHelper.check_if_target_in_top(str(phish_test_files[i].name), only_names)
+            names_min_distance, only_names, min_distances = (
+                evaluate.find_names_min_distances(idx, values)
+            )
+            found, found_idx = targetHelper.check_if_target_in_top(
+                str(phish_test_files[i].name), only_names
+            )
             self.logger.info(names_min_distance)
 
             if found == 1:
@@ -106,7 +129,7 @@ class ModelHelper:
 
     def save_model(self, model, output_dir, model_name):
         # TODO: save artifact to wandb
-        model.save(output_dir / f'{model_name}.h5')
+        model.save(output_dir / f"{model_name}.h5")
         self.logger.info("Saved model to disk")
 
     @staticmethod
@@ -122,11 +145,18 @@ class ModelHelper:
         negative_input = Input(input_shape)
 
         # Use VGG as a base model
-        base_model = VGG16(weights='imagenet', input_shape=input_shape, include_top=False)
+        base_model = VGG16(
+            weights="imagenet", input_shape=input_shape, include_top=False
+        )
 
         x = base_model.output
-        x = Conv2D(new_conv_params[2], (new_conv_params[0], new_conv_params[1]), activation='relu',
-                   kernel_initializer='he_normal', kernel_regularizer=l2(2e-4))(x)
+        x = Conv2D(
+            new_conv_params[2],
+            (new_conv_params[0], new_conv_params[1]),
+            activation="relu",
+            kernel_initializer="he_normal",
+            kernel_regularizer=l2(2e-4),
+        )(x)
         x = GlobalMaxPooling2D()(x)
         model = Model(inputs=base_model.input, outputs=x)
 
@@ -149,7 +179,9 @@ class ModelHelper:
         diff = Reshape((1,))(diff)
 
         # Connect the inputs with the outputs
-        triplet_net = Model(inputs=[anchor_input, positive_input, negative_input], outputs=diff)
+        triplet_net = Model(
+            inputs=[anchor_input, positive_input, negative_input], outputs=diff
+        )
 
         # return the model
         return triplet_net
