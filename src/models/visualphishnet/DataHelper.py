@@ -186,6 +186,7 @@ def read_or_load_train_test_idx(dirname, all_imgs_test, all_labels_test, phishin
         _, _, _, _, idx_test, idx_train = train_test_split(
             all_imgs_test, all_labels_test, idx, test_size=phishing_test_size
         )
+        dirname.mkdir(parents=True, exist_ok=True)
         np.save(dirname / "test_idx", idx_test)
         np.save(dirname / "train_idx", idx_train)
 
@@ -223,19 +224,6 @@ def save_embeddings(emb: TrainResults, output_dir, run=None):
         run.save(output_dir / "whitelist_labels.npy")
         run.save(output_dir / "phishing_emb.npy")
         run.save(output_dir / "phishing_labels.npy")
-
-
-if __name__ == "__main__":
-    setup_logging()
-    parser = ArgumentParser()
-
-    parser.add_argument("--dataset-path", type=str, default=RAW_DATA_DIR / "VisualPhish")
-    parser.add_argument("--output-dir", default=INTERIM_DATA_DIR / "VisualPhish")
-    parser.add_argument("--reshape-size", default=[224, 224, 3])
-    parser.add_argument("--legit-imgs-num", default=9363)
-    parser.add_argument("--phish-imgs-num", default=1195)
-    args = parser.parse_args()
-    data = read_or_load_imgs(parser.parse_args())
 
 
 def targets_start_end(num_target, labels):
@@ -298,3 +286,16 @@ def order_random_array(orig_arr, y_orig_arr, targets):
                 y_sorted_arr[count, :] = i
                 count = count + 1
     return sorted_arr, y_sorted_arr
+
+
+if __name__ == "__main__":
+    setup_logging()
+    parser = ArgumentParser()
+
+    parser.add_argument("--dataset-path", type=str, default=RAW_DATA_DIR / "VisualPhish")
+    parser.add_argument("--output-dir", default=INTERIM_DATA_DIR / "VisualPhish")
+    parser.add_argument("--reshape-size", default=[224, 224, 3])
+    parser.add_argument("--legit-imgs-num", default=9363)
+    parser.add_argument("--phish-imgs-num", default=1195)
+    args = parser.parse_args()
+    data = read_or_load_imgs(parser.parse_args())

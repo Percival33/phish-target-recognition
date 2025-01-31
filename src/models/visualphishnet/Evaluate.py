@@ -35,8 +35,7 @@ class Evaluate:
         X_all_train = np.concatenate((train_legit, train_phish))
 
         distances = (
-                np.sum((test_matrix[:, np.newaxis, :] - X_all_train[np.newaxis, :, :]) ** 2, axis=2) /
-                train_phish.shape[1]
+            np.sum((test_matrix[:, np.newaxis, :] - X_all_train[np.newaxis, :, :]) ** 2, axis=2) / train_phish.shape[1]
         )
 
         return distances
