@@ -114,11 +114,12 @@ class ModelHelper:
 		correct = 0
 		self.logger.info(f"Calculating acc with top-{n} match")
 		assert VPTrainResults.phish_test_idx.shape[0] == len(phish_test_files)
-		for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
+		for i, test_file in enumerate(phish_test_files):
 			distances_to_train = evaluate.pairwise_distance[i, :]
-			idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
-			names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
-			found, found_idx = targetHelper.check_if_target_in_top(str(phish_test_files[i].name), only_names)
+			names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(
+				*evaluate.find_min_distances(np.ravel(distances_to_train), n)
+			)
+			found, found_idx = targetHelper.check_if_target_in_top(str(test_file.name), only_names)
 			self.logger.info(names_min_distance)
 
 			if found == 1:
