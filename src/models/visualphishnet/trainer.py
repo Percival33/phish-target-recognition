@@ -193,7 +193,7 @@ def train_phase2(run, args):
 
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
-    for k in tqdm(range(0, args.num_sets), desc="Sets", position=0, leave=True):
+    for k in tqdm(range(0, args.num_sets), desc="Sets"):
         logger.info(f"Starting a new set! - {k}")
         X_train_legit = all_imgs_train
         y_train_legit = all_labels_train
@@ -204,7 +204,7 @@ def train_phase2(run, args):
         )
         fixed_set = X_train_legit[fixed_set_idx.astype(int), :, :, :]
 
-        for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set", position=1, leave=False):
+        for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set"):
             # TODO: log iteration to wandb
             model = full_model.layers[3]
             X_train_new, y_train_new, labels_start_end_train = hard_subset_sampling.find_main_train(
@@ -219,7 +219,7 @@ def train_phase2(run, args):
                 X_train_phish=X_train_phish,
             )
 
-            for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations", position=2, leave=False):
+            for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations"):
                 tot_count = tot_count + 1
                 inputs = get_batch_for_phase2(
                     targetHelper=targetHelper,
@@ -232,7 +232,7 @@ def train_phase2(run, args):
                 )
                 loss_iteration = full_model.train_on_batch(inputs, targets_train)
 
-                logger.info(f"Iteration: {i}. Loss: {loss_iteration}")
+                logger.info(f"Set: {k} SetIteration: {j} Iteration: {i}. Loss: {loss_iteration}")
                 run.log({"loss": loss_iteration})
 
                 if tot_count % args.save_interval == 0:
