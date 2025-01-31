@@ -1,7 +1,7 @@
 # Install git
 apt-get install git
 # Install uv
-curl -LsSf https://astral.sh/uv/0.5.26/install.sh | sh
+curl -LsSf https://astral.sh/uv/0.5.18/install.sh | sh
 source $HOME/.local/bin/env
 
 # Download processed dataset
