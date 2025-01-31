@@ -1,20 +1,11 @@
 import numpy as np
 
+from Evaluate import Evaluate
+
 
 class HardSubsetSampling:
-	# Compute distance between the query set and all training examples
-	def compute_all_distances(self, fixed_set, train_legit, train_phish):
-		# TODO: refactor with trainer_phase2.py
-		train_size = train_legit.shape[0] + train_phish.shape[0]
-		X_all_train = np.concatenate((train_legit, train_phish))
-		pairwise_distance = np.zeros([fixed_set.shape[0], train_size])
-		for i in range(0, fixed_set.shape[0]):
-			pair1 = fixed_set[i, :]
-			for j in range(0, train_size):
-				pair2 = X_all_train[j, :]
-				l2_diff = self.compute_distance_pair(pair1, pair2)
-				pairwise_distance[i, j] = l2_diff
-		return pairwise_distance
+	def __init__(self):
+		self.evaluate = Evaluate(None, None, None)
 
 	# Main function for subset sampling
 	# Steps:
