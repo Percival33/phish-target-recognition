@@ -21,12 +21,6 @@ class Evaluate:
 
     @staticmethod
     def compute_all_distances(test_matrix, train_legit, train_phish):
-        # L2 distance
-        def compute_distance_pair(num, layer1, layer2):
-            diff = layer1 - layer2
-            _l2_diff = np.sum(diff**2) / num
-            return _l2_diff
-
         """
         Compute pairwise distances between test matrix and training data.
 
@@ -38,28 +32,14 @@ class Evaluate:
         Returns:
         numpy.ndarray: Pairwise distances between test matrix and training data
         """
-        # Concatenate training samples
-        train_size = train_legit.shape[0] + train_phish.shape[0]
         X_all_train = np.concatenate((train_legit, train_phish))
 
         distances = (
-            np.sum((test_matrix[:, np.newaxis, :] - X_all_train[np.newaxis, :, :]) ** 2, axis=2) / train_phish.shape[1]
+                np.sum((test_matrix[:, np.newaxis, :] - X_all_train[np.newaxis, :, :]) ** 2, axis=2) /
+                train_phish.shape[1]
         )
 
-        # Initialize pairwise distance matrix
-        pairwise_distance = np.zeros([test_matrix.shape[0], train_size])
-
-        # Compute distances
-        for i in range(test_matrix.shape[0]):
-            pair1 = test_matrix[i, :]
-            for j in range(train_size):
-                pair2 = X_all_train[j, :]
-                l2_diff = compute_distance_pair(train_phish.shape[1], pair1, pair2)
-                pairwise_distance[i, j] = l2_diff
-
-        assert np.array_equal(distances, pairwise_distance)
-
-        return pairwise_distance
+        return distances
 
     def _compute_all_distances(self, test_matrix):
         return self.compute_all_distances(test_matrix, self.X_legit_train, self.X_phish_train)
