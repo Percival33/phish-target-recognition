@@ -10,7 +10,6 @@ from matplotlib.pyplot import imread
 from sklearn.model_selection import train_test_split
 import numpy as np
 from tqdm import tqdm
-from pathlib import Path
 
 from tools.config import SRC_DIR, RAW_DATA_DIR, INTERIM_DATA_DIR, setup_logging
 
@@ -179,15 +178,8 @@ def read_or_load_imgs(args):
 
 
 def get_phish_file_names(phish_file_names, phish_train_idx, phish_test_idx):
-    phish_train_file_names = []
-    for i in range(0, phish_train_idx.shape[0]):
-        phish_train_file_names.append(phish_file_names[phish_train_idx[i]])
-
     phish_train_file_names = [phish_file_names[idx] for idx in phish_train_idx]
-
-    phish_test_file_names = []
-    for i in range(0, phish_test_idx.shape[0]):
-        phish_test_file_names.append(phish_file_names[phish_test_idx[i]])
+    phish_test_file_names = [phish_file_names[idx] for idx in phish_test_idx]
 
     return phish_train_file_names, phish_test_file_names
 

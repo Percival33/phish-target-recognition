@@ -54,32 +54,55 @@ class ModelHelper:
             phish_train_idx=train_idx
         )
 
-    def get_acc(self, targetHelper: TargetHelper, VPTrainResults: data.TrainResults, trusted_list_path, phishing_path):
+    def get_acc(self, targetHelper: TargetHelper, VPTrainResults: data.TrainResults, trusted_list_path, phishing_path,
+                all_file_names_train=None, all_file_names_test=None):
         # TODO: enable using wandb artifacts
         self.logger.info("Preparing to calculate acc...")
-        legit_file_names_targets = targetHelper.read_file_names(trusted_list_path, 'targets.txt')
-        phish_file_names_targets = targetHelper.read_file_names(phishing_path, 'targets.txt')
+        legit_file_names = (all_file_names_train or
+                            targetHelper.read_file_names(trusted_list_path, 'targets.txt'))
+        phish_file_names = (all_file_names_test or
+                            targetHelper.read_file_names(phishing_path, 'targets.txt'))
 
-        phish_train_file_names, phish_test_file_names = data.get_phish_file_names(phish_file_names_targets,
-                                                                                  VPTrainResults.phish_train_idx,
-                                                                                  VPTrainResults.phish_test_idx)
+        phish_train_files, phish_test_files = data.get_phish_file_names(
+            phish_file_names,
+            VPTrainResults.phish_train_idx,
+            VPTrainResults.phish_test_idx
+        )
 
-        evaluate = Evaluate(VPTrainResults, legit_file_names_targets, phish_train_file_names)
+        evaluate = Evaluate(VPTrainResults, legit_file_names, phish_train_files)
+
+        """
+        correct_matches = sum(
+            targetHelper.check_if_target_in_top(
+                str(test_file.name), 
+                evaluate.find_names_min_distances(
+                    *evaluate.find_min_distances(
+                        np.ravel(evaluate.pairwise_distance[i, :]), 
+                        1
+                    )
+                )[1]
+            )[0] 
+            for i, test_file in enumerate(phish_test_files)
+        )
+       """
 
         n = 1  # Top-1 match
         correct = 0
         self.logger.info(f"Calculating acc with top-{n} match")
+        assert VPTrainResults.phish_test_idx.shape[0] == len(phish_test_files)
         for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
             distances_to_train = evaluate.pairwise_distance[i, :]
             idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
             names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
-            found, found_idx = targetHelper.check_if_target_in_top(str(phish_test_file_names[i].name), only_names)
+            found, found_idx = targetHelper.check_if_target_in_top(str(phish_test_files[i].name), only_names)
             self.logger.info(names_min_distance)
 
             if found == 1:
                 correct += 1
-        self.logger.info(f"Correct match percentage: {str(correct / VPTrainResults.phish_test_idx.shape[0])}")
-        return correct / VPTrainResults.phish_test_idx.shape[0]
+
+        accuracy = correct / len(phish_test_files)
+        self.logger.info(f"Accuracy: {accuracy:.2%}")
+        return accuracy
 
     def save_model(self, model, output_dir, model_name):
         # TODO: save artifact to wandb

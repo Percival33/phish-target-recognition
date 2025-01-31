@@ -145,7 +145,7 @@ def train_phase1(run, args):
                                                      all_labels_test, train_idx=idx_train,
                                                      test_idx=idx_test)
             acc = modelHelper.get_acc(targetHelper, testResults, args.dataset_path / 'trusted_list',
-                                      args.dataset_path / 'phishing')
+                                      args.dataset_path / 'phishing', all_file_names_train, all_file_names_test)
             run.log({"acc": acc})
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
 
@@ -213,7 +213,6 @@ def train_phase2(run, args):
     run.log({'lr': args.lr})
     for k in tqdm(range(0, args.num_sets), desc="Sets"):
         logger.info(f"Starting a new set! - {k}")
-        # print("\n ------------- \n")
         X_train_legit = all_imgs_train
         y_train_legit = all_labels_train
 
@@ -249,7 +248,6 @@ def train_phase2(run, args):
                 )
                 loss_iteration = full_model.train_on_batch(inputs, targets_train)
 
-                # print("\n ------------- \n")
                 logger.info('Iteration: ' + str(i) + '. ' + "Loss: {0}".format(loss_iteration))
                 run.log({"loss": loss_iteration})
 
@@ -259,7 +257,7 @@ def train_phase2(run, args):
                                                              all_labels_test, train_idx=idx_train,
                                                              test_idx=idx_test)
                     acc = modelHelper.get_acc(targetHelper, testResults, args.dataset_path / 'trusted_list',
-                                              args.dataset_path / 'phishing')
+                                              args.dataset_path / 'phishing', all_file_names_train, all_file_names_test)
                     run.log({"acc": acc})
                     modelHelper.save_model(full_model, args.output_dir, args.saved_model_name)
 
