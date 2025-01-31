@@ -8,7 +8,7 @@ import DataHelper as data
 class Evaluate:
     # Find same-category website (matching is correct if it was matched to the same category (e.g. microsoft and outlook ))
 
-    def __init__(self, train_results: data.TrainResults | None, legit_file_names, phish_train_file_names):
+    def __init__(self, train_results: data.TrainResults, legit_file_names, phish_train_file_names):
         self.X_phish_train = train_results.X_phish_train
         self.X_phish_test = train_results.X_phish_test
         self.phish_train_idx = train_results.phish_train_idx
@@ -17,10 +17,16 @@ class Evaluate:
         self.legit_file_names = legit_file_names
         self.phish_train_file_names = phish_train_file_names
 
-        if train_results is not None:
-            self.pairwise_distance = self.compute_all_distances(self.X_phish_test)
+        self.pairwise_distance = self._compute_all_distances(self.X_phish_test)
 
-    def compute_all_distances(self, test_matrix, train_legit=None, train_phish=None):
+    @staticmethod
+    def compute_all_distances(test_matrix, train_legit, train_phish):
+        # L2 distance
+        def compute_distance_pair(num, layer1, layer2):
+            diff = layer1 - layer2
+            _l2_diff = np.sum(diff**2) / num
+            return _l2_diff
+
         """
         Compute pairwise distances between test matrix and training data.
 
@@ -32,15 +38,13 @@ class Evaluate:
         Returns:
         numpy.ndarray: Pairwise distances between test matrix and training data
         """
-        # If no explicit train sets are provided, use class attributes
-        if train_legit is None:
-            train_legit = self.X_legit_train
-        if train_phish is None:
-            train_phish = self.X_phish_train
-
         # Concatenate training samples
         train_size = train_legit.shape[0] + train_phish.shape[0]
         X_all_train = np.concatenate((train_legit, train_phish))
+
+        distances = (
+            np.sum((test_matrix[:, np.newaxis, :] - X_all_train[np.newaxis, :, :]) ** 2, axis=2) / train_phish.shape[1]
+        )
 
         # Initialize pairwise distance matrix
         pairwise_distance = np.zeros([test_matrix.shape[0], train_size])
@@ -50,16 +54,15 @@ class Evaluate:
             pair1 = test_matrix[i, :]
             for j in range(train_size):
                 pair2 = X_all_train[j, :]
-                l2_diff = self.compute_distance_pair(pair1, pair2)
+                l2_diff = compute_distance_pair(train_phish.shape[1], pair1, pair2)
                 pairwise_distance[i, j] = l2_diff
+
+        assert distances == pairwise_distance
 
         return pairwise_distance
 
-    # L2 distance
-    def compute_distance_pair(self, layer1, layer2):
-        diff = layer1 - layer2
-        l2_diff = np.sum(diff**2) / self.X_phish_train.shape[1]
-        return l2_diff
+    def _compute_all_distances(self, test_matrix):
+        return self.compute_all_distances(test_matrix, self.X_legit_train, self.X_phish_train)
 
     # Find names of examples with min distance
     def find_names_min_distances(self, idx, values):

@@ -4,9 +4,6 @@ from Evaluate import Evaluate
 
 
 class HardSubsetSampling:
-    def __init__(self):
-        self.evaluate = Evaluate(None, None, None)
-
     # Main function for subset sampling
     # Steps:
     # Predict all images
@@ -44,7 +41,7 @@ class HardSubsetSampling:
             X_train_phish=X_train_phish,
             fixed_set=fixed_set,
         )
-        pairwise_distance = self.compute_all_distances(
+        pairwise_distance = Evaluate.compute_all_distances(
             fixed_set_last_layer, X_train_legit_last_layer, X_train_phish_last_layer
         )
         n = 1
