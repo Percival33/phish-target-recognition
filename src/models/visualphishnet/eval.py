@@ -1,5 +1,5 @@
 import logging
-import logging.config
+from argparse import ArgumentParser
 
 import numpy as np
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
@@ -94,24 +94,26 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
     """
 
+    parser = ArgumentParser()
+    parser.add_argument("--dataset_path", type=str, default=PROCESSED_DATA_DIR / "smallerSampleDataset")
+    parser.add_argument("--output_dir_path", type=str, default=PROCESSED_DATA_DIR / "VP-original")
+    args = parser.parse_args()
     logger.info("Evaluating VisualPhishNet")
-    dataset_path = PROCESSED_DATA_DIR / "smallerSampleDataset"
-    output_dir_path = PROCESSED_DATA_DIR / "VP-original"
 
     # TODO: enable using wandb artifacts
     VPTrainResults = TrainResults(
-        X_legit_train=np.load(output_dir_path / "whitelist_emb2.npy"),
-        y_legit_train=np.load(output_dir_path / "whitelist_labels2.npy"),
-        X_phish=np.load(output_dir_path / "phishing_emb2.npy"),
-        y_phish=np.load(output_dir_path / "phishing_labels2.npy"),
-        phish_test_idx=np.load(output_dir_path / "test_idx.npy"),
-        phish_train_idx=np.load(output_dir_path / "train_idx.npy"),
+        X_legit_train=np.load(args.output_dir_path / "whitelist_emb2.npy"),
+        y_legit_train=np.load(args.output_dir_path / "whitelist_labels2.npy"),
+        X_phish=np.load(args.output_dir_path / "phishing_emb2.npy"),
+        y_phish=np.load(args.output_dir_path / "phishing_labels2.npy"),
+        phish_test_idx=np.load(args.output_dir_path / "test_idx.npy"),
+        phish_train_idx=np.load(args.output_dir_path / "train_idx.npy"),
     )
 
-    targetHelper = TargetHelper(dataset_path / "phishing")
+    targetHelper = TargetHelper(args.dataset_path / "phishing")
 
-    legit_file_names_targets = targetHelper.read_file_names(dataset_path / "trusted_list", "targets.txt")
-    phish_file_names_targets = targetHelper.read_file_names(dataset_path / "phishing", "targets.txt")
+    legit_file_names_targets = targetHelper.read_file_names(args.dataset_path / "trusted_list", "targets.txt")
+    phish_file_names_targets = targetHelper.read_file_names(args.dataset_path / "phishing", "targets.txt")
     phish_train_file_names, phish_test_file_names = get_phish_file_names(
         phish_file_names_targets,
         VPTrainResults.phish_train_idx,
