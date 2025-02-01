@@ -359,6 +359,6 @@ if __name__ == "__main__":
             while tb is not None:
                 logger.error(f"File: {tb.tb_frame.f_code.co_filename}, Line: {tb.tb_lineno}")
                 tb = tb.tb_next
-            run.save()
+            # run.save()
         finally:
             run.finish()
