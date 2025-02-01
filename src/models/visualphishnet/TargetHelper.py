@@ -101,6 +101,6 @@ class TargetHelper:
 
     @staticmethod
     def get_label_from_name(name):
-        first_half = name.split("_", 1)[0]
+        first_half = name.name.split("_", 1)[0]
         number = int(first_half.replace("T", ""))
         return number

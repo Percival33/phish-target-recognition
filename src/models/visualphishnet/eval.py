@@ -4,10 +4,10 @@ import logging.config
 import numpy as np
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
 
-from src.models.visualphishnet.Evaluate import Evaluate
-from src.models.visualphishnet.TargetHelper import TargetHelper
+from Evaluate import Evaluate
+from TargetHelper import TargetHelper
 
-from .data import TrainResults, get_phish_file_names
+from DataHelper import TrainResults, get_phish_file_names
 
 
 def get_label_from_name(name):
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     logger.info("Evaluating VisualPhishNet")
     dataset_path = PROCESSED_DATA_DIR / "smallerSampleDataset"
-    output_dir_path = INTERIM_DATA_DIR / "smallerSampleDataset"
+    output_dir_path = PROCESSED_DATA_DIR / "VP-original"
 
     # TODO: enable using wandb artifacts
     VPTrainResults = TrainResults(
@@ -108,7 +108,7 @@ if __name__ == "__main__":
         phish_train_idx=np.load(output_dir_path / "train_idx.npy"),
     )
 
-    targetHelper = TargetHelper()
+    targetHelper = TargetHelper(dataset_path / "phishing")
 
     legit_file_names_targets = targetHelper.read_file_names(dataset_path / "trusted_list", "targets.txt")
     phish_file_names_targets = targetHelper.read_file_names(dataset_path / "phishing", "targets.txt")

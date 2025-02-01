@@ -19,6 +19,9 @@ uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar z
 # vp original paper results on smaller dataset
 uv run --with gdown gdown 1xPN_3GYo8tcdnCPwPdKXzUS13-K54NLg -O - --quiet | tar zxvf - -C ../../../data/interim
 
+# run gaptb94y
+uv run --with gdown gdown 1rhXI6CluYxizS1mEEItvCtAVJJInr4Up -O - --quiet | tar zxvf - -C ../../../data/interim
+
 # Login to wandb
 uv run wandb login
 
@@ -27,3 +30,5 @@ uv run wandb login
 
 # smaller sample dataset
 #uv run trainer.py --num-targets 5 --legit-imgs-num 420 --phish-imgs-num 160 --save-interval 20 --n-iter 20 --num-sets 5 --hard-n-iter 5 --num-sets 5 --lr-interval 250
+
+# tar --disable-copyfile --no-xattrs -czvf archive.tar.gz folder_name
