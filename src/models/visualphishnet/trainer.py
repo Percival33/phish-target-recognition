@@ -2,11 +2,11 @@ import logging
 from argparse import ArgumentParser
 
 import numpy as np
-import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
+import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling

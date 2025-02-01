@@ -1,89 +1,17 @@
 import logging
 from argparse import ArgumentParser
+from pathlib import Path
 
 import numpy as np
-from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
-from pathlib import Path
+from tools.config import PROCESSED_DATA_DIR, setup_logging
+
+from DataHelper import TrainResults, get_phish_file_names
 from Evaluate import Evaluate
 from TargetHelper import TargetHelper
 
-from DataHelper import TrainResults, get_phish_file_names
-
-
-def get_label_from_name(name):
-    first_half = name.split("_", 1)[0]
-    number = int(first_half.replace("T", ""))
-    return number
-
-
-# class TargetHelper:
-#     # parents_targets = ['microsoft','apple','google','alibaba']
-#     # sub_targets = [['ms_outlook','ms_office','ms_bing','ms_onedrive','ms_skype'],['itunes','icloud'],['google_drive'],['aliexpress']]
-#
-#     parents_targets_idx = [90, 12, 65, 4]
-#     sub_targets = [[150, 152, 151, 149, 148], [153, 154], [147], [5]]
-#
-#     def __init__(self):
-#         self.logger = logging.getLogger(__name__)
-#
-#     # this function maps sub targets if they were split
-#     def check_if_same_category(self, img_label1, img_label2):
-#         if_same = 0
-#         if img_label1 in self.parents_targets_idx:
-#             if img_label2 in self.sub_targets[self.parents_targets_idx.index(img_label1)]:
-#                 if_same = 1
-#         elif img_label1 in self.sub_targets[0]:
-#             if img_label2 in self.sub_targets[0] or img_label2 == self.parents_targets_idx[0]:
-#                 if_same = 1
-#         elif img_label1 in self.sub_targets[1]:
-#             if img_label2 in self.sub_targets[1] or img_label2 == self.parents_targets_idx[1]:
-#                 if_same = 1
-#         elif img_label1 in self.sub_targets[2]:
-#             if img_label2 in self.sub_targets[2] or img_label2 == self.parents_targets_idx[2]:
-#                 if_same = 1
-#         return if_same
-#
-#     # Find if target is in the top closest n distances
-#     def check_if_target_in_top(self, test_file_name, only_names):
-#         found = 0
-#         idx = 0
-#         test_label = get_label_from_name(test_file_name)
-#         self.logger.info('***')
-#         self.logger.info('Test example: %s', test_file_name)
-#         for i in range(0, len(only_names)):
-#             label_distance = get_label_from_name(only_names[i])
-#             if label_distance == test_label or self.check_if_same_category(test_label, label_distance) == 1:
-#                 found = 1
-#                 idx = i + 1
-#                 self.logger.info('found')
-#                 break
-#         return found, idx
-#
-#     # Get file names of each example
-#     @staticmethod
-#     def read_file_names(data_path, file_name):
-#         targets_file = open(data_path / file_name, "r")
-#         targets = targets_file.read()
-#
-#         file_names_list = []
-#         targets_list = targets.splitlines()
-#         for i in range(0, len(targets_list)):
-#             target_path = data_path / targets_list[i]
-#             file_names = sorted(os.listdir(target_path))
-#             for j in range(0, len(file_names)):
-#                 file_names_list.append(file_names[j])
-#         return file_names_list
-#
-#     @staticmethod
-#     def get_label_from_name(name):
-#         first_half = name.split('_', 1)[0]
-#         number = int(first_half.replace('T', ''))
-#         return number
-
-
 if __name__ == "__main__":
     setup_logging()
-    logger = logging.getLogger()
+    logger = logging.getLogger(__name__)
 
     """
     file_handler = logging.FileHandler('result.log')
@@ -97,10 +25,10 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--dataset-path", type=Path, default=PROCESSED_DATA_DIR / "smallerSampleDataset")
     parser.add_argument("--output-dir", type=Path, default=PROCESSED_DATA_DIR / "VP-original")
-    parser.add_argument("--version", type=int, default=2)
+    parser.add_argument("--version", type=str, default="2")
     args = parser.parse_args()
     logger.info("Evaluating VisualPhishNet")
-
+    logger.info(f"phishing_emb{args.version}.npy")
     # TODO: enable using wandb artifacts
     VPTrainResults = TrainResults(
         X_legit_train=np.load(args.output_dir / f"whitelist_emb{args.version}.npy"),

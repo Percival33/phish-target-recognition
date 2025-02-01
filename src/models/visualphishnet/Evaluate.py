@@ -32,7 +32,7 @@ class Evaluate:
         Returns:
         numpy.ndarray: Pairwise distances between test matrix and training data
         """
-        X_all_train = np.concatenate((train_legit, train_phish))
+        X_all_train = np.concatenate((train_phish, train_legit))
 
         distances = (
             np.sum((test_matrix[:, np.newaxis, :] - X_all_train[np.newaxis, :, :]) ** 2, axis=2) / train_phish.shape[1]
