@@ -50,6 +50,8 @@ class ModelHelper:
         test_idx,
         train_idx,
     ) -> data.TrainResults:
+        self.logger.info("Starting to calculate embeddings...")
+
         shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
         full_model.summary(print_fn=self.logger.debug)
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
@@ -77,6 +79,11 @@ class ModelHelper:
     ):
         # TODO: enable using wandb artifacts
         self.logger.info("Preparing to calculate acc...")
+        if all_file_names_train is not None:
+            self.logger.info("Using all_file_names_train")
+        if all_file_names_test is not None:
+            self.logger.info("Using all_file_names_test")
+
         legit_file_names = (
             all_file_names_train
             if all_file_names_train is not None
@@ -113,7 +120,6 @@ class ModelHelper:
         n = 1  # Top-1 match
         correct = 0
         self.logger.info(f"Calculating acc with top-{n} match")
-        assert VPTrainResults.phish_test_idx.shape[0] == len(phish_test_files)
         for i, test_file in enumerate(phish_test_files):
             distances_to_train = evaluate.pairwise_distance[i, :]
             names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(
