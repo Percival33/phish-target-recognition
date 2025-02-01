@@ -1,5 +1,13 @@
-# Install git
-apt-get install git tmux -y
+sudo apt-get update
+sudo apt-get install -y locales
+sudo locale-gen en_US.UTF-8
+sudo update-locale LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+sudo apt-get update
+sudo apt-get install -y \
+    git \
+    tmux
+
 # Install uv
 curl -LsSf https://astral.sh/uv/0.5.18/install.sh | sh
 source $HOME/.local/bin/env
