@@ -1,12 +1,13 @@
 import logging
 from argparse import ArgumentParser
+from pathlib import Path
 
 import numpy as np
-import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
+import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
@@ -307,7 +308,7 @@ if __name__ == "__main__":
         # Dataset parameters
         parser.add_argument(
             "--dataset-path",
-            type=str,
+            type=Path,
             default=INTERIM_DATA_DIR / "VisualPhish",
         )
         parser.add_argument("--reshape-size", default=[224, 224, 3])
@@ -321,7 +322,7 @@ if __name__ == "__main__":
         parser.add_argument("--new-conv-params", default=[5, 5, 512])
         # Training parameters
         parser.add_argument("--lr", type=float, default=2e-5)  # 0.00002
-        parser.add_argument("--output-dir", type=str, default=PROCESSED_DATA_DIR / "VisualPhish")
+        parser.add_argument("--output-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
         parser.add_argument("--saved-model-name", type=str, default="model")  # from first training
         parser.add_argument("--new-saved-model-name", type=str, default="model2")
         parser.add_argument("--save-interval", type=int, default=2000)  # 2000

@@ -41,26 +41,32 @@ if __name__ == "__main__":
 
     targetHelper = TargetHelper(args.dataset_path / "phishing")
 
-    legit_file_names_targets = targetHelper.read_file_names(args.dataset_path / "trusted_list", "targets.txt")
-    phish_file_names_targets = targetHelper.read_file_names(args.dataset_path / "phishing", "targets.txt")
-    phish_train_file_names, phish_test_file_names = get_phish_file_names(
-        phish_file_names_targets,
+    legit_file_names = targetHelper.read_file_names(args.dataset_path / "trusted_list", "targets.txt")
+    phish_file_names = targetHelper.read_file_names(args.dataset_path / "phishing", "targets.txt")
+
+    phish_train_files, phish_test_files = get_phish_file_names(
+        phish_file_names,
         VPTrainResults.phish_train_idx,
         VPTrainResults.phish_test_idx,
     )
 
-    evaluate = Evaluate(VPTrainResults, legit_file_names_targets, phish_train_file_names)
+    evaluate = Evaluate(VPTrainResults, legit_file_names, phish_train_files)
 
     n = 1  # Top-1 match
     correct = 0
 
-    for i in range(0, VPTrainResults.phish_test_idx.shape[0]):
+    for i, test_file in enumerate(phish_test_files):
+        filename = str(test_file.name) if isinstance(test_file, Path) else test_file
+        print(f"FILENAME: {type(filename)} {filename} <> {test_file}")
         distances_to_train = evaluate.pairwise_distance[i, :]
-        idx, values = evaluate.find_min_distances(np.ravel(distances_to_train), n)
-        names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(idx, values)
-        found, found_idx = targetHelper.check_if_target_in_top(phish_test_file_names[i], only_names)
-        print(names_min_distance)
+        names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(
+            *evaluate.find_min_distances(np.ravel(distances_to_train), n)
+        )
+        found, found_idx = targetHelper.check_if_target_in_top(filename, only_names)
+        logger.info(names_min_distance)
 
         if found == 1:
             correct += 1
-    logger.info("Correct match percentage: " + str(correct / VPTrainResults.phish_test_idx.shape[0]))
+
+    accuracy = correct / len(phish_test_files)
+    logger.info(f"Correct match percentage: {accuracy:.2%}")
