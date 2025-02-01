@@ -97,15 +97,16 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--dataset-path", type=Path, default=PROCESSED_DATA_DIR / "smallerSampleDataset")
     parser.add_argument("--output-dir", type=Path, default=PROCESSED_DATA_DIR / "VP-original")
+    parser.add_argument("--version", type=int, default=2)
     args = parser.parse_args()
     logger.info("Evaluating VisualPhishNet")
 
     # TODO: enable using wandb artifacts
     VPTrainResults = TrainResults(
-        X_legit_train=np.load(args.output_dir / "whitelist_emb3.npy"),
-        y_legit_train=np.load(args.output_dir / "whitelist_labels3.npy"),
-        X_phish=np.load(args.output_dir / "phishing_emb3.npy"),
-        y_phish=np.load(args.output_dir / "phishing_labels3.npy"),
+        X_legit_train=np.load(args.output_dir / f"whitelist_emb{args.version}.npy"),
+        y_legit_train=np.load(args.output_dir / f"whitelist_labels{args.version}.npy"),
+        X_phish=np.load(args.output_dir / f"phishing_emb{args.version}.npy"),
+        y_phish=np.load(args.output_dir / f"phishing_labels{args.version}.npy"),
         phish_test_idx=np.load(args.output_dir / "test_idx.npy"),
         phish_train_idx=np.load(args.output_dir / "train_idx.npy"),
     )
