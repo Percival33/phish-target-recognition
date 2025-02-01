@@ -48,11 +48,11 @@ class TargetHelper:
     def check_if_target_in_top(self, test_file_name, only_names):
         found = 0
         idx = 0
-        test_label = self.get_label_from_name(test_file_name)
+        test_label = self._get_label_from_name(test_file_name)
         self.logger.debug("***")
         self.logger.debug("Test example: %s", test_file_name)
         for i in range(0, len(only_names)):
-            label_distance = self.get_label_from_name(only_names[i])
+            label_distance = self._get_label_from_name(only_names[i])
             if label_distance == test_label or self.check_if_same_category(test_label, label_distance) == 1:
                 found = 1
                 idx = i + 1
@@ -69,16 +69,20 @@ class TargetHelper:
             target_list = target_lists[i]
             parent_target = target_list[0]
             one_target_list = []
-            parent_idx = self.get_idx_of_target(parent_target, all_targets)
+            parent_idx = self._get_idx_of_target(parent_target, all_targets)
             parents_ids.append(parent_idx)
             for child_target in target_list[1:]:
-                child_idx = self.get_idx_of_target(child_target, all_targets)
+                child_idx = self._get_idx_of_target(child_target, all_targets)
                 one_target_list.append(child_idx)
             sub_target_lists_idx.append(one_target_list)
         return parents_ids, sub_target_lists_idx
 
-    @staticmethod
-    def get_idx_of_target(target_name, all_targets):
+    def _get_label_from_name(self, name):
+        first_half = name.split("_", 1)[0]
+        number = int(first_half.replace("T", ""))
+        return number
+
+    def _get_idx_of_target(self, target_name, all_targets):
         for i in range(0, len(all_targets)):
             if all_targets[i] == target_name:
                 found_idx = i
@@ -98,9 +102,3 @@ class TargetHelper:
             for j in range(0, len(file_names)):
                 file_names_list.append(file_names[j])
         return file_names_list
-
-    @staticmethod
-    def get_label_from_name(name):
-        first_half = name.name.split("_", 1)[0]
-        number = int(first_half.replace("T", ""))
-        return number
