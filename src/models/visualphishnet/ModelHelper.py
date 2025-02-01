@@ -2,6 +2,7 @@ import logging
 import logging.config
 
 import numpy as np
+import tensorflow as tf
 from keras import Input, Model, optimizers
 from keras import backend as K
 from keras.applications import VGG16
@@ -19,13 +20,14 @@ class ModelHelper:
     def __init__(self):
         setup_logging()
         self.logger = logging.getLogger(__name__)
+        self.run_opts = tf.RunOptions(report_tensor_allocations_upon_oom=True)
 
     def prepare_model(self, input_shape, new_conv_params, margin, lr):
         model = self.define_triplet_network(input_shape, new_conv_params)
         model.summary(print_fn=self.logger.debug)
 
         optimizer = optimizers.Adam(lr=lr)
-        model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
+        model.compile(loss=self.custom_loss(margin), optimizer=optimizer, options=self.run_opts)
         self.logger.debug("Model compiled")
         return model
 
@@ -36,7 +38,7 @@ class ModelHelper:
         )
 
         optimizer = optimizers.Adam(lr=lr)
-        model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
+        model.compile(loss=self.custom_loss(margin), optimizer=optimizer, options=self.run_opts)
 
         return model
 
