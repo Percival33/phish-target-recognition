@@ -112,6 +112,7 @@ def train_phase1(run, args):
             )
             run.log({"acc": acc})
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
+            run.log_model(args.output_dir / f"{args.saved_model_name}.h5")
 
         if i % args.lr_interval == 0:
             args.lr = 0.99 * args.lr
@@ -258,7 +259,8 @@ def train_phase2(run, args):
                         all_file_names_test,
                     )
                     run.log({"acc": acc})
-                    modelHelper.save_model(full_model, args.output_dir, args.saved_model_name)
+                    modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
+                    run.log_model(args.output_dir / f"{args.new_saved_model_name}.h5")
 
                 if tot_count % args.lr_interval == 0:
                     args.lr = 0.99 * args.lr
@@ -357,5 +359,6 @@ if __name__ == "__main__":
             while tb is not None:
                 logger.error(f"File: {tb.tb_frame.f_code.co_filename}, Line: {tb.tb_lineno}")
                 tb = tb.tb_next
+            run.save()
         finally:
             run.finish()
