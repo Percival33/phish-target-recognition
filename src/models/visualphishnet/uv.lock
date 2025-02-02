@@ -404,6 +404,68 @@ wheels = [
 ]
 
 [[package]]
+name = "etils"
+version = "1.3.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.9' and sys_platform == 'linux'",
+    "python_full_version < '3.9' and sys_platform != 'linux'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e7/e5/fdbaca6a543f459a28b6713cdda7bccfb340b2c048c0982f654f1e1f5173/etils-1.3.0.tar.gz", hash = "sha256:0a695ec45a982ae7c9deb437f1f251346d88b43ca59be67e961f61fe8bc8cae4", size = 77560 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ca/db/47ffb866d7a1aa21132a72f67e84c4f03a4cad11ae9d069dd61c52f929de/etils-1.3.0-py3-none-any.whl", hash = "sha256:809a92ff72f12149441492cf4d9a26b56a4741dffb4dfb9c4c7b7afe055c2d28", size = 126441 },
+]
+
+[package.optional-dependencies]
+epath = [
+    { name = "importlib-resources", version = "6.4.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.9'" },
+    { name = "zipp", version = "3.20.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+]
+
+[[package]]
+name = "etils"
+version = "1.5.2"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.9.*' and sys_platform == 'linux'",
+    "python_full_version == '3.9.*' and sys_platform != 'linux'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/fa/8637c95271dd9eed00e258184295dd00ba163bb8924ba3be978ec89f093f/etils-1.5.2.tar.gz", hash = "sha256:ba6a3e1aff95c769130776aa176c11540637f5dd881f3b79172a5149b6b1c446", size = 87021 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/6a/d2aaebacf73d5da7126c632ec0d9dc2df99cc4bbd259bad48904a034fc1b/etils-1.5.2-py3-none-any.whl", hash = "sha256:6dc882d355e1e98a5d1a148d6323679dc47c9a5792939b9de72615aa4737eb0b", size = 140603 },
+]
+
+[package.optional-dependencies]
+epath = [
+    { name = "fsspec", marker = "python_full_version == '3.9.*'" },
+    { name = "importlib-resources", version = "6.5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "typing-extensions", marker = "python_full_version == '3.9.*'" },
+    { name = "zipp", version = "3.21.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+]
+
+[[package]]
+name = "etils"
+version = "1.11.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.10' and sys_platform == 'linux'",
+    "python_full_version >= '3.10' and sys_platform != 'linux'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/85/28/8a4d0614a7864c1c703f848dedb69d2f532a623ffb0159e390c06ad20279/etils-1.11.0.tar.gz", hash = "sha256:aff3278a3be7fddf302dfd80335e9f924244666c71239cd91e836f3d055f1c4a", size = 103610 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4f/4a/ff8aa2c57300613b69905308c5afe92c5b01112d766c25a305fd6796170a/etils-1.11.0-py3-none-any.whl", hash = "sha256:a394cf3476bcec51c221426a70c39cd1006e889456ba41e4d7f12fd6814be7a5", size = 165419 },
+]
+
+[package.optional-dependencies]
+epath = [
+    { name = "fsspec", marker = "python_full_version >= '3.10'" },
+    { name = "importlib-resources", version = "6.4.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.10'" },
+    { name = "zipp", version = "3.20.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+]
+
+[[package]]
 name = "eval-type-backport"
 version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -476,6 +538,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/bb/c0/2779d167e6b8def68f31cf70e077e91afba10a46e330f22cc3ee206086d1/fonttools-4.55.3-cp39-cp39-win32.whl", hash = "sha256:dc5294a3d5c84226e3dbba1b6f61d7ad813a8c0238fceea4e09aa04848c3d851", size = 2175672 },
     { url = "https://files.pythonhosted.org/packages/e3/05/b0ddd91049475035cc341d1e6fa88a04340f2ef6c38192ca45e4e2b3331f/fonttools-4.55.3-cp39-cp39-win_amd64.whl", hash = "sha256:aedbeb1db64496d098e6be92b2e63b5fac4e53b1b92032dfc6988e1ea9134a4d", size = 2219942 },
     { url = "https://files.pythonhosted.org/packages/99/3b/406d17b1f63e04a82aa621936e6e1c53a8c05458abd66300ac85ea7f9ae9/fonttools-4.55.3-py3-none-any.whl", hash = "sha256:f412604ccbeee81b091b420272841e5ec5ef68967a9790e80bffd0e30b8e2977", size = 1111638 },
+]
+
+[[package]]
+name = "fsspec"
+version = "2025.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/79/68612ed99700e6413de42895aa725463e821a6b3be75c87fcce1b4af4c70/fsspec-2025.2.0.tar.gz", hash = "sha256:1c24b16eaa0a1798afa0337aa0db9b256718ab2a89c425371f5628d22c3b6afd", size = 292283 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e2/94/758680531a00d06e471ef649e4ec2ed6bf185356a7f9fbfbb7368a40bd49/fsspec-2025.2.0-py3-none-any.whl", hash = "sha256:9de2ad9ce1f85e1931858535bc882543171d197001a0a5eb2ddc04f1781ab95b", size = 184484 },
 ]
 
 [[package]]
@@ -610,6 +681,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/de/a4/d1a03913df292ba7322086c68301c66e14b3f8f9532e4c3854846442f0a0/grpcio-1.69.0-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:5ccbed100dc43704e94ccff9e07680b540d64e4cc89213ab2832b51b4f68a520", size = 6226574 },
     { url = "https://files.pythonhosted.org/packages/8d/fb/e104bc4296ee4991d803dd39b6c72ed247ba0e18a4e56fd895947aae1249/grpcio-1.69.0-cp39-cp39-win32.whl", hash = "sha256:1514341def9c6ec4b7f0b9628be95f620f9d4b99331b7ef0a1845fd33d9b579c", size = 3663452 },
     { url = "https://files.pythonhosted.org/packages/ad/39/12d48bccd429699a3c909173b395900eb64e4c6bc5eed34d7088e438bc4d/grpcio-1.69.0-cp39-cp39-win_amd64.whl", hash = "sha256:c1fea55d26d647346acb0069b08dca70984101f2dc95066e003019207212e303", size = 4411151 },
+]
+
+[[package]]
+name = "gviz-api"
+version = "1.10.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/19/9f/04af080c6cb83b934ec9ce65d047e43ae6fddfed847cac0093fe97296a98/gviz_api-1.10.0.tar.gz", hash = "sha256:846692dd8cc73224fc31b18e41589bd934e1cc05090c6576af4b4b26c2e71b90", size = 13787 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/67/42/e6ae4f7903f17be07c47b7af1f6d83ec4fe931f373f900f542d737d9940e/gviz_api-1.10.0-py2.py3-none-any.whl", hash = "sha256:a05055fed8c279f34f4b496eace7648c7fe9c1b06851e8a36e748541f1adbb05", size = 13618 },
 ]
 
 [[package]]
@@ -754,6 +837,8 @@ name = "importlib-resources"
 version = "6.4.5"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
+    "python_full_version >= '3.10' and sys_platform == 'linux'",
+    "python_full_version >= '3.10' and sys_platform != 'linux'",
     "python_full_version < '3.9' and sys_platform == 'linux'",
     "python_full_version < '3.9' and sys_platform != 'linux'",
 ]
@@ -2717,6 +2802,36 @@ wheels = [
 ]
 
 [[package]]
+name = "tensorboard-plugin-profile"
+version = "2.19.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "etils", version = "1.3.0", source = { registry = "https://pypi.org/simple" }, extra = ["epath"], marker = "python_full_version < '3.9'" },
+    { name = "etils", version = "1.5.2", source = { registry = "https://pypi.org/simple" }, extra = ["epath"], marker = "python_full_version == '3.9.*'" },
+    { name = "etils", version = "1.11.0", source = { registry = "https://pypi.org/simple" }, extra = ["epath"], marker = "python_full_version >= '3.10'" },
+    { name = "gviz-api" },
+    { name = "protobuf" },
+    { name = "setuptools", version = "75.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "setuptools", version = "75.8.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "six" },
+    { name = "werkzeug", version = "3.0.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "werkzeug", version = "3.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e7/6d/5e2feccbb70ac077a3dacf0a24bcb95b07fc34c9308882095c4337c39058/tensorboard_plugin_profile-2.19.0.tar.gz", hash = "sha256:e52328f321ff5207d53690abee68941a49d93b72a33f094b887e595b9b72906b", size = 5902447 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/1c/eb553690933f2142fc5ad4adc5a5d9594c2e69bd008ba80d2cc5f1a2c499/tensorboard_plugin_profile-2.19.0-cp310-none-macosx_12_0_arm64.whl", hash = "sha256:4c8ebd04be4963148e05411ac320988135e43625cffbae590b259ce96f79e9b0", size = 24504848 },
+    { url = "https://files.pythonhosted.org/packages/c2/27/4c60a605529e82d5da8f7768a66665677da86540da807f16aa879f996c09/tensorboard_plugin_profile-2.19.0-cp310-none-manylinux2014_x86_64.whl", hash = "sha256:01f16b1c7189eded524231426fbc3eb866feed74af3fb24d589a8edf6040896a", size = 25828136 },
+    { url = "https://files.pythonhosted.org/packages/7f/8e/bf4e2722aaa7e9d144cbf7578460472ee84e1260d20d113ddddbbecb2f0e/tensorboard_plugin_profile-2.19.0-cp310-none-win_amd64.whl", hash = "sha256:063ce1f21a1d4ec4b333640a4ee711ff912d2777731a1b13559f786ccf7e447f", size = 17779285 },
+    { url = "https://files.pythonhosted.org/packages/b8/84/26c2cea17690ec85e5d6daca0886676a7e5143c7ff50f7b6837c837409d3/tensorboard_plugin_profile-2.19.0-cp311-none-macosx_12_0_arm64.whl", hash = "sha256:0b2011074b636895cb5fd80a413e8a3e3f37b5f509d3bcd7247d9123c4f986ba", size = 24506054 },
+    { url = "https://files.pythonhosted.org/packages/50/f7/316f12c3e6f7f8fc58793d1178a7b502a904144d69279f83c910316453d6/tensorboard_plugin_profile-2.19.0-cp311-none-manylinux2014_x86_64.whl", hash = "sha256:1326d41697eef096533f350f446be9117bd8f5c121208545b6c2e6f93ee1fddc", size = 25828910 },
+    { url = "https://files.pythonhosted.org/packages/21/4f/6d26e31598fd2ffbc63b08485c9eaa7b72b56eaa5763d70a12c45d3da78a/tensorboard_plugin_profile-2.19.0-cp311-none-win_amd64.whl", hash = "sha256:75c070da51ac5e47695fcd9f61f57486310f32000479e4d1a99e30de11d950f2", size = 17781520 },
+    { url = "https://files.pythonhosted.org/packages/28/91/ddb04e9f44dc2699c8fea5debff619d9aa40dc64875686e646d1c7035e52/tensorboard_plugin_profile-2.19.0-cp39-none-macosx_12_0_arm64.whl", hash = "sha256:317e7ccf7b8cface6345f495b615f81c0a6b765c1c27adaa35af48c3021972a9", size = 24506141 },
+    { url = "https://files.pythonhosted.org/packages/18/09/6ebd1da9f8f13c1d96eeeee39576f870fb503cd1709b50067422e9cecfb2/tensorboard_plugin_profile-2.19.0-cp39-none-manylinux2014_x86_64.whl", hash = "sha256:46fb3060057251247122f11b41996aab34faece9e3992b6d60362cf3c5614d97", size = 25828015 },
+    { url = "https://files.pythonhosted.org/packages/3d/de/f26f154debe30d5e1cfe039774c5e3868316eed5ac2a92b78e10477ca2aa/tensorboard_plugin_profile-2.19.0-cp39-none-win_amd64.whl", hash = "sha256:82e045a3b01f66fbdf774510a56e61dfe089cdbb4b6faefd2133c041f43c72e3", size = 17779903 },
+    { url = "https://files.pythonhosted.org/packages/86/c5/6def907dafeba3c5c77f9913b4bde2600a906345261d1a1e9859ad40287c/tensorboard_plugin_profile-2.19.0-py3-none-any.whl", hash = "sha256:83262b7d339f35969e62755c80f1bed9525b8ea365c2b99fc9b95bc042b5ac89", size = 5987076 },
+]
+
+[[package]]
 name = "tensorboard-plugin-wit"
 version = "1.8.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2960,6 +3075,8 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "ruff" },
+    { name = "tensorboard" },
+    { name = "tensorboard-plugin-profile" },
 ]
 
 [package.metadata]
@@ -2975,7 +3092,11 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ruff", specifier = ">=0.9.4" }]
+dev = [
+    { name = "ruff", specifier = ">=0.9.4" },
+    { name = "tensorboard", specifier = ">=2.11.2" },
+    { name = "tensorboard-plugin-profile", specifier = ">=2.19.0" },
+]
 
 [[package]]
 name = "wandb"
@@ -3139,6 +3260,8 @@ name = "zipp"
 version = "3.20.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
+    "python_full_version >= '3.10' and sys_platform == 'linux'",
+    "python_full_version >= '3.10' and sys_platform != 'linux'",
     "python_full_version < '3.9' and sys_platform == 'linux'",
     "python_full_version < '3.9' and sys_platform != 'linux'",
 ]
