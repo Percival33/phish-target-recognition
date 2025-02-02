@@ -1,7 +1,8 @@
 import numpy as np
 
+from DataHelper import order_random_array
 from Evaluate import Evaluate
-from DataHelper import order_random_array as dh_order_random_array
+
 
 class HardSubsetSampling:
     # Main function for subset sampling
@@ -55,10 +56,7 @@ class HardSubsetSampling:
             n=n,
         )
         # FIXME: make sure it works
-        X_train_new, y_train_new = self.order_random_array(X_train_new, y_train_new, targets)
-        dh_X_train_new, dh_y_train_new = dh_order_random_array(X_train_new, y_train_new, targets)
-        assert np.array_equal(X_train_new, dh_X_train_new)
-        assert np.array_equal(y_train_new, dh_y_train_new)
+        X_train_new, y_train_new = order_random_array(X_train_new, y_train_new, targets)
         labels_start_end_train = self.start_end_each_target(targets, y_train_new)
         return X_train_new, y_train_new, labels_start_end_train
 
@@ -88,19 +86,6 @@ class HardSubsetSampling:
                 prev_target = prev_target + 1
         start_end_each_target[num_target - 1, 1] = labels.shape[0] - 1
         return start_end_each_target
-
-    @staticmethod
-    def order_random_array(orig_arr, y_orig_arr, targets):
-        sorted_arr = np.zeros(orig_arr.shape)
-        y_sorted_arr = np.zeros(y_orig_arr.shape)
-        count = 0
-        for i in range(0, targets):
-            for j in range(0, orig_arr.shape[0]):
-                if y_orig_arr[j] == i:
-                    sorted_arr[count, :, :, :] = orig_arr[j, :, :, :]
-                    y_sorted_arr[count, :] = i
-                    count = count + 1
-        return sorted_arr, y_sorted_arr
 
     # Compute L2 distance between embeddings
     @staticmethod
