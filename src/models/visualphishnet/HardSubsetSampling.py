@@ -1,7 +1,7 @@
 import numpy as np
 
 from Evaluate import Evaluate
-
+from DataHelper import order_random_array as dh_order_random_array
 
 class HardSubsetSampling:
     # Main function for subset sampling
@@ -54,7 +54,11 @@ class HardSubsetSampling:
             all_idx=all_idx,
             n=n,
         )
+        # FIXME: make sure it works
         X_train_new, y_train_new = self.order_random_array(X_train_new, y_train_new, targets)
+        dh_X_train_new, dh_y_train_new = dh_order_random_array(X_train_new, y_train_new, targets)
+        assert np.array_equal(X_train_new, dh_X_train_new)
+        assert np.array_equal(y_train_new, dh_y_train_new)
         labels_start_end_train = self.start_end_each_target(targets, y_train_new)
         return X_train_new, y_train_new, labels_start_end_train
 

@@ -276,6 +276,23 @@ def all_targets_start_end(num_target, labels, logger):
 # Order random phishing arrays per website (from 0 to 155 target)
 def order_random_array(orig_arr, y_orig_arr, targets):
     # TODO: remove duplicate with HardSubsetSampling
+
+    y_flat = y_orig_arr.flatten()
+
+    # Get indices that would sort the array by target
+    sorted_indices = np.argsort(y_flat)
+
+    # Use advanced indexing to sort both arrays
+    np_sorted_arr = orig_arr[sorted_indices]
+    np_y_sorted_arr = y_orig_arr[sorted_indices]
+
+    # Verify that all targets are present and properly ordered
+    # unique_targets = np.unique(np_y_sorted_arr)
+    # if len(unique_targets) != targets:
+    #     logger.warning(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
+    #
+    # return sorted_arr, y_sorted_arr
+
     sorted_arr = np.zeros(orig_arr.shape)
     y_sorted_arr = np.zeros(y_orig_arr.shape)
     count = 0
@@ -285,6 +302,9 @@ def order_random_array(orig_arr, y_orig_arr, targets):
                 sorted_arr[count, :, :, :] = orig_arr[j, :, :, :]
                 y_sorted_arr[count, :] = i
                 count = count + 1
+
+    assert np.array_equal(np_sorted_arr, sorted_arr)
+    assert np.array_equal(np_y_sorted_arr, y_sorted_arr)
     return sorted_arr, y_sorted_arr
 
 
