@@ -366,8 +366,8 @@ if __name__ == "__main__":
         parser.add_argument("--reshape-size", default=[224, 224, 3])
         parser.add_argument("--phishing-test-size", default=0.4)
         parser.add_argument("--num-targets", type=int, default=155)
-        parser.add_argument("--legit-imgs-num", default=9363)
-        parser.add_argument("--phish-imgs-num", default=1195)
+        parser.add_argument("--legit-imgs-num", type=int, default=9363)
+        parser.add_argument("--phish-imgs-num", type=int, default=1195)
         # Model parameters
         parser.add_argument("--input-shape", default=[224, 224, 3])
         parser.add_argument("--margin", type=float, default=2.2)
@@ -401,7 +401,7 @@ if __name__ == "__main__":
                 log_dir=str(args.logdir), profile_batch=args.profile_batch
             )
             tf.debugging.experimental.enable_dump_debug_info(
-                str(debug_dump_dir), tensor_debug_mode="FULL_HEALTH", circular_buffer_size=100
+                str(debug_dump_dir), tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1
             )
             options = tf.profiler.experimental.ProfilerOptions(
                 host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
