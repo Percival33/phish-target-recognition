@@ -102,25 +102,26 @@ def train_phase1(run, args):
         if i % args.save_interval == 0:
             # TODO: log model artifact if better accuracy
             # with tf.profiler.experimental.Trace("get_acc", step_num=i):
-            testResults = modelHelper.get_embeddings(
-                model,
-                X_train_legit,
-                y_train_legit,
-                all_imgs_test,
-                all_labels_test,
-                train_idx=idx_train,
-                test_idx=idx_test,
-            )
-            acc = modelHelper.get_acc(
-                targetHelper,
-                testResults,
-                args.dataset_path / "trusted_list",
-                args.dataset_path / "phishing",
-                all_file_names_train,
-                all_file_names_test,
-            )
+            if i % (3 * args.save_interval) == 0:
+                testResults = modelHelper.get_embeddings(
+                    model,
+                    X_train_legit,
+                    y_train_legit,
+                    all_imgs_test,
+                    all_labels_test,
+                    train_idx=idx_train,
+                    test_idx=idx_test,
+                )
+                acc = modelHelper.get_acc(
+                    targetHelper,
+                    testResults,
+                    args.dataset_path / "trusted_list",
+                    args.dataset_path / "phishing",
+                    all_file_names_train,
+                    all_file_names_test,
+                )
 
-            run.log({"acc": acc})
+                run.log({"acc": acc})
             # with tf.profiler.experimental.Trace("save_model", step_num=i):
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
             run.log_model(args.output_dir / f"{args.saved_model_name}.h5")

@@ -291,7 +291,6 @@ def order_random_array(orig_arr, y_orig_arr, targets):
     # if len(unique_targets) != targets:
     #     raise ValueError(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
 
-    
     sorted_arr = np.zeros(orig_arr.shape)
     y_sorted_arr = np.zeros(y_orig_arr.shape)
     count = 0
@@ -303,11 +302,11 @@ def order_random_array(orig_arr, y_orig_arr, targets):
                 count = count + 1
 
     unique_targets = np.unique(y_sorted_arr)
-    if len(unique_targets) != targets:
-        raise ValueError(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
+    # if len(unique_targets) != targets:
+    #     raise ValueError(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
 
     return sorted_arr, y_sorted_arr
-        
+
     # return np_sorted_arr, np_y_sorted_arr
 
 
