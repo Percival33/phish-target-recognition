@@ -4,11 +4,11 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
-import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
@@ -18,6 +18,10 @@ from triplet_sampling import get_batch_for_phase2
 
 def train_phase1(run, args):
     logger.info("Trainer phase 1")
+
+    # Set up TensorBoard metrics writers
+    file_writer = tf.summary.create_file_writer(str(args.logdir))
+    train_loss_metric = tf.keras.metrics.Mean("train_loss", dtype=tf.float32)
 
     (
         all_imgs_train,
@@ -52,6 +56,14 @@ def train_phase1(run, args):
     with tf.profiler.experimental.Trace("model_loading", step_num=1):
         model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
         logger.debug("Model prepared")
+
+        # Log model graph
+        with file_writer.as_default():
+            tf.summary.trace_on(graph=True, profiler=True)
+            # Forward pass to build the model graph
+            dummy_input = tf.zeros([1] + list(args.input_shape))
+            _ = model(dummy_input)
+            tf.summary.trace_export(name="model_trace", step=0, profiler_outdir=str(args.logdir))
 
     # order random array? -> po co?
     X_test_phish, y_test_phish = data.order_random_array(X_test_phish, y_test_phish, args.num_targets)
@@ -94,6 +106,14 @@ def train_phase1(run, args):
 
         with tf.profiler.experimental.Trace("training", step_num=i):
             loss_value = model.train_on_batch(inputs, targets_train)
+            train_loss_metric.update_state(loss_value)
+
+        if i % 1 == 0:  # Adjust frequency as needed
+            with file_writer.as_default():
+                tf.summary.scalar("batch_loss", loss_value, step=i)
+                tf.summary.scalar("avg_loss", train_loss_metric.result(), step=i)
+                memory_usage = modelHelper.get_model_memory_usage(args.batch_size, model)
+                tf.summary.scalar("memory_usage_gb", memory_usage, step=i)
 
         logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
         logger.info(f"Iteration: {i}. Loss: {loss_value}")
@@ -119,6 +139,9 @@ def train_phase1(run, args):
                     all_file_names_train,
                     all_file_names_test,
                 )
+                with file_writer.as_default():
+                    tf.summary.scalar("accuracy", acc, step=i)
+
             run.log({"acc": acc})
             with tf.profiler.experimental.Trace("save_model", step_num=i):
                 modelHelper.save_model(model, args.output_dir, args.saved_model_name)
@@ -127,6 +150,8 @@ def train_phase1(run, args):
         if i % args.lr_interval == 0:
             args.lr = 0.99 * args.lr
             K.set_value(model.optimizer.lr, args.lr)
+            with file_writer.as_default():
+                tf.summary.scalar("learning_rate", args.lr, step=i)
             run.log({"lr": args.lr})
 
     modelHelper.save_model(model, args.output_dir, args.saved_model_name)
@@ -160,6 +185,9 @@ def train_phase2(run, args):
     logger.info("Trainer phase 2")
     # TODO: log dataset hash
 
+    file_writer = tf.summary.create_file_writer(str(args.logdir))
+    train_loss_metric = tf.keras.metrics.Mean("train_loss_phase2", dtype=tf.float32)
+
     # Initialize variables
     data_path_phish = args.dataset_path / "phishing"
     (
@@ -190,6 +218,14 @@ def train_phase2(run, args):
     modelHelper = ModelHelper()
     with tf.profiler.experimental.Trace("model_loading2", step_num=1):
         full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
+
+        # Log model graph
+        with file_writer.as_default():
+            tf.summary.trace_on(graph=True, profiler=True)
+            dummy_input = tf.zeros([1] + list(args.input_shape))
+            _ = full_model(dummy_input)
+            tf.summary.trace_export(name="model_trace_phase2", step=0, profiler_outdir=str(args.logdir))
+
     hard_subset_sampling = HardSubsetSampling()
     #########################################################################################
     n = 1  # number of wrong points
@@ -210,10 +246,10 @@ def train_phase2(run, args):
     y_train_new = np.zeros([args.num_targets * 2 * n, 1])
 
     targets_train = np.zeros([args.batch_size, 1])
-    tot_count = 0
 
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
+    total_iterations = 0
     # for k in tqdm(range(0, args.num_sets), desc="Sets"):
     for k in range(0, args.num_sets):
         logger.info(f"Starting a new set! - {k}")
@@ -225,6 +261,9 @@ def train_phase2(run, args):
             num_target=args.num_targets,
         )
         fixed_set = X_train_legit[fixed_set_idx.astype(int), :, :, :]
+
+        with file_writer.as_default():
+            tf.summary.scalar("current_set", k, step=total_iterations)
 
         # for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set"):
         for j in range(0, args.iter_per_set):
@@ -244,8 +283,8 @@ def train_phase2(run, args):
 
             # for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations"):
             for i in range(1, args.hard_n_iter):
-                tot_count = tot_count + 1
-                with tf.profiler.experimental.Trace("next_batch2", step_num=i):
+                tot_count = total_iterations + 1
+                with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
                     inputs = get_batch_for_phase2(
                         targetHelper=targetHelper,
                         X_train_legit=X_train_legit,
@@ -255,14 +294,24 @@ def train_phase2(run, args):
                         train_fixed_set=fixed_set,
                         num_targets=args.num_targets,
                     )
-                logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
-                with tf.profiler.experimental.Trace("training2", step_num=i):
+
+                with tf.profiler.experimental.Trace("training2", step_num=tot_count):
                     loss_iteration = full_model.train_on_batch(inputs, targets_train)
+                    train_loss_metric.update_state(loss_iteration)
+
+                if tot_count % 1 == 0:  # Adjust frequency as needed
+                    memory_usage = modelHelper.get_model_memory_usage(args.batch_size, model)
+                    with file_writer.as_default():
+                        tf.summary.scalar("batch_loss_phase2", loss_iteration, step=tot_count)
+                        tf.summary.scalar("avg_loss_phase2", train_loss_metric.result(), step=tot_count)
+                        tf.summary.scalar("memory_usage_gb_phase2", memory_usage, step=tot_count)
+                        tf.summary.scalar("set_progress", j / args.iter_per_set, step=tot_count)
+
                 logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
                 logger.info(f"Set: {k} SetIteration: {j} Iteration: {i}. Loss: {loss_iteration}")
                 run.log({"loss": loss_iteration})
 
-                if tot_count % args.save_interval == 0:
+                if total_iterations % args.save_interval == 0:
                     # TODO: log model artifact if better accuracy
                     with tf.profiler.experimental.Trace("get_acc2", step_num=i):
                         testResults = modelHelper.get_embeddings(
@@ -282,16 +331,24 @@ def train_phase2(run, args):
                             all_file_names_train,
                             all_file_names_test,
                         )
+                        # Log accuracy to TensorBoard
+                        with file_writer.as_default():
+                            tf.summary.scalar("accuracy_phase2", acc, step=tot_count)
+
                     run.log({"acc": acc})
                     with tf.profiler.experimental.Trace("save_model2", step_num=i):
                         modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
                     run.log_model(args.output_dir / f"{args.new_saved_model_name}.h5")
 
-                if tot_count % args.lr_interval == 0:
+                if total_iterations % args.lr_interval == 0:
                     args.lr = 0.99 * args.lr
                     K.set_value(full_model.optimizer.lr, args.lr)
+                    with file_writer.as_default():
+                        tf.summary.scalar("learning_rate_phase2", args.lr, step=tot_count)
                     logger.info(f"Learning rate changed to: {args.lr}")
                     run.log({"lr": args.lr})
+
+            total_iterations += args.hard_n_iter
 
     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
     run.log_model(args.output_dir / f"{args.new_saved_model_name}.h5")
@@ -373,10 +430,6 @@ if __name__ == "__main__":
 
         args = parser.parse_args()
 
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(
-            log_dir=str(args.logdir), profile_batch=args.profile_batch
-        )
-
         run = wandb.init(
             project="VisualPhish",
             group="visualphishnet",
@@ -384,9 +437,28 @@ if __name__ == "__main__":
             tags=["jarvis", "phase-1"],
         )
         try:
-            tf.profiler.experimental.start(str(args.logdir))
+            """"""
+            tensorboard_callback = tf.keras.callbacks.TensorBoard(
+                log_dir=str(args.logdir),
+                profile_batch=args.profile_batch,
+                histogram_freq=1,  # Log histograms every epoch
+                update_freq="batch",  # Update metrics every batch
+            )
+
+            # Enable trace logging
+            tf.summary.trace_on(graph=True, profiler=True)
+
+            # Start profiler with options
+            options = tf.profiler.experimental.ProfilerOptions(
+                host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
+            )
+            tf.profiler.experimental.start(str(args.logdir), options=options)
+
             train_phase1(run, args)
-            # tf.profiler.experimental.stop()
+
+            tf.profiler.experimental.stop()
+            """"""
+            # train_phase1(run, args)
             run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
