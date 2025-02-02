@@ -333,9 +333,9 @@ def train_phase2(run, args):
 
 
 if __name__ == "__main__":
-    gpus = tf.config.experimental.list_physical_devices("GPU")
-    for gpu in gpus:
-        tf.config.experimental.set_memory_growth(gpu, True)
+    # gpus = tf.config.experimental.list_physical_devices("GPU")
+    # for gpu in gpus:
+    #     tf.config.experimental.set_memory_growth(gpu, True)
     setup_logging()
     logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
@@ -395,20 +395,20 @@ if __name__ == "__main__":
             tags=["jarvis", "phase-1"],
         )
         try:
-            debug_dump_dir = args.logdir / "debug_dump"
-            debug_dump_dir.mkdir(parents=True, exist_ok=True)
-            tensorboard_callback = tf.keras.callbacks.TensorBoard(
-                log_dir=str(args.logdir), profile_batch=args.profile_batch
-            )
-            tf.debugging.experimental.enable_dump_debug_info(
-                str(debug_dump_dir), tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1
-            )
-            options = tf.profiler.experimental.ProfilerOptions(
-                host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
-            )
-            tf.profiler.experimental.start(str(args.logdir), options=options)
+            # debug_dump_dir = args.logdir / "debug_dump"
+            # debug_dump_dir.mkdir(parents=True, exist_ok=True)
+            # tensorboard_callback = tf.keras.callbacks.TensorBoard(
+            #     log_dir=str(args.logdir), profile_batch=args.profile_batch
+            # )
+            # tf.debugging.experimental.enable_dump_debug_info(
+            #     str(debug_dump_dir), tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1
+            # )
+            # options = tf.profiler.experimental.ProfilerOptions(
+            #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
+            # )
+            # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase1(run, args)
-            tf.profiler.experimental.stop()
+            # tf.profiler.experimental.stop()
             run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
@@ -419,9 +419,9 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
-            tf.profiler.experimental.start(str(args.logdir), options=options)
+            # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)
-            tf.profiler.experimental.stop()
+            # tf.profiler.experimental.stop()
         except Exception as e:
             logger.error(e)
             tb = e.__traceback__
