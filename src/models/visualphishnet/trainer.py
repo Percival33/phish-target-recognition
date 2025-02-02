@@ -93,6 +93,7 @@ def train_phase1(run, args):
         run.log({"loss": loss_value})
 
         if i % args.save_interval == 0:
+            logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
             # TODO: log model artifact if better accuracy
             testResults = modelHelper.get_embeddings(
                 model,
@@ -135,6 +136,15 @@ def train_phase1(run, args):
         test_idx=idx_test,
     )
     data.save_embeddings(emb, args.output_dir, run)
+    acc = modelHelper.get_acc(
+        targetHelper,
+        emb,
+        args.dataset_path / "trusted_list",
+        args.dataset_path / "phishing",
+        all_file_names_train,
+        all_file_names_test,
+    )
+    run.log({"acc": acc})
     logger.info("Phase 1 has finished!")
 
 
@@ -283,6 +293,16 @@ def train_phase2(run, args):
         test_idx=idx_test,
     )
     data.save_embeddings(emb, args.output_dir, run)
+
+    acc = modelHelper.get_acc(
+        targetHelper,
+        emb,
+        args.dataset_path / "trusted_list",
+        args.dataset_path / "phishing",
+        all_file_names_train,
+        all_file_names_test,
+    )
+    run.log({"acc": acc})
     logger.info("Phase 2 has finished!")
 
 
