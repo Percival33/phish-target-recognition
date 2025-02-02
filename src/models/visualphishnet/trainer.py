@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
+import tensorflow as tf
 import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
@@ -27,8 +28,10 @@ def train_phase1(run, args):
     ) = data.read_or_load_imgs(args)
     logger.info("Images loaded")
 
-    X_train_legit = all_imgs_train
-    y_train_legit = all_labels_train
+    # X_train_legit = all_imgs_train
+    # y_train_legit = all_labels_train
+    X_train_legit = tf.convert_to_tensor(all_imgs_train, dtype=tf.float32)
+    y_train_legit = tf.convert_to_tensor(all_labels_train, dtype=tf.float32)
 
     idx_test, idx_train = data.read_or_load_train_test_idx(
         dirname=args.output_dir,
@@ -39,11 +42,16 @@ def train_phase1(run, args):
     run.save(str(args.output_dir / "test_idx.npy"))
     run.save(str(args.output_dir / "train_idx.npy"))
 
-    X_test_phish = all_imgs_test[idx_test, :]
-    y_test_phish = all_labels_test[idx_test, :]
+    X_test_phish = tf.gather(tf.convert_to_tensor(all_imgs_test, dtype=tf.float32), idx_test)
+    y_test_phish = tf.gather(tf.convert_to_tensor(all_labels_test, dtype=tf.float32), idx_test)
 
-    X_train_phish = all_imgs_test[idx_train, :]
-    y_train_phish = all_labels_test[idx_train, :]
+    # X_test_phish = all_imgs_test[idx_test, :]
+    # y_test_phish = all_labels_test[idx_test, :]
+
+    X_train_phish = tf.gather(tf.convert_to_tensor(all_imgs_test, dtype=tf.float32), idx_train)
+    y_train_phish = tf.gather(tf.convert_to_tensor(all_labels_test, dtype=tf.float32), idx_train)
+    # X_train_phish = all_imgs_test[idx_train, :]
+    # y_train_phish = all_labels_test[idx_train, :]
 
     # create model
     modelHelper = ModelHelper()
@@ -74,7 +82,8 @@ def train_phase1(run, args):
     # training
     logger.info("Starting training process! - phase 1")
 
-    targets_train = np.zeros([args.batch_size, 1])
+    # targets_train = np.zeros([args.batch_size, 1])
+    targets_train = tf.zeros([args.batch_size, 1], dtype=tf.float32)
     run.log({"lr": args.lr})
 
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
@@ -89,9 +98,8 @@ def train_phase1(run, args):
             batch_size=args.batch_size,
             num_targets=args.num_targets,
         )
-
         # with tf.profiler.experimental.Trace("training", step_num=i):
-        loss_value = model.train_on_batch(inputs, targets_train)
+        loss_value = model.train_on_batch(tf.convert_to_tensor(inputs, dtype=tf.float32), targets_train)
 
         if i % 100 == 0:
             logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
