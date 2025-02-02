@@ -4,11 +4,11 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
-import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
+import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
@@ -18,11 +18,6 @@ from triplet_sampling import get_batch_for_phase2
 
 def train_phase1(run, args):
     logger.info("Trainer phase 1")
-
-    # Set up TensorBoard metrics writers
-    file_writer = tf.summary.create_file_writer(str(args.logdir))
-    train_loss_metric = tf.keras.metrics.Mean("train_loss", dtype=tf.float32)
-
     (
         all_imgs_train,
         all_labels_train,
@@ -56,14 +51,6 @@ def train_phase1(run, args):
     with tf.profiler.experimental.Trace("model_loading", step_num=1):
         model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
         logger.debug("Model prepared")
-
-        # Log model graph
-        with file_writer.as_default():
-            tf.summary.trace_on(graph=True, profiler=True)
-            # Forward pass to build the model graph
-            dummy_input = tf.zeros([1] + list(args.input_shape))
-            _ = model(dummy_input)
-            tf.summary.trace_export(name="model_trace", step=0, profiler_outdir=str(args.logdir))
 
     # order random array? -> po co?
     X_test_phish, y_test_phish = data.order_random_array(X_test_phish, y_test_phish, args.num_targets)
@@ -106,14 +93,10 @@ def train_phase1(run, args):
 
         with tf.profiler.experimental.Trace("training", step_num=i):
             loss_value = model.train_on_batch(inputs, targets_train)
-            train_loss_metric.update_state(loss_value)
 
         if i % 1 == 0:  # Adjust frequency as needed
-            with file_writer.as_default():
-                tf.summary.scalar("batch_loss", loss_value, step=i)
-                tf.summary.scalar("avg_loss", train_loss_metric.result(), step=i)
-                memory_usage = modelHelper.get_model_memory_usage(args.batch_size, model)
-                tf.summary.scalar("memory_usage_gb", memory_usage, step=i)
+            memory_usage = modelHelper.get_model_memory_usage(args.batch_size, model)
+            logger.info(f"Memory usage: {memory_usage}")
 
         logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
         logger.info(f"Iteration: {i}. Loss: {loss_value}")
@@ -139,8 +122,6 @@ def train_phase1(run, args):
                     all_file_names_train,
                     all_file_names_test,
                 )
-                with file_writer.as_default():
-                    tf.summary.scalar("accuracy", acc, step=i)
 
             run.log({"acc": acc})
             with tf.profiler.experimental.Trace("save_model", step_num=i):
@@ -150,8 +131,6 @@ def train_phase1(run, args):
         if i % args.lr_interval == 0:
             args.lr = 0.99 * args.lr
             K.set_value(model.optimizer.lr, args.lr)
-            with file_writer.as_default():
-                tf.summary.scalar("learning_rate", args.lr, step=i)
             run.log({"lr": args.lr})
 
     modelHelper.save_model(model, args.output_dir, args.saved_model_name)
@@ -184,10 +163,6 @@ def train_phase1(run, args):
 def train_phase2(run, args):
     logger.info("Trainer phase 2")
     # TODO: log dataset hash
-
-    file_writer = tf.summary.create_file_writer(str(args.logdir))
-    train_loss_metric = tf.keras.metrics.Mean("train_loss_phase2", dtype=tf.float32)
-
     # Initialize variables
     data_path_phish = args.dataset_path / "phishing"
     (
@@ -218,13 +193,6 @@ def train_phase2(run, args):
     modelHelper = ModelHelper()
     with tf.profiler.experimental.Trace("model_loading2", step_num=1):
         full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
-
-        # Log model graph
-        with file_writer.as_default():
-            tf.summary.trace_on(graph=True, profiler=True)
-            dummy_input = tf.zeros([1] + list(args.input_shape))
-            _ = full_model(dummy_input)
-            tf.summary.trace_export(name="model_trace_phase2", step=0, profiler_outdir=str(args.logdir))
 
     hard_subset_sampling = HardSubsetSampling()
     #########################################################################################
@@ -262,9 +230,6 @@ def train_phase2(run, args):
         )
         fixed_set = X_train_legit[fixed_set_idx.astype(int), :, :, :]
 
-        with file_writer.as_default():
-            tf.summary.scalar("current_set", k, step=total_iterations)
-
         # for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set"):
         for j in range(0, args.iter_per_set):
             # TODO: log iteration to wandb
@@ -297,15 +262,10 @@ def train_phase2(run, args):
 
                 with tf.profiler.experimental.Trace("training2", step_num=tot_count):
                     loss_iteration = full_model.train_on_batch(inputs, targets_train)
-                    train_loss_metric.update_state(loss_iteration)
 
                 if tot_count % 1 == 0:  # Adjust frequency as needed
                     memory_usage = modelHelper.get_model_memory_usage(args.batch_size, model)
-                    with file_writer.as_default():
-                        tf.summary.scalar("batch_loss_phase2", loss_iteration, step=tot_count)
-                        tf.summary.scalar("avg_loss_phase2", train_loss_metric.result(), step=tot_count)
-                        tf.summary.scalar("memory_usage_gb_phase2", memory_usage, step=tot_count)
-                        tf.summary.scalar("set_progress", j / args.iter_per_set, step=tot_count)
+                    logger.info(f"Memory usage: {memory_usage}")
 
                 logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
                 logger.info(f"Set: {k} SetIteration: {j} Iteration: {i}. Loss: {loss_iteration}")
@@ -331,9 +291,6 @@ def train_phase2(run, args):
                             all_file_names_train,
                             all_file_names_test,
                         )
-                        # Log accuracy to TensorBoard
-                        with file_writer.as_default():
-                            tf.summary.scalar("accuracy_phase2", acc, step=tot_count)
 
                     run.log({"acc": acc})
                     with tf.profiler.experimental.Trace("save_model2", step_num=i):
@@ -343,8 +300,6 @@ def train_phase2(run, args):
                 if total_iterations % args.lr_interval == 0:
                     args.lr = 0.99 * args.lr
                     K.set_value(full_model.optimizer.lr, args.lr)
-                    with file_writer.as_default():
-                        tf.summary.scalar("learning_rate_phase2", args.lr, step=tot_count)
                     logger.info(f"Learning rate changed to: {args.lr}")
                     run.log({"lr": args.lr})
 
@@ -378,6 +333,9 @@ def train_phase2(run, args):
 
 
 if __name__ == "__main__":
+    gpus = tf.config.experimental.list_physical_devices("GPU")
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
     setup_logging()
     logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
@@ -398,7 +356,7 @@ if __name__ == "__main__":
         parser = ArgumentParser(parents=[init_parser])
         # Profiling parameters
         parser.add_argument("--logdir", type=Path, default=LOGS_DIR)
-        parser.add_argument("--profile-batch", type=str, default="0,100")
+        parser.add_argument("--profile-batch", type=int, default=100)
         # Dataset parameters
         parser.add_argument(
             "--dataset-path",
@@ -437,28 +395,20 @@ if __name__ == "__main__":
             tags=["jarvis", "phase-1"],
         )
         try:
-            """"""
+            debug_dump_dir = args.logdir / "debug_dump"
+            debug_dump_dir.mkdir(parents=True, exist_ok=True)
             tensorboard_callback = tf.keras.callbacks.TensorBoard(
-                log_dir=str(args.logdir),
-                profile_batch=args.profile_batch,
-                histogram_freq=1,  # Log histograms every epoch
-                update_freq="batch",  # Update metrics every batch
+                log_dir=str(args.logdir), profile_batch=args.profile_batch
             )
-
-            # Enable trace logging
-            tf.summary.trace_on(graph=True, profiler=True)
-
-            # Start profiler with options
+            tf.debugging.experimental.enable_dump_debug_info(
+                str(debug_dump_dir), tensor_debug_mode="FULL_HEALTH", circular_buffer_size=100
+            )
             options = tf.profiler.experimental.ProfilerOptions(
                 host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
             )
             tf.profiler.experimental.start(str(args.logdir), options=options)
-
             train_phase1(run, args)
-
             tf.profiler.experimental.stop()
-            """"""
-            # train_phase1(run, args)
             run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
@@ -469,7 +419,9 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
+            tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)
+            tf.profiler.experimental.stop()
         except Exception as e:
             logger.error(e)
             tb = e.__traceback__
@@ -478,5 +430,4 @@ if __name__ == "__main__":
                 tb = tb.tb_next
             # run.save()
         finally:
-            tf.profiler.experimental.stop()
             run.finish()
