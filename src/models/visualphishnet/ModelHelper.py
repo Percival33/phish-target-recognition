@@ -126,7 +126,7 @@ class ModelHelper:
                 *evaluate.find_min_distances(np.ravel(distances_to_train), n)
             )
             found, found_idx = targetHelper.check_if_target_in_top(str(test_file), only_names)
-            self.logger.info(names_min_distance)
+            self.logger.debug(names_min_distance)
 
             if found == 1:
                 correct += 1

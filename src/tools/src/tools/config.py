@@ -14,6 +14,7 @@ RAW_DATA_DIR = DATA_DIR / "raw"
 INTERIM_DATA_DIR = DATA_DIR / "interim"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
+
 def setup_logging():
     """Configures logging from the logging.conf file."""
     LOGGING_CONFIG_PATH = SRC_DIR / "logging.conf"

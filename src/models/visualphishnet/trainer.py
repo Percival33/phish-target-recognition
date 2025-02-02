@@ -3,11 +3,11 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
-import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
+import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
@@ -78,6 +78,7 @@ def train_phase1(run, args):
 
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
     for i in range(1, args.n_iter):
+        logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
         inputs = randomSampling.get_batch(
             targetHelper=targetHelper,
             X_train_legit=X_train_legit,
@@ -93,7 +94,6 @@ def train_phase1(run, args):
         run.log({"loss": loss_value})
 
         if i % args.save_interval == 0:
-            logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
             # TODO: log model artifact if better accuracy
             testResults = modelHelper.get_embeddings(
                 model,
