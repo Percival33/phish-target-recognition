@@ -389,12 +389,12 @@ if __name__ == "__main__":
 
         args = parser.parse_args()
 
-        run = wandb.init(
-            project="VisualPhish",
-            group="visualphishnet",
-            config=args,
-            tags=["jarvis", "phase-1"],
-        )
+        # run = wandb.init(
+        #     project="VisualPhish",
+        #     group="visualphishnet",
+        #     config=args,
+        #     tags=["jarvis", "phase-1"],
+        # )
         try:
             # debug_dump_dir = args.logdir / "debug_dump"
             # debug_dump_dir.mkdir(parents=True, exist_ok=True)
@@ -408,9 +408,9 @@ if __name__ == "__main__":
             #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
             # )
             # tf.profiler.experimental.start(str(args.logdir), options=options)
-            train_phase1(run, args)
+            # train_phase1(run, args)
             # tf.profiler.experimental.stop()
-            run.finish()
+            # run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
             args.n_iter = 50000
@@ -420,6 +420,10 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
+            artifact = run.use_artifact('jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10', type='model')
+            artifact_dir = artifact.download(args.output_dir)
+
+
             # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)
             # tf.profiler.experimental.stop()

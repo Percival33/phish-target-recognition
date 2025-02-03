@@ -277,14 +277,14 @@ def all_targets_start_end(num_target, labels, logger):
 def order_random_array(orig_arr, y_orig_arr, targets):
     # TODO: remove duplicate with HardSubsetSampling
 
-    y_flat = y_orig_arr.flatten()
+    # y_flat = y_orig_arr.flatten()
 
     # Get indices that would sort the array by target
-    sorted_indices = np.argsort(y_flat)
+    # sorted_indices = np.argsort(y_flat)
 
     # Use advanced indexing to sort both arrays
-    np_sorted_arr = orig_arr[sorted_indices]
-    np_y_sorted_arr = y_orig_arr[sorted_indices]
+    # np_sorted_arr = orig_arr[sorted_indices]
+    # np_y_sorted_arr = y_orig_arr[sorted_indices]
 
     # Verify that all targets are present and properly ordered
     # unique_targets = np.unique(np_y_sorted_arr)
@@ -304,11 +304,11 @@ def order_random_array(orig_arr, y_orig_arr, targets):
     # unique_targets = np.unique(y_sorted_arr)
     # if len(unique_targets) != targets:
     #     raise ValueError(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
-    assert np.array_equal(sorted_arr, np_sorted_arr)
-    assert np.array_equal(y_sorted_arr, np_y_sorted_arr)
-    # return sorted_arr, y_sorted_arr
+    # assert np.array_equal(sorted_arr, np_sorted_arr)
+    # assert np.array_equal(y_sorted_arr, np_y_sorted_arr)
+    return sorted_arr, y_sorted_arr
 
-    return np_sorted_arr, np_y_sorted_arr
+    # return np_sorted_arr, np_y_sorted_arr
 
 
 if __name__ == "__main__":
