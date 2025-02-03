@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
+import tensorflow as tf
 from keras import backend as K
 from keras.backend import clear_session, get_session, set_session
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
@@ -300,9 +301,10 @@ def train_phase2(run, args):
                     logger.info(f"Learning rate changed to: {args.lr}")
                     run.log({"lr": args.lr})
 
-            del X_train_new
-            del y_train_new
-            del labels_start_end_train
+            # del X_train_new
+            # X_train_new
+            # del y_train_new
+            # del labels_start_end_train
             reset_keras(model)
 
     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
