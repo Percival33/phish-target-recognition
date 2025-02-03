@@ -1,14 +1,16 @@
+import gc
 import logging
 from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
-import wandb
 from keras import backend as K
+from keras.backend import clear_session, get_session, set_session
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
+import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
@@ -274,7 +276,7 @@ def train_phase2(run, args):
                     logger.info(f"Set: {k} SetIteration: {j} Iteration: {i}. Loss: {loss_iteration}")
                 run.log({"loss": loss_iteration})
 
-                if total_iterations % args.save_interval == 0:
+                if total_iterations % (3 * args.save_interval) == 0:
                     # TODO: log model artifact if better accuracy
                     # with tf.profiler.experimental.Trace("get_acc2", step_num=i):
                     testResults = modelHelper.get_embeddings(
@@ -306,6 +308,11 @@ def train_phase2(run, args):
                     logger.info(f"Learning rate changed to: {args.lr}")
                     run.log({"lr": args.lr})
 
+            del X_train_new
+            del y_train_new
+            del labels_start_end_train
+            reset_keras(model)
+
     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
     run.log_model(args.output_dir / f"{args.new_saved_model_name}.h5")
     logger.info("Training finished!")
@@ -331,6 +338,30 @@ def train_phase2(run, args):
     )
     run.log({"acc": acc})
     logger.info("Phase 2 has finished!")
+
+
+def reset_keras(model):
+    # Clear the Keras backend
+    tf.keras.backend.clear_session()
+
+    try:
+        del model  # this is from global space - change this as you need
+    except:
+        pass
+
+    # Force garbage collection
+    print(gc.collect())  # if it's done something you should see a number being outputted
+
+    # In TF 2.x, GPU memory management is different
+    # Use the following if you need explicit GPU memory management
+    # gpus = tf.config.experimental.list_physical_devices('GPU')
+    # if gpus:
+    #     try:
+    #         # Restrict TensorFlow to only allocate as much GPU memory as needed
+    #         for gpu in gpus:
+    #             tf.config.experimental.set_memory_growth(gpu, True)
+    #     except RuntimeError as e:
+    #         print(e)
 
 
 if __name__ == "__main__":
@@ -420,9 +451,8 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
-            artifact = run.use_artifact('jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10', type='model')
+            artifact = run.use_artifact("jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10", type="model")
             artifact_dir = artifact.download(args.output_dir)
-
 
             # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)
