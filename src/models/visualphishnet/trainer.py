@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import tensorflow as tf
 from keras import backend as K
-from keras.backend import clear_session, get_session, set_session
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
@@ -442,7 +441,7 @@ if __name__ == "__main__":
             run = wandb.init(
                 project="VisualPhish",
                 group="visualphishnet",
-                notes="training params from paper"
+                notes="training params from paper",
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
