@@ -40,6 +40,12 @@ class ModelHelper:
 
         return model
 
+    def load_model(self, output_dir, saved_model_name, margin):
+        return load_model(
+            output_dir / f"{saved_model_name}.h5",
+            custom_objects={"loss": self.custom_loss(margin)},
+        )
+
     def get_embeddings(
         self,
         full_model,
@@ -52,7 +58,7 @@ class ModelHelper:
     ) -> data.TrainResults:
         self.logger.info("Starting to calculate embeddings...")
 
-        shared_model = full_model.layers[3]  # FIXME: dlaczego akurat 3???
+        shared_model = full_model.layers[3]  # partial model to get embeddings
         full_model.summary(print_fn=self.logger.debug)
         whitelist_emb = shared_model.predict(X_train_legit, batch_size=64)
         phishing_emb = shared_model.predict(all_imgs_test, batch_size=64)

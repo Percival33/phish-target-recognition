@@ -31,7 +31,9 @@ class RandomSampling:
         w = X_train_legit.shape[2]
         triple = [np.zeros((batch_size, h, w, 3)) for i in range(3)]
 
-        for i in range(0, batch_size):
+        # TODO: simplify this by creating a dict with targets
+        # https://github.com/lindsey98/PhishingBaseline/blob/main/VisualPhishnet/visualphish_model.py#L43
+        for i in range(batch_size):
             img_idx_pair1 = self.pick_first_img_idx(labels_start_end_train_legit, num_targets)
             triple[0][i, :, :, :] = X_train_legit[img_idx_pair1, :]
             img_label = int(y_train_legit[img_idx_pair1])

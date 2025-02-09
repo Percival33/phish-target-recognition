@@ -5,12 +5,11 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+import wandb
 from keras import backend as K
-from keras.backend import clear_session, get_session, set_session
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
-import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling

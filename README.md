@@ -16,3 +16,18 @@ uv pip install tensorflow matplotlib wandb scikit-learn scikit-image jupyter pyd
 ```
 `python -m src.models.visualphishnet.evaluate`
 `uv run -m src.models.visualphishnet.evaluate`
+
+1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC
+```shell 
+VisualPhish
+├── all_file_names_test.npy
+├── all_file_names_train.npy
+├── all_imgs_test.npy
+├── all_imgs_train.npy
+├── all_labels_test.npy
+├── all_labels_train.npy
+├── phishing
+│   └── targets.txt
+└── trusted_list
+    └── targets.txt
+```

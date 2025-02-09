@@ -21,7 +21,7 @@ if __name__ == "__main__":
     logger = logging.getLogger()
     logger.addHandler(file_handler)
     """
-
+    # TODO: use ModelHelper load_trained_model, get_embeddings, get_acc
     parser = ArgumentParser()
     parser.add_argument("--dataset-path", type=Path, default=PROCESSED_DATA_DIR / "smallerSampleDataset")
     parser.add_argument("--output-dir", type=Path, default=PROCESSED_DATA_DIR / "VP-original")
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     for i, test_file in enumerate(phish_test_files):
         filename = str(test_file.name) if isinstance(test_file, Path) else test_file
-        print(f"FILENAME: {type(filename)} {filename} <> {test_file}")
+        logger.info(f"FILENAME: {type(filename)} {filename} <> {test_file}")
         distances_to_train = evaluate.pairwise_distance[i, :]
         names_min_distance, only_names, min_distances = evaluate.find_names_min_distances(
             *evaluate.find_min_distances(np.ravel(distances_to_train), n)
