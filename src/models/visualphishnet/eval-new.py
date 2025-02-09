@@ -2,8 +2,10 @@ import logging
 from argparse import ArgumentParser
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 from skimage.transform import resize
+from sklearn.metrics import roc_auc_score, roc_curve
 from tools.config import PROCESSED_DATA_DIR, setup_logging
 from tqdm import tqdm
 
@@ -146,7 +148,7 @@ if __name__ == "__main__":
     """
 
     y_true = np.zeros([len(X), 1])
-    y_pred = np.zeros([len(X), 1])
+    y_score = np.zeros([len(X), 1])
 
     n = 1  # Top-1 match
     print("Start ")
@@ -159,10 +161,18 @@ if __name__ == "__main__":
         # distance lower than threshold ==> report as phishing
         if float(min_distances) <= args.threshold:
             phish = 1
-            y_pred[i] = 1
+            y_score[i] = 1
         # else it is benign
         else:
             phish = 0
 
         with open(args.result_path, "a+", encoding="utf-8", errors="ignore") as f:
-            f.write(file_names[i] + "\t" + y_pred[i] + "\t" + str(min_distances) + str(only_names[0]) + "\n")
+            f.write(file_names[i] + "\t" + y_score[i] + "\t" + str(min_distances) + str(only_names[0]) + "\n")
+
+    # TODO: closest target => target
+    print(roc_auc_score(y_true, y_score))
+    fpr, tpr, thresholds = roc_curve(y_true, y_score, pos_label=0)
+
+    # Print ROC curve
+    plt.plot(fpr, tpr)
+    plt.show()
