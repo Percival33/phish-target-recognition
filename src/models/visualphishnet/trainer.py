@@ -407,7 +407,7 @@ if __name__ == "__main__":
         parser.add_argument("--n-iter", type=int, default=21000)  # p1: 21000, p2: 50000
         parser.add_argument("--lr-interval", type=int, default=100)  # p1: 100, p2: 250
         # hard examples training
-        parser.add_argument("--num-sets", type=int, default=100)
+        parser.add_argument("--num-sets", type=int, default=75)
         parser.add_argument("--iter-per-set", type=int, default=8)
         parser.add_argument("--hard-n-iter", type=int, default=30)
 
@@ -437,10 +437,11 @@ if __name__ == "__main__":
             # run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
-            args.n_iter = 50000
+            args.n_iter = 18_000
             run = wandb.init(
                 project="VisualPhish",
                 group="visualphishnet",
+                notes="training params from paper",
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
