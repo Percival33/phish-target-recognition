@@ -18,6 +18,7 @@ uv pip install tensorflow matplotlib wandb scikit-learn scikit-image jupyter pyd
 `uv run -m src.models.visualphishnet.evaluate`
 
 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC
+https://wandb.ai/jarcin/VisualPhish/groups/visualphishnet/files/VisualPhish?runName=t7jhr5z6
 ```shell 
 VisualPhish
 ├── all_file_names_test.npy
@@ -31,3 +32,5 @@ VisualPhish
 └── trusted_list
     └── targets.txt
 ```
+
+Val: 1GTMaIW9LOWSbWdwk69AoxNs-Df0Ao-6X

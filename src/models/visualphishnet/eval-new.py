@@ -6,13 +6,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from skimage.transform import resize
 from sklearn.metrics import roc_auc_score, roc_curve
-from tools.config import PROCESSED_DATA_DIR, setup_logging
+from tools.config import LOGS_DIR, PROCESSED_DATA_DIR, RAW_DATA_DIR, setup_logging
 from tqdm import tqdm
 
 from DataHelper import read_image
 from Evaluate import Evaluate
 from ModelHelper import ModelHelper
-from src.tools.src.tools.config import LOGS_DIR, RAW_DATA_DIR
 
 
 # load targetlist embedding
@@ -39,7 +38,7 @@ def read_data(data_path, reshape_size):
     all_labels = []
     all_file_names = []
 
-    for file_path in tqdm(range(data_path.iterdir())):
+    for file_path in tqdm(data_path.iterdir()):
         img = read_image(file_path, logger)
 
         if img is None:
@@ -109,7 +108,7 @@ if __name__ == "__main__":
     """
 
     parser = ArgumentParser()
-    parser.add_argument("--emb-dir", type=Path, default=PROCESSED_DATA_DIR / "smallerSampleDataset")
+    parser.add_argument("--emb-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
     parser.add_argument("--data-dir", type=Path, default=RAW_DATA_DIR / "VisualPhish" / "benign_test")
     parser.add_argument("--margin", type=float, default=2.2)
     parser.add_argument("--saved-model-name", type=str, default="model2")
@@ -122,24 +121,35 @@ if __name__ == "__main__":
 
     # load targetlist and model
     targetlist_emb, all_labels, all_file_names = load_targetemb(
-        args.emb_dir / "targetlist_emb.npy",
-        args.emb_dir / "targetlist_labels.npy",
-        args.emb_dir / "targetlist_file_names.npy",
+        args.emb_dir / "whitelist_emb.npy",
+        args.emb_dir / "whitelist_labels.npy",
+        args.emb_dir / "whitelist_file_names.npy",
     )
     modelHelper = ModelHelper()
-    model = modelHelper.load_model(args.dir, args.saved_model_name, args.margin)
+    model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin).layers[3]
 
     logger.info("Loaded targetlist and model, number of protected target screenshots {}".format(len(targetlist_emb)))
 
     # read data
-    X, y, file_names = read_data(args.data_dir, args.reshape)
+    # X, y, file_names = read_data(args.data_dir, args.reshape_size)
+    # logger.info("Finish reading data, number of data {}".format(len(X)))
+
+    # np.save('val_imgs', X)
+    # np.save('val_labels', y)
+    # np.save('val_file_names', file_names)
+
+    X = np.load("val_imgs.npy")
+    y = np.load("val_labels.npy")
+    file_names = np.load("val_file_names.npy")
     logger.info("Finish reading data, number of data {}".format(len(X)))
+
+    # TODO: save X, y, file_names as test_set
 
     # get embeddings from data
     data_emb = model.predict(X, batch_size=32)
-    pairwise_distance = Evaluate.compute_all_distances(data_emb, targetlist_emb, np.array())
-    assert np.array_equal(pairwise_distance, compute_all_distances(data_emb, targetlist_emb))
-
+    # pairwise_distance = Evaluate.compute_all_distances(data_emb, targetlist_emb, np.zeros([1, 512]))
+    # assert np.array_equal(pairwise_distance, compute_all_distances(data_emb, targetlist_emb))
+    pairwise_distance = compute_all_distances(data_emb, targetlist_emb)
     logger.info("Finish getting embedding")
 
     """
@@ -152,6 +162,8 @@ if __name__ == "__main__":
 
     n = 1  # Top-1 match
     print("Start ")
+    # args.result_path.mkdir(parents=True, exist_ok=True)
+
     for i in tqdm(range(data_emb.shape[0])):
         # url = open(file_names[i].replace('shot.png', 'info.txt'), encoding='utf-8', errors='ignore').read()
         # print(url)
@@ -167,7 +179,7 @@ if __name__ == "__main__":
             phish = 0
 
         with open(args.result_path, "a+", encoding="utf-8", errors="ignore") as f:
-            f.write(file_names[i] + "\t" + y_score[i] + "\t" + str(min_distances) + str(only_names[0]) + "\n")
+            f.write(f"{file_names[i]}\t{y_score[i]}\t{str(min_distances)}\t{str(only_names[0])}\n")
 
     # TODO: closest target => target
     print(roc_auc_score(y_true, y_score))
