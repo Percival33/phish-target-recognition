@@ -1,3 +1,4 @@
+import gc
 import logging
 from argparse import ArgumentParser
 from pathlib import Path
@@ -26,12 +27,49 @@ def load_targetemb(emb_path, label_path, file_name_path):
     return targetlist_emb, all_labels, all_file_names
 
 
+def read_data_batched(data_path, reshape_size, batch_size=32):
+    """
+    Read and process data in batches, yielding each batch
+    """
+    all_labels = []
+    if (data_path / "labels.txt").exists():
+        with open(data_path / "labels.txt", "r") as f:
+            all_labels = [line.strip() for line in f]
+
+    # Get list of all valid files
+    image_files = [f for f in sorted(data_path.iterdir()) if f.suffix != ".txt"]
+    if not all_labels:
+        all_labels = ["benign"] * len(image_files)
+
+    total_files = len(image_files)
+
+    for start_idx in range(0, total_files, batch_size):
+        end_idx = min(start_idx + batch_size, total_files)
+        batch_imgs = []
+        batch_files = []
+
+        for file_path in image_files[start_idx:end_idx]:
+            img = read_image(file_path, logger)
+            if img is None:
+                img = read_image(file_path, logger, format="jpeg")
+            if img is None:
+                logger.error(f"Failed to process {file_path}")
+                continue
+
+            batch_imgs.append(resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True))
+            batch_files.append(file_path.name)
+
+        if batch_imgs:
+            yield (np.asarray(batch_imgs),
+                   np.asarray(all_labels[start_idx:end_idx]),
+                   np.asarray(batch_files))
+
+
 def read_data(data_path, reshape_size):
     """
     read data
     :param data_path:
     :param reshape_size:
-    :param chunk_range: Tuple
     :return:
     """
     all_imgs = []
@@ -64,10 +102,54 @@ def read_data(data_path, reshape_size):
     return all_imgs, all_labels, all_file_names
 
 
+def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=256):
+    """
+    Process dataset in batches and compute embeddings
+    Returns total count of processed images and accumulated embeddings
+    """
+    total_processed = 0
+    embeddings_list = []
+    labels_list = []
+    filenames_list = []
+
+    data_generator = read_data_batched(data_path, reshape_size, batch_size)
+
+    for imgs, labels, files in tqdm(data_generator, desc=f"Processing {data_path.name}", total=len(list(data_path.iterdir())) // batch_size):
+        # Get embeddings for current batch
+        batch_emb = model.predict(imgs, batch_size=batch_size, verbose=0)
+        embeddings_list.append(batch_emb)
+
+        if save_path:
+            labels_list.append(labels)
+            filenames_list.append(files)
+
+        total_processed += len(imgs)
+
+        # Free memory
+        if total_processed % 1024 == 0:
+            del imgs
+            gc.collect()
+
+    # Concatenate all embeddings
+    all_embeddings = np.concatenate(embeddings_list, axis=0)
+
+    if save_path:
+        all_labels = np.concatenate(labels_list, axis=0)
+        all_filenames = np.concatenate(filenames_list, axis=0)
+
+        np.save(save_path / "embeddings.npy", all_embeddings)
+        np.save(save_path / "labels.npy", all_labels)
+        np.save(save_path / "filenames.npy", all_filenames)
+
+        return total_processed, all_embeddings, all_labels, all_filenames
+
+    return total_processed, all_embeddings, None, None
+
+
 # L2 distance
 def compute_distance_pair(layer1, layer2, targetlist_emb):
     diff = layer1 - layer2
-    l2_diff = np.sum(diff**2) / targetlist_emb.shape[1]
+    l2_diff = np.sum(diff ** 2) / targetlist_emb.shape[1]
     return l2_diff
 
 
@@ -99,7 +181,7 @@ def compute_all_distances_batched(test_matrix, targetlist_emb, batch_size=256):
 
         # Compute pairwise L2 distances efficiently
         diff = batch[:, np.newaxis, :] - targetlist_emb[np.newaxis, :, :]
-        l2_diff = np.sum(diff**2, axis=2) / targetlist_emb.shape[1]
+        l2_diff = np.sum(diff ** 2, axis=2) / targetlist_emb.shape[1]
 
         pairwise_distance[batch_start:batch_end] = l2_diff
 
@@ -124,7 +206,7 @@ def find_names_min_distances(idx, values, all_file_names):
 
 
 def evaluate_threshold(
-    pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
+        pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
 ):
     """
     Evaluate model performance for a given threshold
@@ -152,7 +234,7 @@ def evaluate_threshold(
 
         # distance lower than threshold ==> report as phishing
         if float(min_distances) <= threshold:
-            y_pred[i] = 1
+            y_pred[i] = abs(float(min_distances) - threshold)
 
         with open(result_file, "a+", encoding="utf-8", errors="ignore") as f:
             f.write(f"{file_names[i]}\t{y_pred[i]}\t{str(min_distances)}\t{str(only_names[0])}\n")
@@ -163,85 +245,69 @@ def evaluate_threshold(
     return auc_score, fpr, tpr
 
 
-if __name__ == "__main__":
-    setup_logging()
-    logger = logging.getLogger(__name__)
-
+def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder):
     """
-    file_handler = logging.FileHandler('result.log')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    file_handler.setFormatter(formatter)
-    logger = logging.getLogger()
-    logger.addHandler(file_handler)
+    Process both datasets and compute pairwise distances
+    Args:
+        args: ArgumentParser arguments
+        model: loaded model
+        targetlist_emb: target list embeddings
+        all_file_names: list of target file names
+        phish_folder: path to phishing dataset folder
+        benign_folder: path to benign dataset folder
     """
-
-    parser = ArgumentParser()
-    parser.add_argument("--emb-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
-    parser.add_argument("--data-dir", type=Path, default=RAW_DATA_DIR / "VisualPhish")
-    parser.add_argument("--margin", type=float, default=2.2)
-    parser.add_argument("--saved-model-name", type=str, default="model2")
-    parser.add_argument("--threshold", type=float, default=1.5)
-    parser.add_argument("--result-path", type=Path, default=LOGS_DIR / "VisualPhish")
-    parser.add_argument("--reshape-size", default=[224, 224, 3])
-
-    args = parser.parse_args()
-    logger.info("Evaluating VisualPhishNet")
-
-    # load targetlist and model
-    targetlist_emb, all_labels, all_file_names = load_targetemb(
-        args.emb_dir / "whitelist_emb.npy",
-        args.emb_dir / "whitelist_labels.npy",
-        args.emb_dir / "whitelist_file_names.npy",
+    # Process phishing dataset
+    phish_count, phish_emb, phish_labels, phish_files = process_dataset(
+        args.data_dir / phish_folder,
+        args.reshape_size,
+        model,
+        save_path=args.emb_dir if args.save_intermediate else None,
+        batch_size=32
     )
-    modelHelper = ModelHelper()
-    model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin).layers[3]
+    logger.info(f"Processed {phish_count} phishing images")
 
-    logger.info("Loaded targetlist and model, number of protected target screenshots {}".format(len(targetlist_emb)))
+    # Process benign dataset
+    benign_count, benign_emb, benign_labels, benign_files = process_dataset(
+        args.data_dir / benign_folder,
+        args.reshape_size,
+        model,
+        save_path=args.emb_dir if args.save_intermediate else None,
+        batch_size=32
+    )
+    logger.info(f"Processed {benign_count} benign images")
 
-    # read data
-    # X_phish, y_phish, file_names_phish = read_data(args.data_dir / "newly_crawled_phishing", args.reshape_size)
-    # logger.info("Finish reading data, number of data {}".format(len(X_phish)))
-    #
-    # X_benign, y_benign, file_names_benign = read_data(args.data_dir / "benign_test", args.reshape_size)
-    # logger.info("Finish reading data, number of data {}".format(len(X_benign)))
-    #
-    # X = np.concatenate((X_benign, X_phish), axis=0)
-    # y = np.concatenate((y_benign, y_phish), axis=0)
-    # file_names = np.concatenate((file_names_benign, file_names_phish), axis=0)
-    # # random shuffle all data as tuples (X, y, file_names)
-    # assert len(X) == len(y) == len(file_names)
-    # np.random.seed(42)
-    # idx = np.random.permutation(len(X))
-    # X = X[idx]
-    # y = y[idx]
-    # file_names = file_names[idx]
-    # np.savez_compressed("val_data", X=X, y=y, file_names=file_names)
+    # Combine embeddings
+    data_emb = np.concatenate([benign_emb, phish_emb], axis=0)
+    np.save(args.emb_dir / "all_embeddings.npy", data_emb)
 
-    val_data = np.load("val_data.npz")
-    X = val_data["X"]
-    y = val_data["y"]
-    file_names = val_data["file_names"]
-    logger.info("Finish reading data, number of data {}".format(len(X)))
+    # Combine labels and filenames if they were saved
+    if args.save_intermediate:
+        y = np.concatenate([benign_labels, phish_labels], axis=0)
+        file_names = np.concatenate([benign_files, phish_files], axis=0)
 
-    # TODO: save X, y, file_names as test_set
+        # Random shuffle
+        np.random.seed(42)
+        idx = np.random.permutation(len(data_emb))
+        data_emb = data_emb[idx]
+        y = y[idx]
+        file_names = file_names[idx]
+    else:
+        # For evaluation, create file names that indicate source
+        benign_files = np.array([f'benign/file_{i}' for i in range(benign_count)])
+        phish_files = np.array([f'phish/file_{i}' for i in range(phish_count)])
+        file_names = np.concatenate([benign_files, phish_files])
+        y = np.array(['benign'] * benign_count + ['phish'] * phish_count)
 
-    # get embeddings from data
-    # data_emb = model.predict(X, batch_size=32)
-    # np.save("data_emb", data_emb)
-    data_emb = np.load("data_emb.npy")
-    # pairwise_distance = Evaluate.compute_all_distances(data_emb, targetlist_emb, np.zeros([1,512]))
+    # Compute pairwise distances
+    pairwise_distance = compute_all_distances_batched(data_emb, targetlist_emb)
+    np.save(args.emb_dir / "pairwise_distances.npy", pairwise_distance)
 
-    # pairwise_distance_batched = compute_all_distances_batched(data_emb, targetlist_emb)
-    # pairwise_distance = compute_all_distances(data_emb, targetlist_emb)
-    # assert np.array_equal(pairwise_distance, pairwise_distance_batched)
+    return data_emb, pairwise_distance, y, file_names
 
-    # np.save("pairwise_distance", pairwise_distance)
-    pairwise_distance = np.load("pairwise_distance.npy")
-    logger.info("Finish getting embedding")
 
+def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args):
     # Test different thresholds
-    thresholds = np.arange(3, 8, .25)
+    thresholds = np.arange(3, 20, 1)
     # np.arange(4, 71, 2)
     results = []
     plt.figure(figsize=(10, 6))
@@ -275,6 +341,114 @@ if __name__ == "__main__":
     with open(final_result_path, "w") as f:
         for result in results:
             f.write(f"Threshold: {result['threshold']}, AUC Score: {result['auc_score']}\n")
+
+
+if __name__ == "__main__":
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
+    """
+    file_handler = logging.FileHandler('result.log')
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    file_handler.setFormatter(formatter)
+    logger = logging.getLogger()
+    logger.addHandler(file_handler)
+    """
+
+    parser = ArgumentParser()
+    parser.add_argument("--emb-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
+    parser.add_argument("--data-dir", type=Path, default=RAW_DATA_DIR / "VisualPhish")
+    parser.add_argument("--margin", type=float, default=2.2)
+    parser.add_argument("--saved-model-name", type=str, default="model2")
+    parser.add_argument("--threshold", type=float, default=1.5)
+    parser.add_argument("--result-path", type=Path, default=LOGS_DIR / "VisualPhish")
+    parser.add_argument("--reshape-size", default=[224, 224, 3])
+    parser.add_argument("--save-intermediate", action="store_true", help="Save intermediate results")
+    parser.add_argument("--phish-folder", type=str, default="newly_crawled_phishing")
+    parser.add_argument("--benign-folder", type=str, default="benign_test")
+
+    args = parser.parse_args()
+    logger.info("Evaluating VisualPhishNet")
+
+    # load targetlist and model
+    targetlist_emb, all_labels, all_file_names = load_targetemb(
+        args.emb_dir / "whitelist_emb.npy",
+        args.emb_dir / "whitelist_labels.npy",
+        args.emb_dir / "whitelist_file_names.npy",
+    )
+    modelHelper = ModelHelper()
+    model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin).layers[3]
+    logger.info("Loaded targetlist and model, number of protected target screenshots {}".format(len(targetlist_emb)))
+
+    data_emb, pairwise_distance, y, file_names = process_and_evaluate(
+        args,
+        model,
+        targetlist_emb,
+        all_file_names,
+        phish_folder=args.phish_folder,
+        benign_folder=args.benign_folder
+    )
+
+    calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
+
+    # # read data
+    # X_phish, y_phish, file_names_phish = read_data(args.data_dir / "phish_sample_30k", args.reshape_size)
+    # logger.info("Finish reading data, number of data {}".format(len(X_phish)))
+    #
+    # np.save("X_phish", X_phish)
+    # np.save("y_phish", y_phish)
+    # np.save("file_names_phish", file_names_phish)
+    # gc.collect()
+    #
+    # X_benign, y_benign, file_names_benign = read_data(args.data_dir / "benign_sample_30k", args.reshape_size)
+    # logger.info("Finish reading data, number of data {}".format(len(X_benign)))
+    # np.save("X_benign", X_benign)
+    # np.save("y_benign", y_benign)
+    # np.save("file_names_benign", file_names_benign)
+    # gc.collect()
+    #
+    # X_phish = np.load("X_phish.npy")
+    # y_phish = np.load("y_phish.npy")
+    # file_names_phish = np.load("file_names_phish.npy")
+    # X_benign = np.load("X_benign.npy")
+    # y_benign = np.load("y_benign.npy")
+    # file_names_benign = np.load("file_names_benign.npy")
+    #
+    # X = np.concatenate((X_benign, X_phish), axis=0)
+    # y = np.concatenate((y_benign, y_phish), axis=0)
+    # file_names = np.concatenate((file_names_benign, file_names_phish), axis=0)
+    # # random shuffle all data as tuples (X, y, file_names)
+    # # assert len(X) == len(y) == len(file_names)
+    # np.random.seed(42)
+    # idx = np.random.permutation(len(X))
+    # X = X[idx]
+    # y = y[idx]
+    # file_names = file_names[idx]
+    # np.savez_compressed("val_data", X=X, y=y, file_names=file_names)
+    # gc.collect()
+    #
+    # val_data = np.load("val_data.npz")
+    # X = val_data["X"]
+    # y = val_data["y"]
+    # file_names = val_data["file_names"]
+    # logger.info("Finish reading data, number of data {}".format(len(X)))
+
+    # TODO: save X, y, file_names as test_set
+
+    # get embeddings from data
+    # data_emb = model.predict(X, batch_size=32)
+    # np.save("data_emb", data_emb)
+    # data_emb = np.load("data_emb.npy")
+    # # pairwise_distance = Evaluate.compute_all_distances(data_emb, targetlist_emb, np.zeros([1,512]))
+    #
+    # pairwise_distance_batched = compute_all_distances_batched(data_emb, targetlist_emb)
+    # # pairwise_distance = compute_all_distances(data_emb, targetlist_emb)
+    # # assert np.array_equal(pairwise_distance, pairwise_distance_batched)
+    #
+    # np.save("pairwise_distance", pairwise_distance_batched)
+    # pairwise_distance = np.load("pairwise_distance.npy")
+    # logger.info("Finish getting embedding")
 
     # y_true = np.zeros([len(X), 1])
     # y_score = np.zeros([len(X), 1])
