@@ -7,3 +7,10 @@
 
 
 https://stackoverflow.com/questions/77250743/mac-xcode-g-cannot-compile-even-a-basic-c-program-issues-with-standard-libr
+
+git fetch overleaf
+
+git checkout thesis-t
+git merge overleaf/master  # Or use `git rebase overleaf/master`
+
+git push overleaf thesis-t:master
