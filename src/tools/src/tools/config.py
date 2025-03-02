@@ -1,11 +1,31 @@
-from pydantic import Field
-from pydantic_settings import BaseSettings
+# from pydantic import Field
+# from pydantic_settings import BaseSettings
+import logging
+import logging.config
 from pathlib import Path
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[1]
+PROJ_ROOT = Path(__file__).resolve().parents[4]
+print(PROJ_ROOT)
+DATA_DIR = PROJ_ROOT / "data"
+LOGS_DIR = PROJ_ROOT / "logs"
+SRC_DIR = PROJ_ROOT / "src"
+RAW_DATA_DIR = DATA_DIR / "raw"
+INTERIM_DATA_DIR = DATA_DIR / "interim"
+PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
 
+def setup_logging():
+    """Configures logging from the logging.conf file."""
+    LOGGING_CONFIG_PATH = SRC_DIR / "logging.conf"
+    if LOGGING_CONFIG_PATH.exists():
+        logging.config.fileConfig(LOGGING_CONFIG_PATH, disable_existing_loggers=False)
+    else:
+        print(f"Warning: Logging configuration file not found at {LOGGING_CONFIG_PATH}")
+        logging.basicConfig(level=logging.INFO)  # Fallback to basic logging
+
+
+"""
 class AppConfig(BaseSettings):
     DATA_DIR: Path = PROJ_ROOT / "data"
     RAW_DATA_DIR: Path = DATA_DIR / "raw"
@@ -219,3 +239,4 @@ class AppConfig(BaseSettings):
 
 
 config = AppConfig()
+"""
