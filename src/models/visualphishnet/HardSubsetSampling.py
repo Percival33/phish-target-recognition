@@ -116,7 +116,7 @@ class HardSubsetSampling:
         for i in range(0, distances.shape[0]):
             next_max_idx = idx_max[i]
             n_label = y_train[next_max_idx]
-            # false negatives (have large distance, although they are in the same category )
+            # false negatives (have large distance, although they are in the same category)
             if test_label == n_label:
                 X_false_neg_idx[count] = next_max_idx
                 count = count + 1

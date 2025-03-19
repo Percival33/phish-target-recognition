@@ -5,16 +5,16 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
-import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
 from TargetHelper import TargetHelper
-from triplet_sampling import get_batch_for_phase2
+from triplet_sampling import get_batch_for_phase2, dataset_generator
 
 
 def train_phase1(run, args):
@@ -79,18 +79,28 @@ def train_phase1(run, args):
     targets_train = np.zeros([args.batch_size, 1])
     run.log({"lr": args.lr})
 
+    # TODO: batch_size * strategy.num_replicas_in_sync
+    dataset = (
+        tf.data.Dataset.from_generator(
+            randomSampling.dataset_generator,
+            args=(
+                X_train_legit,
+                y_train_legit,
+                X_train_phish,
+                labels_start_end_train_legit,
+                args.num_targets,
+                args.n_iter,
+            ),
+            output_signature=(tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),),
+        )
+        .batch(args.batch_size)
+        .prefetch(tf.data.AUTOTUNE)
+    )
+    iterator = iter(dataset)
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
     for i in range(1, args.n_iter):
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
-        inputs = randomSampling.get_batch(
-            targetHelper=targetHelper,
-            X_train_legit=X_train_legit,
-            y_train_legit=y_train_legit,
-            X_train_phish=X_train_phish,
-            labels_start_end_train_legit=labels_start_end_train_legit,
-            batch_size=args.batch_size,
-            num_targets=args.num_targets,
-        )
+        inputs = iterator.get_next()
 
         # with tf.profiler.experimental.Trace("training", step_num=i):
         loss_value = model.train_on_batch(inputs, targets_train)
@@ -192,7 +202,6 @@ def train_phase2(run, args):
 
     modelHelper = ModelHelper()
     # with tf.profiler.experimental.Trace("model_loading2", step_num=1):
-    full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
 
     hard_subset_sampling = HardSubsetSampling()
     #########################################################################################
@@ -218,6 +227,13 @@ def train_phase2(run, args):
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
     total_iterations = 0
+
+    if args.multi_gpu:
+        strategy = tf.distribute.MirroredStrategy()
+        logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
+        with strategy.scope():
+            full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
+
     # for k in tqdm(range(0, args.num_sets), desc="Sets"):
     for k in range(0, args.num_sets):
         logger.info(f"Starting a new set! - {k}")
@@ -247,18 +263,33 @@ def train_phase2(run, args):
             )
 
             # for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations"):
+
+            phase2_dataset = (
+                tf.data.Dataset.from_generator(
+                    dataset_generator,
+                    args=(
+                        targetHelper,
+                        X_train_legit,
+                        X_train_new,
+                        labels_start_end_train,
+                        args.batch_size,
+                        fixed_set,
+                        args.num_targets,
+                        args.hard_n_iter,
+                    ),
+                    output_signature=(
+                        tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                    ),
+                )
+                .batch(args.batch_size)
+                .prefetch(tf.data.AUTOTUNE)
+            )
+            iterator = iter(phase2_dataset)
+
             for i in range(1, args.hard_n_iter):
                 total_iterations += 1
                 # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
-                inputs = get_batch_for_phase2(
-                    targetHelper=targetHelper,
-                    X_train_legit=X_train_legit,
-                    X_train_new=X_train_new,
-                    labels_start_end_train=labels_start_end_train,
-                    batch_size=args.batch_size,
-                    train_fixed_set=fixed_set,
-                    num_targets=args.num_targets,
-                )
+                inputs = iterator.get_next()
 
                 # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
                 loss_iteration = full_model.train_on_batch(inputs, targets_train)
@@ -364,6 +395,8 @@ if __name__ == "__main__":
     setup_logging()
     logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
+
+    tf.keras.utils.set_random_seed(42)
 
     init_parser = ArgumentParser(add_help=False)
     # TODO: enable wandb sweep

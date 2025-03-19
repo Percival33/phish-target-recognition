@@ -60,9 +60,7 @@ def read_data_batched(data_path, reshape_size, batch_size=32):
             batch_files.append(file_path.name)
 
         if batch_imgs:
-            yield (np.asarray(batch_imgs),
-                   np.asarray(all_labels[start_idx:end_idx]),
-                   np.asarray(batch_files))
+            yield (np.asarray(batch_imgs), np.asarray(all_labels[start_idx:end_idx]), np.asarray(batch_files))
 
 
 def read_data(data_path, reshape_size):
@@ -114,7 +112,9 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
 
     data_generator = read_data_batched(data_path, reshape_size, batch_size)
 
-    for imgs, labels, files in tqdm(data_generator, desc=f"Processing {data_path.name}", total=len(list(data_path.iterdir())) // batch_size):
+    for imgs, labels, files in tqdm(
+        data_generator, desc=f"Processing {data_path.name}", total=len(list(data_path.iterdir())) // batch_size
+    ):
         # Get embeddings for current batch
         batch_emb = model.predict(imgs, batch_size=batch_size, verbose=0)
         embeddings_list.append(batch_emb)
@@ -149,7 +149,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
 # L2 distance
 def compute_distance_pair(layer1, layer2, targetlist_emb):
     diff = layer1 - layer2
-    l2_diff = np.sum(diff ** 2) / targetlist_emb.shape[1]
+    l2_diff = np.sum(diff**2) / targetlist_emb.shape[1]
     return l2_diff
 
 
@@ -181,7 +181,7 @@ def compute_all_distances_batched(test_matrix, targetlist_emb, batch_size=256):
 
         # Compute pairwise L2 distances efficiently
         diff = batch[:, np.newaxis, :] - targetlist_emb[np.newaxis, :, :]
-        l2_diff = np.sum(diff ** 2, axis=2) / targetlist_emb.shape[1]
+        l2_diff = np.sum(diff**2, axis=2) / targetlist_emb.shape[1]
 
         pairwise_distance[batch_start:batch_end] = l2_diff
 
@@ -206,7 +206,7 @@ def find_names_min_distances(idx, values, all_file_names):
 
 
 def evaluate_threshold(
-        pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
+    pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
 ):
     """
     Evaluate model performance for a given threshold
@@ -262,7 +262,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         args.reshape_size,
         model,
         save_path=args.emb_dir if args.save_intermediate else None,
-        batch_size=32
+        batch_size=32,
     )
     logger.info(f"Processed {phish_count} phishing images")
 
@@ -272,7 +272,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         args.reshape_size,
         model,
         save_path=args.emb_dir if args.save_intermediate else None,
-        batch_size=32
+        batch_size=32,
     )
     logger.info(f"Processed {benign_count} benign images")
 
@@ -293,10 +293,10 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         file_names = file_names[idx]
     else:
         # For evaluation, create file names that indicate source
-        benign_files = np.array([f'benign/file_{i}' for i in range(benign_count)])
-        phish_files = np.array([f'phish/file_{i}' for i in range(phish_count)])
+        benign_files = np.array([f"benign/file_{i}" for i in range(benign_count)])
+        phish_files = np.array([f"phish/file_{i}" for i in range(phish_count)])
         file_names = np.concatenate([benign_files, phish_files])
-        y = np.array(['benign'] * benign_count + ['phish'] * phish_count)
+        y = np.array(["benign"] * benign_count + ["phish"] * phish_count)
 
     # Compute pairwise distances
     pairwise_distance = compute_all_distances_batched(data_emb, targetlist_emb)
@@ -382,12 +382,7 @@ if __name__ == "__main__":
     logger.info("Loaded targetlist and model, number of protected target screenshots {}".format(len(targetlist_emb)))
 
     data_emb, pairwise_distance, y, file_names = process_and_evaluate(
-        args,
-        model,
-        targetlist_emb,
-        all_file_names,
-        phish_folder=args.phish_folder,
-        benign_folder=args.benign_folder
+        args, model, targetlist_emb, all_file_names, phish_folder=args.phish_folder, benign_folder=args.benign_folder
     )
 
     calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
