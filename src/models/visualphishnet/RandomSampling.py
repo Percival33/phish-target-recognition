@@ -19,11 +19,18 @@ class RandomSampling:
         self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets, length
     ):
         for i in range(length):
-            yield tf.convert_to_tensor(
+            triple = (
                 self._get_triple(
                     X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
                 ),
-                dtype=tf.float32,
+            )
+            yield (
+                tf.convert_to_tensor(triple[0], dtype=tf.float32),
+                tf.convert_to_tensor(triple[1], dtype=tf.float32),
+                tf.convert_to_tensor(
+                    triple[2],
+                    dtype=tf.float32,
+                ),
             )
 
     def _get_triple(self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets):

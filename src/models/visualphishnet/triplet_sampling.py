@@ -108,15 +108,26 @@ def dataset_generator(
     targetHelper, X_train_legit, X_train_new, labels_start_end_train, batch_size, train_fixed_set, num_targets, length
 ):
     for i in range(length):
-        yield tf.convert_to_tensor(
-            get_triple_for_phase2(
-                targetHelper,
-                X_train_legit,
-                X_train_new,
-                labels_start_end_train,
-                batch_size,
-                train_fixed_set,
-                num_targets,
+        triple = get_triple_for_phase2(
+            targetHelper,
+            X_train_legit,
+            X_train_new,
+            labels_start_end_train,
+            batch_size,
+            train_fixed_set,
+            num_targets,
+        )
+        yield (
+            tf.convert_to_tensor(
+                triple[0],
+                dtype=tf.float32,
             ),
-            dtype=tf.float32,
+            tf.convert_to_tensor(
+                triple[1],
+                dtype=tf.float32,
+            ),
+            tf.convert_to_tensor(
+                triple[2],
+                dtype=tf.float32,
+            ),
         )
