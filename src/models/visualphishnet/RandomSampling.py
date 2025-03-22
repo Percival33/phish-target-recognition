@@ -18,8 +18,11 @@ class RandomSampling:
         self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets, length
     ):
         for i in range(length):
-            yield self._get_triple(
-                X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
+            yield np.stack(
+                self._get_triple(
+                    X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
+                ),
+                axis=0,
             )
 
     def _get_triple(self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets):

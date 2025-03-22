@@ -5,11 +5,11 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
-import wandb
 from keras import backend as K
 from tools.config import INTERIM_DATA_DIR, LOGS_DIR, PROCESSED_DATA_DIR, setup_logging
 
 import DataHelper as data
+import wandb
 from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
@@ -50,7 +50,14 @@ def train_phase1(run, args):
     # create model
     modelHelper = ModelHelper()
     # with tf.profiler.experimental.Trace("model_loading", step_num=1):
-    model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+    if args.multi_gpu:
+        strategy = tf.distribute.MirroredStrategy()
+        logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
+        with strategy.scope():
+            model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+    else:
+        model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+
     logger.debug("Model prepared")
 
     # order random array? -> po co?
@@ -233,6 +240,8 @@ def train_phase2(run, args):
         logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
         with strategy.scope():
             full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
+    else:
+        full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
 
     # for k in tqdm(range(0, args.num_sets), desc="Sets"):
     for k in range(0, args.num_sets):
@@ -374,7 +383,7 @@ def reset_keras(model):
 
     try:
         del model  # this is from global space - change this as you need
-    except: # noqa: E722
+    except:  # noqa: E722
         pass
 
     # Force garbage collection
@@ -447,6 +456,7 @@ if __name__ == "__main__":
         parser.add_argument("--num-sets", type=int, default=75)
         parser.add_argument("--iter-per-set", type=int, default=8)
         parser.add_argument("--hard-n-iter", type=int, default=30)
+        parser.add_argument("--multi-gpu", type=bool, default=True)
 
         args = parser.parse_args()
 
