@@ -96,19 +96,20 @@ def train_phase1(run, args):
                 X_train_phish,
                 labels_start_end_train_legit,
                 args.num_targets,
-                args.n_iter,
             ),
             output_signature=(tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32)),
         )
         .batch(args.batch_size)
         .prefetch(tf.data.AUTOTUNE)
     )
+
     iterator = iter(dataset)
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
     for i in range(1, args.n_iter):
+        logger.debug(f"Iter: {i}")
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
         inputs = iterator.get_next()
-
+        logger.debug(f"Inputs shape: {inputs.shape}")
         # with tf.profiler.experimental.Trace("training", step_num=i):
         loss_value = model.train_on_batch(inputs, targets_train)
 
