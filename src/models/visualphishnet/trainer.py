@@ -14,7 +14,7 @@ from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
 from TargetHelper import TargetHelper
-from triplet_sampling import get_batch_for_phase2, dataset_generator
+from triplet_sampling import dataset_generator
 
 
 def train_phase1(run, args):
@@ -366,11 +366,15 @@ def train_phase2(run, args):
 
 def reset_keras(model):
     # Clear the Keras backend
-    tf.keras.backend.clear_session()
+
+    K.get_session().close()
+    cfg = K.tf.ConfigProto()
+    cfg.gpu_options.allow_growth = True
+    K.set_session(K.tf.Session(config=cfg))
 
     try:
         del model  # this is from global space - change this as you need
-    except:
+    except: # noqa: E722
         pass
 
     # Force garbage collection
@@ -446,12 +450,12 @@ if __name__ == "__main__":
 
         args = parser.parse_args()
 
-        # run = wandb.init(
-        #     project="VisualPhish",
-        #     group="visualphishnet",
-        #     config=args,
-        #     tags=["jarvis", "phase-1"],
-        # )
+        run = wandb.init(
+            project="VisualPhish",
+            group="visualphishnet",
+            config=args,
+            tags=["jarvis", "phase-1"],
+        )
         try:
             # debug_dump_dir = args.logdir / "debug_dump"
             # debug_dump_dir.mkdir(parents=True, exist_ok=True)
@@ -465,9 +469,9 @@ if __name__ == "__main__":
             #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
             # )
             # tf.profiler.experimental.start(str(args.logdir), options=options)
-            # train_phase1(run, args)
+            train_phase1(run, args)
             # tf.profiler.experimental.stop()
-            # run.finish()
+            run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
             args.n_iter = 18_000
