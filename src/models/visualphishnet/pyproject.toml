@@ -3,7 +3,7 @@ name = "visualphishnet"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">3.8,<3.10"
+requires-python = ">=3.9,<3.10"
 dependencies = [
     "matplotlib>=3.7.5",
     "scikit-image>=0.21.0",
@@ -20,7 +20,6 @@ tools = { path = "../../tools" }
 [dependency-groups]
 dev = [
     "ruff>=0.9.4",
-    "tensorboard-plugin-profile==2.11.2",
 ]
 
 [tool.ruff]

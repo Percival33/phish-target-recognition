@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 
 class RandomSampling:
@@ -18,11 +19,11 @@ class RandomSampling:
         self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets, length
     ):
         for i in range(length):
-            yield np.stack(
+            yield tf.convert_to_tensor(
                 self._get_triple(
                     X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
                 ),
-                axis=0,
+                dtype=tf.float32,
             )
 
     def _get_triple(self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets):

@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 # TODO: refactor to HardSubsetSampling.py
 
@@ -107,6 +108,15 @@ def dataset_generator(
     targetHelper, X_train_legit, X_train_new, labels_start_end_train, batch_size, train_fixed_set, num_targets, length
 ):
     for i in range(length):
-        yield get_triple_for_phase2(
-            targetHelper, X_train_legit, X_train_new, labels_start_end_train, batch_size, train_fixed_set, num_targets
+        yield tf.convert_to_tensor(
+            get_triple_for_phase2(
+                targetHelper,
+                X_train_legit,
+                X_train_new,
+                labels_start_end_train,
+                batch_size,
+                train_fixed_set,
+                num_targets,
+            ),
+            dtype=tf.float32,
         )

@@ -98,7 +98,7 @@ def train_phase1(run, args):
                 args.num_targets,
                 args.n_iter,
             ),
-            output_signature=(tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),),
+            output_signature=(tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32)),
         )
         .batch(args.batch_size)
         .prefetch(tf.data.AUTOTUNE)
@@ -287,7 +287,7 @@ def train_phase2(run, args):
                         args.hard_n_iter,
                     ),
                     output_signature=(
-                        tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32)
                     ),
                 )
                 .batch(args.batch_size)
