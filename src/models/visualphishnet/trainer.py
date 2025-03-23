@@ -65,7 +65,7 @@ def train_phase1(run, args):
     X_train_phish, y_train_phish = data.order_random_array(X_train_phish, y_train_phish, args.num_targets)
     logger.debug("Phishing arrays ordered")
 
-    # labels_start_end_train_phish, labels_start_end_test_phish
+    # labels_start_end_train_phish, labels_start_end_test_p1hish
     labels_start_end_train_phish = data.targets_start_end(args.num_targets, y_train_phish)
     labels_start_end_test_phish = data.targets_start_end(args.num_targets, y_test_phish)
     # labels_start_end_train_legit
@@ -300,7 +300,6 @@ def train_phase2(run, args):
                         args.batch_size,
                         fixed_set,
                         args.num_targets,
-                        args.hard_n_iter,
                     ),
                     output_signature=(
                         (
