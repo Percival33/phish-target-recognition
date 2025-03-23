@@ -457,7 +457,7 @@ if __name__ == "__main__":
         parser.add_argument("--num-sets", type=int, default=75)
         parser.add_argument("--iter-per-set", type=int, default=8)
         parser.add_argument("--hard-n-iter", type=int, default=30)
-        parser.add_argument("--multi-gpu", type=bool, default=True)
+        parser.add_argument("--multi-gpu", action="store_true")
 
         args = parser.parse_args()
 
