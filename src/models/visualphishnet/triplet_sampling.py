@@ -118,20 +118,10 @@ def dataset_generator(
             num_targets,
         )
         yield (
-            tf.convert_to_tensor(
-                triple[0],
-                dtype=tf.float32,
+            (
+                tf.convert_to_tensor(triple[0], dtype=tf.float32),
+                tf.convert_to_tensor(triple[1], dtype=tf.float32),
+                tf.convert_to_tensor(triple[2], dtype=tf.float32),
             ),
-            tf.convert_to_tensor(
-                triple[1],
-                dtype=tf.float32,
-            ),
-            tf.convert_to_tensor(
-                triple[2],
-                dtype=tf.float32,
-            ),
-            tf.convert_to_tensor(
-                0,
-                dtype=tf.float32,
-            ),
+            tf.convert_to_tensor(0, dtype=tf.float32),
         )

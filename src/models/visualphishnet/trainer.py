@@ -83,7 +83,7 @@ def train_phase1(run, args):
     # training
     logger.info("Starting training process! - phase 1")
 
-    targets_train = np.zeros([args.batch_size, 1])
+    # targets_train = np.zeros([args.batch_size, 1])
     run.log({"lr": args.lr})
 
     # TODO: batch_size * strategy.num_replicas_in_sync
@@ -98,25 +98,35 @@ def train_phase1(run, args):
                 args.num_targets,
             ),
             output_signature=(
-                tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                (
+                    tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                    tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                    tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                ),
                 tf.TensorSpec(shape=(), dtype=tf.float32),
             ),
         )
-        .batch(args.batch_size)
+        .batch(args.batch_size, num_parallel_calls=tf.data.AUTOTUNE)
         .prefetch(tf.data.AUTOTUNE)
     )
 
+    print(type(dataset))
+
     iterator = iter(dataset)
+    for _ in range(2):
+        inputs, targets = next(iterator)
+        logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
+        inputs, targets = next(iterator)
+        logger.debug(f"SECOND Inputs: {len(inputs)}, Targets: {targets.shape}")
+
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
     for i in range(1, args.n_iter):
         logger.debug(f"Iter: {i}")
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
-        inputs = iterator.get_next()
-        logger.debug(f"Inputs shape: {inputs.shape}")
+        inputs, targets = iterator.get_next()
+        logger.debug(f"Inputs: {len(inputs)}, Targets: {targets.shape}")
         # with tf.profiler.experimental.Trace("training", step_num=i):
-        loss_value = model.train_on_batch(inputs, targets_train)
+        loss_value = model.train_on_batch(inputs, targets)
 
         if i % 100 == 0:
             logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
@@ -235,7 +245,7 @@ def train_phase2(run, args):
     )
     y_train_new = np.zeros([args.num_targets * 2 * n, 1])
 
-    targets_train = np.zeros([args.batch_size, 1])
+    # targets_train = np.zeros([args.batch_size, 1])
 
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
@@ -293,9 +303,11 @@ def train_phase2(run, args):
                         args.hard_n_iter,
                     ),
                     output_signature=(
-                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        (
+                            tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                            tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                            tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        ),
                         tf.TensorSpec(shape=(), dtype=tf.float32),
                     ),
                 )
@@ -307,10 +319,10 @@ def train_phase2(run, args):
             for i in range(1, args.hard_n_iter):
                 total_iterations += 1
                 # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
-                inputs = iterator.get_next()
+                inputs, targets = iterator.get_next()
 
                 # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
-                loss_iteration = full_model.train_on_batch(inputs, targets_train)
+                loss_iteration = full_model.train_on_batch(inputs, targets)
 
                 if total_iterations % 100 == 0:
                     logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
