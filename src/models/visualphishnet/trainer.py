@@ -115,7 +115,7 @@ def train_phase1(run, args):
 
     # print(type(dataset))
 
-    iterator = iter(dataset)
+    iterator = dataset.as_numpy_iterator()
     # for _ in range(2):
     #     inputs, targets = next(iterator)
     #     logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
@@ -325,7 +325,7 @@ def train_phase2(run, args):
                 .batch(args.batch_size)
                 .prefetch(tf.data.AUTOTUNE)
             )
-            iterator = iter(phase2_dataset)
+            iterator = phase2_dataset.as_numpy_iterator()
 
             for i in range(1, args.hard_n_iter):
                 total_iterations += 1
