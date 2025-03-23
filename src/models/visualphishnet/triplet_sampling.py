@@ -38,11 +38,11 @@ def pick_neg_img(labels_start_end_train, X_train_new, anchor_idx, num_targets):
 
 
 def get_triple_for_phase2(
-    targetHelper, X_train_legit, X_train_new, labels_start_end_train, batch_size, train_fixed_set, num_targets
+    targetHelper, X_train_legit, X_train_new, labels_start_end_train, train_fixed_set, num_targets
 ):
     h = X_train_legit.shape[1]
     w = X_train_legit.shape[2]
-    triple = [np.zeros((h, w, 3)) for i in range(3)]
+    triple = [np.zeros((h, w, 3)) for _ in range(3)]
     img_idx_pair1 = pick_first_img_idx(labels_start_end_train, num_targets)
     triple[0][:, :, :] = train_fixed_set[img_idx_pair1, :]
     img_label = img_idx_pair1
@@ -94,7 +94,6 @@ def get_batch_for_phase2(
                 X_train_legit,
                 X_train_new,
                 labels_start_end_train,
-                batch_size,
                 train_fixed_set,
                 num_targets,
             )
@@ -120,7 +119,6 @@ def dataset_generator(
             X_train_legit,
             X_train_new,
             labels_start_end_train,
-            batch_size,
             train_fixed_set,
             num_targets,
         )

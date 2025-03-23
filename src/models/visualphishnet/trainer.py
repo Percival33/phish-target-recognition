@@ -129,7 +129,7 @@ def train_phase1(run, args):
     for i in range(1, args.n_iter):
         logger.debug(f"Iter: {i}")
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
-        inputs, targets = iterator.get_next()
+        inputs, targets = next(iterator)
         logger.debug(f"Inputs: {len(inputs)}, Targets: {targets.shape}")
         # with tf.profiler.experimental.Trace("training", step_num=i):
         loss_value = model.train_on_batch(inputs, targets)
@@ -271,7 +271,7 @@ def train_phase2(run, args):
     logger.info(f"Gpus: {gpus}")
 
     # for k in tqdm(range(0, args.num_sets), desc="Sets"):
-    for k in range(0, args.num_sets):
+    for k in range(args.num_sets):
         logger.info(f"Starting a new set! - {k}")
         X_train_legit = all_imgs_train
         y_train_legit = all_labels_train
@@ -327,10 +327,10 @@ def train_phase2(run, args):
             )
             iterator = phase2_dataset.as_numpy_iterator()
 
-            for i in range(1, args.hard_n_iter):
+            for i in range(args.hard_n_iter):
                 total_iterations += 1
                 # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
-                inputs, targets = iterator.get_next()
+                inputs, targets = next(iterator)
 
                 # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
                 loss_iteration = full_model.train_on_batch(inputs, targets)
@@ -524,8 +524,8 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
-            artifact = run.use_artifact("jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10", type="model")
-            artifact_dir = artifact.download(args.output_dir)
+            # artifact = run.use_artifact("jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10", type="model")
+            # artifact_dir = artifact.download(args.output_dir)
 
             # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)
