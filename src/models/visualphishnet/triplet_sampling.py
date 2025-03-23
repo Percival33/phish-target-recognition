@@ -105,9 +105,16 @@ def get_batch_for_phase2(
 
 
 def dataset_generator(
-    targetHelper, X_train_legit, X_train_new, labels_start_end_train, batch_size, train_fixed_set, num_targets
+    targetHelper,
+    X_train_legit,
+    X_train_new,
+    labels_start_end_train,
+    batch_size,
+    train_fixed_set,
+    num_targets,
+    gen_length,
 ):
-    while True:
+    for _ in range(gen_length):
         triple = get_triple_for_phase2(
             targetHelper,
             X_train_legit,

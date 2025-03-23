@@ -15,8 +15,10 @@ class RandomSampling:
         self.labels_start_end_test_phish = labels_start_end_test_phish
         self.labels_start_end_train_legit = labels_start_end_train_legit
 
-    def dataset_generator(self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets):
-        while True:
+    def dataset_generator(
+        self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets, gen_length
+    ):
+        for _ in range(gen_length):
             triple = self._get_triple(
                 X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
             )

@@ -50,14 +50,18 @@ def train_phase1(run, args):
     # create model
     modelHelper = ModelHelper()
     # with tf.profiler.experimental.Trace("model_loading", step_num=1):
+    gpus = 0
     if args.multi_gpu:
         strategy = tf.distribute.MirroredStrategy()
         logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
+        gpus = strategy.num_replicas_in_sync
         with strategy.scope():
             model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
     else:
         model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
-
+        gpus = 1
+    assert gpus >= 1
+    logger.info(f"Gpus: {gpus}")
     logger.debug("Model prepared")
 
     # order random array? -> po co?
@@ -80,11 +84,9 @@ def train_phase1(run, args):
         labels_start_end_train_legit,
     )
     logger.debug("Random sampling initialized")
-    # training
-    logger.info("Starting training process! - phase 1")
-
     # targets_train = np.zeros([args.batch_size, 1])
     run.log({"lr": args.lr})
+    logger.debug(f"Generator items: {data.get_samples_number(args.n_iter, args.batch_size, gpus)}")
 
     # TODO: batch_size * strategy.num_replicas_in_sync
     dataset = (
@@ -96,6 +98,7 @@ def train_phase1(run, args):
                 X_train_phish,
                 labels_start_end_train_legit,
                 args.num_targets,
+                data.get_samples_number(args.n_iter, args.batch_size, gpus),
             ),
             output_signature=(
                 (
@@ -110,14 +113,17 @@ def train_phase1(run, args):
         .prefetch(tf.data.AUTOTUNE)
     )
 
-    print(type(dataset))
+    # print(type(dataset))
 
     iterator = iter(dataset)
-    for _ in range(2):
-        inputs, targets = next(iterator)
-        logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
-        inputs, targets = next(iterator)
-        logger.debug(f"SECOND Inputs: {len(inputs)}, Targets: {targets.shape}")
+    # for _ in range(2):
+    #     inputs, targets = next(iterator)
+    #     logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
+    #     inputs, targets = next(iterator)
+    #     logger.debug(f"SECOND Inputs: {len(inputs)}, Targets: {targets.shape}")
+
+    # training
+    logger.info("Starting training process! - phase 1")
 
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
     for i in range(1, args.n_iter):
@@ -250,14 +256,19 @@ def train_phase2(run, args):
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
     total_iterations = 0
-
+    gpus = 0
     if args.multi_gpu:
         strategy = tf.distribute.MirroredStrategy()
         logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
+        gpus = strategy.num_replicas_in_sync
         with strategy.scope():
             full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
     else:
+        gpus = 1
         full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
+
+    assert gpus >= 1
+    logger.info(f"Gpus: {gpus}")
 
     # for k in tqdm(range(0, args.num_sets), desc="Sets"):
     for k in range(0, args.num_sets):
@@ -300,6 +311,7 @@ def train_phase2(run, args):
                         args.batch_size,
                         fixed_set,
                         args.num_targets,
+                        data.get_samples_number(args.n_iter, args.batch_size, gpus),
                     ),
                     output_signature=(
                         (
