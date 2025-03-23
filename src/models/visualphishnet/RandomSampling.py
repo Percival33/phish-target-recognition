@@ -26,6 +26,7 @@ class RandomSampling:
                 triple[2],
                 dtype=tf.float32,
             ),
+            tf.convert_to_tensor(0, dtype=tf.float32),
         )
 
     def _get_triple(self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets):

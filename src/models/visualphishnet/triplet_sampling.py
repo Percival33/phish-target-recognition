@@ -130,4 +130,8 @@ def dataset_generator(
                 triple[2],
                 dtype=tf.float32,
             ),
+            tf.convert_to_tensor(
+                0,
+                dtype=tf.float32,
+            ),
         )

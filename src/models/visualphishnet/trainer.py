@@ -97,7 +97,12 @@ def train_phase1(run, args):
                 labels_start_end_train_legit,
                 args.num_targets,
             ),
-            output_signature=(tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32)),
+            output_signature=(
+                tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                tf.TensorSpec(shape=(), dtype=tf.float32),
+            ),
         )
         .batch(args.batch_size)
         .prefetch(tf.data.AUTOTUNE)
@@ -288,7 +293,10 @@ def train_phase2(run, args):
                         args.hard_n_iter,
                     ),
                     output_signature=(
-                        tf.TensorSpec(shape=(3, args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32)
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(), dtype=tf.float32),
                     ),
                 )
                 .batch(args.batch_size)
