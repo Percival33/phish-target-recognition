@@ -1,0 +1,13 @@
+# .pre-commit-config.yaml
+repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.4  # Use the latest version from https://github.com/astral-sh/ruff-pre-commit/releases
+    hooks:
+    -   id: ruff
+        args: [--fix]
+    -   id: ruff-format
+    # Use types_or so Ruff will run on both Python and Jupyter files
+    types_or: [python, jupyter]
+
+# This ensures the hooks run on push as well as commit
+default_stages: [pre-commit, pre-push]

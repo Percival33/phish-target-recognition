@@ -311,6 +311,10 @@ def order_random_array(orig_arr, y_orig_arr, targets):
     # return np_sorted_arr, np_y_sorted_arr
 
 
+def get_samples_number(iters, batch_size, gpus):
+    return iters * batch_size * gpus
+
+
 if __name__ == "__main__":
     setup_logging()
     parser = ArgumentParser()

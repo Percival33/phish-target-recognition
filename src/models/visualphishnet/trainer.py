@@ -1,5 +1,6 @@
 import gc
 import logging
+import threading
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from HardSubsetSampling import HardSubsetSampling
 from ModelHelper import ModelHelper
 from RandomSampling import RandomSampling
 from TargetHelper import TargetHelper
-from triplet_sampling import get_batch_for_phase2
+from triplet_sampling import dataset_generator
 
 
 def train_phase1(run, args):
@@ -50,7 +51,18 @@ def train_phase1(run, args):
     # create model
     modelHelper = ModelHelper()
     # with tf.profiler.experimental.Trace("model_loading", step_num=1):
-    model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+    gpus = 0
+    if args.multi_gpu:
+        strategy = tf.distribute.MirroredStrategy()
+        logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
+        gpus = strategy.num_replicas_in_sync
+        with strategy.scope():
+            model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+    else:
+        model = modelHelper.prepare_model(args.input_shape, args.new_conv_params, args.margin, args.lr)
+        gpus = 1
+    assert gpus >= 1
+    logger.info(f"Gpus: {gpus}")
     logger.debug("Model prepared")
 
     # order random array? -> po co?
@@ -58,7 +70,7 @@ def train_phase1(run, args):
     X_train_phish, y_train_phish = data.order_random_array(X_train_phish, y_train_phish, args.num_targets)
     logger.debug("Phishing arrays ordered")
 
-    # labels_start_end_train_phish, labels_start_end_test_phish
+    # labels_start_end_train_phish, labels_start_end_test_p1hish
     labels_start_end_train_phish = data.targets_start_end(args.num_targets, y_train_phish)
     labels_start_end_test_phish = data.targets_start_end(args.num_targets, y_test_phish)
     # labels_start_end_train_legit
@@ -73,27 +85,79 @@ def train_phase1(run, args):
         labels_start_end_train_legit,
     )
     logger.debug("Random sampling initialized")
+    # targets_train = np.zeros([args.batch_size, 1])
+    run.log({"lr": args.lr})
+    logger.debug(f"Generator items: {data.get_samples_number(args.n_iter, args.batch_size, gpus)}")
+
+    def wrapper():
+        return randomSampling.dataset_generator(
+            X_train_legit,
+            y_train_legit,
+            X_train_phish,
+            labels_start_end_train_legit,
+            args.num_targets,
+            data.get_samples_number(args.n_iter, args.batch_size, gpus),
+        )
+
+    try:
+        dataset = (
+            tf.data.Dataset.from_generator(
+                wrapper,
+                output_signature=(
+                    (
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                    ),
+                    tf.TensorSpec(shape=(), dtype=tf.float32),
+                ),
+            )
+            .batch(args.batch_size)
+            .prefetch(tf.data.AUTOTUNE)
+        )
+        iterator = dataset.as_numpy_iterator()
+
+        def test_iterator_with_timeout():
+            try:
+                inputs, targets = next(iterator)
+                return True
+            except Exception as e:
+                logger.error(f"Iterator error: {e}")
+                return False
+
+        timer = threading.Timer(30.0, lambda: logger.error("Iterator test timed out"))
+        timer.start()
+        success = test_iterator_with_timeout()
+        timer.cancel()
+        if not success:
+            raise Exception("Iterator test failed - TIMEOUT")
+    except Exception as e:
+        logger.error(f"Dataset creation failed: {e}")
+        print(f"CRITICAL ERROR: {e}")
+        import traceback
+
+        traceback.print_exc()
+        logger.error(f"Dataset creation failed: {e}")
+
+    # print(type(dataset))
+
+    # iterator = dataset.as_numpy_iterator()
+    # for _ in range(2):
+    #     inputs, targets = next(iterator)
+    #     logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
+    #     inputs, targets = next(iterator)
+    #     logger.debug(f"SECOND Inputs: {len(inputs)}, Targets: {targets.shape}")
+
     # training
     logger.info("Starting training process! - phase 1")
 
-    targets_train = np.zeros([args.batch_size, 1])
-    run.log({"lr": args.lr})
-
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
-    for i in range(1, args.n_iter):
+    for i, (inputs, targets) in enumerate(dataset, start=1):
+        logger.debug(f"Iter: {i}")
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
-        inputs = randomSampling.get_batch(
-            targetHelper=targetHelper,
-            X_train_legit=X_train_legit,
-            y_train_legit=y_train_legit,
-            X_train_phish=X_train_phish,
-            labels_start_end_train_legit=labels_start_end_train_legit,
-            batch_size=args.batch_size,
-            num_targets=args.num_targets,
-        )
-
+        logger.debug(f"Inputs: {len(inputs)}, Targets: {targets.shape}")
         # with tf.profiler.experimental.Trace("training", step_num=i):
-        loss_value = model.train_on_batch(inputs, targets_train)
+        loss_value = model.train_on_batch(inputs, targets)
 
         if i % 100 == 0:
             logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
@@ -192,7 +256,6 @@ def train_phase2(run, args):
 
     modelHelper = ModelHelper()
     # with tf.profiler.experimental.Trace("model_loading2", step_num=1):
-    full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
 
     hard_subset_sampling = HardSubsetSampling()
     #########################################################################################
@@ -213,13 +276,27 @@ def train_phase2(run, args):
     )
     y_train_new = np.zeros([args.num_targets * 2 * n, 1])
 
-    targets_train = np.zeros([args.batch_size, 1])
+    # targets_train = np.zeros([args.batch_size, 1])
 
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
     total_iterations = 0
+    gpus = 0
+    if args.multi_gpu:
+        strategy = tf.distribute.MirroredStrategy()
+        logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
+        gpus = strategy.num_replicas_in_sync
+        with strategy.scope():
+            full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
+    else:
+        gpus = 1
+        full_model = modelHelper.load_trained_model(args.output_dir, args.saved_model_name, args.margin, args.lr)
+
+    assert gpus >= 1
+    logger.info(f"Gpus: {gpus}")
+
     # for k in tqdm(range(0, args.num_sets), desc="Sets"):
-    for k in range(0, args.num_sets):
+    for k in range(args.num_sets):
         logger.info(f"Starting a new set! - {k}")
         X_train_legit = all_imgs_train
         y_train_legit = all_labels_train
@@ -247,21 +324,39 @@ def train_phase2(run, args):
             )
 
             # for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations"):
-            for i in range(1, args.hard_n_iter):
-                total_iterations += 1
-                # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
-                inputs = get_batch_for_phase2(
-                    targetHelper=targetHelper,
-                    X_train_legit=X_train_legit,
-                    X_train_new=X_train_new,
-                    labels_start_end_train=labels_start_end_train,
-                    batch_size=args.batch_size,
-                    train_fixed_set=fixed_set,
-                    num_targets=args.num_targets,
+            def wrapper():
+                return dataset_generator(
+                    targetHelper,
+                    X_train_legit,
+                    X_train_new,
+                    labels_start_end_train,
+                    args.batch_size,
+                    fixed_set,
+                    args.num_targets,
+                    data.get_samples_number(args.hard_n_iter, args.batch_size, gpus),
                 )
 
+            phase2_dataset = (
+                tf.data.Dataset.from_generator(
+                    wrapper,
+                    output_signature=(
+                        (
+                            tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                            tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                            tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        ),
+                        tf.TensorSpec(shape=(), dtype=tf.float32),
+                    ),
+                )
+                .batch(args.batch_size)
+                .prefetch(tf.data.AUTOTUNE)
+            )
+
+            for i, (inputs, targets) in enumerate(phase2_dataset, start=1):
+                total_iterations += 1
+                # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
                 # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
-                loss_iteration = full_model.train_on_batch(inputs, targets_train)
+                loss_iteration = full_model.train_on_batch(inputs, targets)
 
                 if total_iterations % 100 == 0:
                     logger.info(f"Memory usage {modelHelper.get_model_memory_usage(args.batch_size, model)}")
@@ -334,16 +429,25 @@ def train_phase2(run, args):
 
 
 def reset_keras(model):
-    # Clear the Keras backend
-    tf.keras.backend.clear_session()
+    if hasattr(K, "clear_session"):
+        K.clear_session()  # This is the proper way to reset in TF2.x
 
-    try:
-        del model  # this is from global space - change this as you need
-    except:
-        pass
+    # try:
+    #     gpus = tf.config.list_physical_devices("GPU")
+    #     for gpu in gpus:
+    #         tf.config.experimental.set_memory_growth(gpu, True)
+    # except:
+    #     # No GPUs available or other error
+    #     pass
+    #
+    #     # Clean up the model
+    # try:
+    #     del model  # this is from global space - change this as you need
+    # except:  # noqa: E722
+    #     pass
 
     # Force garbage collection
-    print(gc.collect())  # if it's done something you should see a number being outputted
+    print(gc.collect())
 
     # In TF 2.x, GPU memory management is different
     # Use the following if you need explicit GPU memory management
@@ -364,6 +468,8 @@ if __name__ == "__main__":
     setup_logging()
     logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
+
+    tf.keras.utils.set_random_seed(42)
 
     init_parser = ArgumentParser(add_help=False)
     # TODO: enable wandb sweep
@@ -410,15 +516,16 @@ if __name__ == "__main__":
         parser.add_argument("--num-sets", type=int, default=75)
         parser.add_argument("--iter-per-set", type=int, default=8)
         parser.add_argument("--hard-n-iter", type=int, default=30)
+        parser.add_argument("--multi-gpu", action="store_true")
 
         args = parser.parse_args()
 
-        # run = wandb.init(
-        #     project="VisualPhish",
-        #     group="visualphishnet",
-        #     config=args,
-        #     tags=["jarvis", "phase-1"],
-        # )
+        run = wandb.init(
+            project="VisualPhish",
+            group="visualphishnet",
+            config=args,
+            tags=["jarvis", "phase-1"],
+        )
         try:
             # debug_dump_dir = args.logdir / "debug_dump"
             # debug_dump_dir.mkdir(parents=True, exist_ok=True)
@@ -432,9 +539,9 @@ if __name__ == "__main__":
             #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
             # )
             # tf.profiler.experimental.start(str(args.logdir), options=options)
-            # train_phase1(run, args)
+            train_phase1(run, args)
             # tf.profiler.experimental.stop()
-            # run.finish()
+            run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
             args.n_iter = 18_000
@@ -445,8 +552,8 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
-            artifact = run.use_artifact("jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10", type="model")
-            artifact_dir = artifact.download(args.output_dir)
+            # artifact = run.use_artifact("jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10", type="model")
+            # artifact_dir = artifact.download(args.output_dir)
 
             # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)

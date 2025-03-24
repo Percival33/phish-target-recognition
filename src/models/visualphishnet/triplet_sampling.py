@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 # TODO: refactor to HardSubsetSampling.py
 
@@ -36,6 +37,42 @@ def pick_neg_img(labels_start_end_train, X_train_new, anchor_idx, num_targets):
     return img, diff_target
 
 
+def get_triple_for_phase2(
+    targetHelper, X_train_legit, X_train_new, labels_start_end_train, train_fixed_set, num_targets
+):
+    h = X_train_legit.shape[1]
+    w = X_train_legit.shape[2]
+    triple = [np.zeros((h, w, 3)) for _ in range(3)]
+    img_idx_pair1 = pick_first_img_idx(labels_start_end_train, num_targets)
+    triple[0][:, :, :] = train_fixed_set[img_idx_pair1, :]
+    img_label = img_idx_pair1
+
+    # get image for the second: positive
+    triple[1][:, :, :] = pick_pos_img_idx(
+        labels_start_end_train=labels_start_end_train,
+        X_train_new=X_train_new,
+        img_label=img_label,
+    )
+
+    # get image for the third: negative from legit
+    img_neg, label_neg = pick_neg_img(
+        labels_start_end_train=labels_start_end_train,
+        X_train_new=X_train_new,
+        anchor_idx=img_label,
+        num_targets=num_targets,
+    )
+    while targetHelper.check_if_same_category(img_label, label_neg) == 1:
+        img_neg, label_neg = pick_neg_img(
+            labels_start_end_train=labels_start_end_train,
+            X_train_new=X_train_new,
+            anchor_idx=img_label,
+            num_targets=num_targets,
+        )
+
+    triple[2][:, :, :] = img_neg
+    return triple
+
+
 def get_batch_for_phase2(
     targetHelper,
     X_train_legit,
@@ -48,35 +85,48 @@ def get_batch_for_phase2(
     # initialize 3 empty arrays for the input image batch
     h = X_train_legit.shape[1]
     w = X_train_legit.shape[2]
-    triple = [np.zeros((batch_size, h, w, 3)) for i in range(3)]
+    triples = [np.zeros((batch_size, h, w, 3)) for i in range(3)]
 
     for i in range(0, batch_size):
-        img_idx_pair1 = pick_first_img_idx(labels_start_end_train, num_targets)
-        triple[0][i, :, :, :] = train_fixed_set[img_idx_pair1, :]
-        img_label = img_idx_pair1
-
-        # get image for the second: positive
-        triple[1][i, :, :, :] = pick_pos_img_idx(
-            labels_start_end_train=labels_start_end_train,
-            X_train_new=X_train_new,
-            img_label=img_label,
-        )
-
-        # get image for the third: negative from legit
-        img_neg, label_neg = pick_neg_img(
-            labels_start_end_train=labels_start_end_train,
-            X_train_new=X_train_new,
-            anchor_idx=img_label,
-            num_targets=num_targets,
-        )
-        while targetHelper.check_if_same_category(img_label, label_neg) == 1:
-            img_neg, label_neg = pick_neg_img(
-                labels_start_end_train=labels_start_end_train,
-                X_train_new=X_train_new,
-                anchor_idx=img_label,
-                num_targets=num_targets,
+        for j, img in enumerate(
+            get_triple_for_phase2(
+                targetHelper,
+                X_train_legit,
+                X_train_new,
+                labels_start_end_train,
+                train_fixed_set,
+                num_targets,
             )
+        ):
+            triples[j][i, :, :, :] = img
 
-        triple[2][i, :, :, :] = img_neg
+    return triples
 
-    return triple
+
+def dataset_generator(
+    targetHelper,
+    X_train_legit,
+    X_train_new,
+    labels_start_end_train,
+    batch_size,
+    train_fixed_set,
+    num_targets,
+    gen_length,
+):
+    for _ in range(gen_length):
+        triple = get_triple_for_phase2(
+            targetHelper,
+            X_train_legit,
+            X_train_new,
+            labels_start_end_train,
+            train_fixed_set,
+            num_targets,
+        )
+        yield (
+            (
+                tf.convert_to_tensor(triple[0], dtype=tf.float32),
+                tf.convert_to_tensor(triple[1], dtype=tf.float32),
+                tf.convert_to_tensor(triple[2], dtype=tf.float32),
+            ),
+            tf.convert_to_tensor(0, dtype=tf.float32),
+        )
