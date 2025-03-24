@@ -5,7 +5,7 @@ import logging.config
 from pathlib import Path
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[4]
+PROJ_ROOT = Path(__file__).resolve().parents[8]
 print(PROJ_ROOT)
 DATA_DIR = PROJ_ROOT / "data"
 LOGS_DIR = PROJ_ROOT / "logs"

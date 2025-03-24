@@ -1,4 +1,8 @@
+import logging
+
 import numpy as np
+import tensorflow as tf
+from tools.config import setup_logging
 
 
 class RandomSampling:
@@ -13,8 +17,48 @@ class RandomSampling:
         self.labels_start_end_train_phish = labels_start_end_train_phish
         self.labels_start_end_test_phish = labels_start_end_test_phish
         self.labels_start_end_train_legit = labels_start_end_train_legit
+        setup_logging()
+        self.logger = logging.getLogger(__name__)
 
-    # sample triplets
+    def dataset_generator(
+        self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets, gen_length
+    ):
+        self.logger.debug("Generator started")
+        for _ in range(gen_length):
+            triple = self._get_triple(
+                X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
+            )
+            self.logger.debug("Generator step {}".format(_))
+            yield (
+                (
+                    tf.convert_to_tensor(triple[0], dtype=tf.float32),
+                    tf.convert_to_tensor(triple[1], dtype=tf.float32),
+                    tf.convert_to_tensor(triple[2], dtype=tf.float32),
+                ),
+                tf.convert_to_tensor(0, dtype=tf.float32),
+            )
+
+    def _get_triple(self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets):
+        # initialize 3 empty arrays for the input image batch
+        h = X_train_legit.shape[1]
+        w = X_train_legit.shape[2]
+        triple = [np.zeros((h, w, 3)) for _ in range(3)]
+        img_idx_pair1 = self.pick_first_img_idx(labels_start_end_train_legit, num_targets)
+        triple[0][:, :, :] = X_train_legit[img_idx_pair1, :]
+        img_label = int(y_train_legit[img_idx_pair1])
+
+        # get image for the second: positive
+        triple[1][:, :, :] = self.pick_pos_img_idx(X_train_legit, X_train_phish, 0.15, img_label)
+
+        # get image for the third: negative from legit
+        # don't sample from the same cluster
+        img_neg, label_neg = self.pick_neg_img(X_train_legit, img_label, num_targets)
+        while self.targetHelper.check_if_same_category(img_label, label_neg) == 1:
+            img_neg, label_neg = self.pick_neg_img(X_train_legit, img_label, num_targets)
+
+        triple[2][:, :, :] = img_neg
+
+        return triple
 
     def get_batch(
         self,
@@ -29,27 +73,18 @@ class RandomSampling:
         # initialize 3 empty arrays for the input image batch
         h = X_train_legit.shape[1]
         w = X_train_legit.shape[2]
-        triple = [np.zeros((batch_size, h, w, 3)) for i in range(3)]
+        triplets = [np.zeros((batch_size, h, w, 3)) for i in range(3)]
 
         # TODO: simplify this by creating a dict with targets
         # https://github.com/lindsey98/PhishingBaseline/blob/main/VisualPhishnet/visualphish_model.py#L43
         for i in range(batch_size):
-            img_idx_pair1 = self.pick_first_img_idx(labels_start_end_train_legit, num_targets)
-            triple[0][i, :, :, :] = X_train_legit[img_idx_pair1, :]
-            img_label = int(y_train_legit[img_idx_pair1])
+            triple = self._get_triple(
+                X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
+            )
+            for j, img in enumerate(triple):
+                triplets[j][i, :, :, :] = img
 
-            # get image for the second: positive
-            triple[1][i, :, :, :] = self.pick_pos_img_idx(X_train_legit, X_train_phish, 0.15, img_label)
-
-            # get image for the third: negative from legit
-            # don't sample from the same cluster
-            img_neg, label_neg = self.pick_neg_img(X_train_legit, img_label, num_targets)
-            while targetHelper.check_if_same_category(img_label, label_neg) == 1:
-                img_neg, label_neg = self.pick_neg_img(X_train_legit, img_label, num_targets)
-
-            triple[2][i, :, :, :] = img_neg
-
-        return triple
+        return triplets
 
     @staticmethod
     # Sample anchor, positive and negative images
