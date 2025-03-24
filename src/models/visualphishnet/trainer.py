@@ -152,7 +152,7 @@ def train_phase1(run, args):
     logger.info("Starting training process! - phase 1")
 
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
-    for i, (inputs, targets) in enumerate(dataset):
+    for i, (inputs, targets) in enumerate(dataset, start=1):
         logger.debug(f"Iter: {i}")
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
         logger.debug(f"Inputs: {len(inputs)}, Targets: {targets.shape}")
@@ -352,7 +352,7 @@ def train_phase2(run, args):
                 .prefetch(tf.data.AUTOTUNE)
             )
 
-            for i, (inputs, targets) in enumerate(phase2_dataset):
+            for i, (inputs, targets) in enumerate(phase2_dataset, start=1):
                 total_iterations += 1
                 # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
                 # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
@@ -539,9 +539,9 @@ if __name__ == "__main__":
             #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
             # )
             # tf.profiler.experimental.start(str(args.logdir), options=options)
-            # train_phase1(run, args)
+            train_phase1(run, args)
             # tf.profiler.experimental.stop()
-            # run.finish()
+            run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
             args.n_iter = 18_000
