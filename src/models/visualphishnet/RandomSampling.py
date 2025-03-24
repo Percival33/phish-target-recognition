@@ -1,5 +1,8 @@
+import logging
+
 import numpy as np
 import tensorflow as tf
+from tools.config import setup_logging
 
 
 class RandomSampling:
@@ -14,14 +17,18 @@ class RandomSampling:
         self.labels_start_end_train_phish = labels_start_end_train_phish
         self.labels_start_end_test_phish = labels_start_end_test_phish
         self.labels_start_end_train_legit = labels_start_end_train_legit
+        setup_logging()
+        self.logger = logging.getLogger(__name__)
 
     def dataset_generator(
         self, X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets, gen_length
     ):
+        self.logger.debug("Generator started")
         for _ in range(gen_length):
             triple = self._get_triple(
                 X_train_legit, y_train_legit, X_train_phish, labels_start_end_train_legit, num_targets
             )
+            self.logger.debug("Generator step {}".format(_))
             yield (
                 (
                     tf.convert_to_tensor(triple[0], dtype=tf.float32),

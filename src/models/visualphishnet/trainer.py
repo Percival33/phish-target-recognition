@@ -1,5 +1,6 @@
 import gc
 import logging
+import threading
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -88,34 +89,59 @@ def train_phase1(run, args):
     run.log({"lr": args.lr})
     logger.debug(f"Generator items: {data.get_samples_number(args.n_iter, args.batch_size, gpus)}")
 
-    # TODO: batch_size * strategy.num_replicas_in_sync
-    dataset = (
-        tf.data.Dataset.from_generator(
-            randomSampling.dataset_generator,
-            args=(
-                X_train_legit,
-                y_train_legit,
-                X_train_phish,
-                labels_start_end_train_legit,
-                args.num_targets,
-                data.get_samples_number(args.n_iter, args.batch_size, gpus),
-            ),
-            output_signature=(
-                (
-                    tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                    tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                    tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
-                ),
-                tf.TensorSpec(shape=(), dtype=tf.float32),
-            ),
+    def wrapper():
+        return randomSampling.dataset_generator(
+            X_train_legit,
+            y_train_legit,
+            X_train_phish,
+            labels_start_end_train_legit,
+            args.num_targets,
+            data.get_samples_number(args.n_iter, args.batch_size, gpus),
         )
-        .batch(args.batch_size, num_parallel_calls=tf.data.AUTOTUNE)
-        .prefetch(tf.data.AUTOTUNE)
-    )
+
+    try:
+        dataset = (
+            tf.data.Dataset.from_generator(
+                wrapper,
+                output_signature=(
+                    (
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                        tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
+                    ),
+                    tf.TensorSpec(shape=(), dtype=tf.float32),
+                ),
+            )
+            .batch(args.batch_size)
+            .prefetch(tf.data.AUTOTUNE)
+        )
+        iterator = dataset.as_numpy_iterator()
+
+        def test_iterator_with_timeout():
+            try:
+                inputs, targets = next(iterator)
+                return True
+            except Exception as e:
+                logger.error(f"Iterator error: {e}")
+                return False
+
+        timer = threading.Timer(30.0, lambda: logger.error("Iterator test timed out"))
+        timer.start()
+        success = test_iterator_with_timeout()
+        timer.cancel()
+        if not success:
+            raise Exception("Iterator test failed - TIMEOUT")
+    except Exception as e:
+        logger.error(f"Dataset creation failed: {e}")
+        print(f"CRITICAL ERROR: {e}")
+        import traceback
+
+        traceback.print_exc()
+        logger.error(f"Dataset creation failed: {e}")
 
     # print(type(dataset))
 
-    iterator = dataset.as_numpy_iterator()
+    # iterator = dataset.as_numpy_iterator()
     # for _ in range(2):
     #     inputs, targets = next(iterator)
     #     logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
@@ -126,10 +152,9 @@ def train_phase1(run, args):
     logger.info("Starting training process! - phase 1")
 
     # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
-    for i in range(1, args.n_iter):
+    for i, (inputs, targets) in enumerate(dataset):
         logger.debug(f"Iter: {i}")
         # with tf.profiler.experimental.Trace("next_batch", step_num=i):
-        inputs, targets = next(iterator)
         logger.debug(f"Inputs: {len(inputs)}, Targets: {targets.shape}")
         # with tf.profiler.experimental.Trace("training", step_num=i):
         loss_value = model.train_on_batch(inputs, targets)
@@ -299,20 +324,21 @@ def train_phase2(run, args):
             )
 
             # for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations"):
+            def wrapper():
+                return dataset_generator(
+                    targetHelper,
+                    X_train_legit,
+                    X_train_new,
+                    labels_start_end_train,
+                    args.batch_size,
+                    fixed_set,
+                    args.num_targets,
+                    data.get_samples_number(args.hard_n_iter, args.batch_size, gpus),
+                )
 
             phase2_dataset = (
                 tf.data.Dataset.from_generator(
-                    dataset_generator,
-                    args=(
-                        targetHelper,
-                        X_train_legit,
-                        X_train_new,
-                        labels_start_end_train,
-                        args.batch_size,
-                        fixed_set,
-                        args.num_targets,
-                        data.get_samples_number(args.n_iter, args.batch_size, gpus),
-                    ),
+                    wrapper,
                     output_signature=(
                         (
                             tf.TensorSpec(shape=(args.input_shape[0], args.input_shape[1], 3), dtype=tf.float32),
@@ -325,13 +351,10 @@ def train_phase2(run, args):
                 .batch(args.batch_size)
                 .prefetch(tf.data.AUTOTUNE)
             )
-            iterator = phase2_dataset.as_numpy_iterator()
 
-            for i in range(args.hard_n_iter):
+            for i, (inputs, targets) in enumerate(phase2_dataset):
                 total_iterations += 1
                 # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
-                inputs, targets = next(iterator)
-
                 # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
                 loss_iteration = full_model.train_on_batch(inputs, targets)
 
@@ -406,20 +429,25 @@ def train_phase2(run, args):
 
 
 def reset_keras(model):
-    # Clear the Keras backend
+    if hasattr(K, "clear_session"):
+        K.clear_session()  # This is the proper way to reset in TF2.x
 
-    K.get_session().close()
-    cfg = K.tf.ConfigProto()
-    cfg.gpu_options.allow_growth = True
-    K.set_session(K.tf.Session(config=cfg))
-
-    try:
-        del model  # this is from global space - change this as you need
-    except:  # noqa: E722
-        pass
+    # try:
+    #     gpus = tf.config.list_physical_devices("GPU")
+    #     for gpu in gpus:
+    #         tf.config.experimental.set_memory_growth(gpu, True)
+    # except:
+    #     # No GPUs available or other error
+    #     pass
+    #
+    #     # Clean up the model
+    # try:
+    #     del model  # this is from global space - change this as you need
+    # except:  # noqa: E722
+    #     pass
 
     # Force garbage collection
-    print(gc.collect())  # if it's done something you should see a number being outputted
+    print(gc.collect())
 
     # In TF 2.x, GPU memory management is different
     # Use the following if you need explicit GPU memory management
@@ -511,9 +539,9 @@ if __name__ == "__main__":
             #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
             # )
             # tf.profiler.experimental.start(str(args.logdir), options=options)
-            train_phase1(run, args)
+            # train_phase1(run, args)
             # tf.profiler.experimental.stop()
-            run.finish()
+            # run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
             args.n_iter = 18_000
