@@ -1,4 +1,4 @@
-from ..ModelServing import ModelServing
+from ModelServing import ModelServing
 
 
 class PhishpediaServing(ModelServing):
@@ -15,4 +15,6 @@ app = serving.app
 
 if __name__ == "__main__":
     serving.run()
-# uv run fastapi run PhishpediaServing.py
+
+# in api folder
+# uv run python -m phishpedia.PhishpediaServing

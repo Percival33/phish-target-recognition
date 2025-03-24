@@ -3,11 +3,16 @@ COPY --from=ghcr.io/astral-sh/uv:0.5.15 /uv /uvx /bin/
 
 WORKDIR /code
 
-COPY ../uv.lock /code/uv.lock
-COPY .//pyproject.toml /code/pyproject.toml
+COPY uv.lock /code/uv.lock
+COPY pyproject.toml /code/pyproject.toml
 
-RUN uv pip install --system --no-cache-dir -r pyproject.toml --extra visualphish
+RUN uv pip install --system --no-cache-dir -r pyproject.toml --extra visualphishnet
+RUN mkdir -p /code/app
 
-COPY VisualPhishServing.py /code/app
+COPY ModelServing.py /code
+COPY __init__.py /code
+
+COPY visualphishnet/VisualPhishServing.py /code/app
+
 
 CMD ["python", "-m", "app.VisualPhishServing"]

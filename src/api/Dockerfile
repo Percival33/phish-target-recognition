@@ -9,6 +9,6 @@ COPY ./pyproject.toml /code/pyproject.toml
 
 RUN uv pip install --system --no-cache-dir -r pyproject.toml
 
-COPY . /code/app
+COPY *.py /code/app
 
 CMD ["uv", "run", "python", "-m", "app.main"]

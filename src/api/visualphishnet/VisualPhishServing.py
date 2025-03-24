@@ -1,4 +1,4 @@
-from ..ModelServing import ModelServing
+from ModelServing import ModelServing
 
 
 class VisualPhishServing(ModelServing):
@@ -15,4 +15,6 @@ app = serving.app
 
 if __name__ == "__main__":
     serving.run()
-# uv run fastapi run VisualPhishServing.py
+
+# in api folder
+# uv run python -m visualphishnet.VisualPhishServing
