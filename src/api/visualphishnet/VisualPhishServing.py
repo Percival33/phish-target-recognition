@@ -1,6 +1,5 @@
-import time
 
-from .ModelServing import ModelServing
+from ..ModelServing import ModelServing
 
 
 class VisualPhishServing(ModelServing):
@@ -9,7 +8,6 @@ class VisualPhishServing(ModelServing):
 
     async def predict(self, data: dict):
         """Implementation of the predict method for VisualPhish"""
-        time.sleep(2)
         return {"prediction": "visualphish"}
 
 

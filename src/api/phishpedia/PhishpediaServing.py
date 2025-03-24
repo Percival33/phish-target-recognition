@@ -1,4 +1,5 @@
-from .ModelServing import ModelServing
+from ..ModelServing import ModelServing
+
 
 
 class PhishpediaServing(ModelServing):
