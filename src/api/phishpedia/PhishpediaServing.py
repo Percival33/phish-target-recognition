@@ -1,7 +1,6 @@
 from ..ModelServing import ModelServing
 
 
-
 class PhishpediaServing(ModelServing):
     def __init__(self):
         super().__init__()
