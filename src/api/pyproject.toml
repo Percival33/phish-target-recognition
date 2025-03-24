@@ -9,24 +9,18 @@ dependencies = [
     "httpx>=0.28.1",
 ]
 
-[tool.uv.dependency-groups]
-visualphish = [
+[project.optional-dependencies]
+visualphishnet = [
     "tensorflow==2.13",
 ]
 
-phishpedia = [
-    "torch==1.9.0+cpu",
-    "torchvision==0.10.0+cpu",
-    "torchaudio==0.9.0",
-    "detectron2",
+[dependency-groups]
+dev = [
+    "ruff>=0.11.2",
 ]
-
-[tool.uv.indexes]
-torch_stable = "https://download.pytorch.org/whl/torch_stable.html"
-detectron2 = "https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html"
-
-[tool.uv.sources]
-torch = { index = "torch_stable" }
-torchvision = { index = "torch_stable" }
-torchaudio = { index = "torch_stable" }
-detectron2 = { index = "detectron2" }
+#phishpedia = [
+#    "torch==1.9.0+cpu",
+#    "torchvision==0.10.0+cpu",
+#    "torchaudio==0.9.0",
+#    "detectron2",
+#]
