@@ -53,7 +53,7 @@ def train_phase1(run, args):
     # with tf.profiler.experimental.Trace("model_loading", step_num=1):
     gpus = 0
     if args.multi_gpu:
-        strategy = tf.distribute.MirroredStrategy()
+        strategy = tf.distribute.MirroredStrategy(tf.config.list_logical_devices("GPU"))
         logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
         gpus = strategy.num_replicas_in_sync
         with strategy.scope():
@@ -188,9 +188,14 @@ def train_phase1(run, args):
                 )
 
                 run.log({"acc": acc})
+                logger.info(f"Accuracy: {acc}")
+                del testResults
+                del acc
+
             # with tf.profiler.experimental.Trace("save_model", step_num=i):
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
             run.log_model(args.output_dir / f"{args.saved_model_name}.h5")
+            gc.collect()
 
         if i % args.lr_interval == 0:
             args.lr = 0.99 * args.lr
@@ -283,7 +288,7 @@ def train_phase2(run, args):
     total_iterations = 0
     gpus = 0
     if args.multi_gpu:
-        strategy = tf.distribute.MirroredStrategy()
+        strategy = tf.distribute.MirroredStrategy(tf.config.list_logical_devices("GPU"))
         logger.info("Number of devices: {}".format(strategy.num_replicas_in_sync))
         gpus = strategy.num_replicas_in_sync
         with strategy.scope():
@@ -388,6 +393,8 @@ def train_phase2(run, args):
                     # with tf.profiler.experimental.Trace("save_model2", step_num=i):
                     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
                     run.log_model(args.output_dir / f"{args.new_saved_model_name}.h5")
+                    del testResults
+                    del acc
 
                 if total_iterations % args.lr_interval == 0:
                     args.lr = 0.99 * args.lr
@@ -462,6 +469,23 @@ def reset_keras(model):
 
 
 if __name__ == "__main__":
+    gpus = tf.config.list_physical_devices("GPU")
+    if gpus:
+        # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+        try:
+            tf.config.set_logical_device_configuration(
+                gpus[0],
+                [
+                    tf.config.LogicalDeviceConfiguration(memory_limit=8192),
+                    tf.config.LogicalDeviceConfiguration(memory_limit=8192),
+                ],
+            )
+            logical_gpus = tf.config.list_logical_devices("GPU")
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        except RuntimeError as e:
+            # Virtual devices must be set before GPUs have been initialized
+            print(e)
+
     # gpus = tf.config.experimental.list_physical_devices("GPU")
     # for gpu in gpus:
     #     tf.config.experimental.set_memory_growth(gpu, True)
