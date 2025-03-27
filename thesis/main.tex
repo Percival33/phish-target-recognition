@@ -12,7 +12,13 @@
 
 \graphicspath{{tex/img/}} % Katalog z obrazkami.
 \addbibresource{bibliografia.bib} % Plik .bib z bibliografią
-\usepackage{todonotes}
+\RequirePackage[
+    colorinlistoftodos,
+    textsize=scriptsize
+]{todonotes}
+\RequirePackage{marginnote}
+\let\marginpar\marginnote
+\RequirePackage{placeins}
 %-------------------------------------------------------------
 % Wybór wydziału:
 %  \facultyeiti: Wydział Elektroniki i Technik Informacyjnych

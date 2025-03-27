@@ -25,7 +25,7 @@ Są to między innymi wymagania związane z wydajnością, czy jakością takowe
 \end{itemize}
 
 \subsection{Architektura}
-TODO: opisać diagramy
+\todo[inline]{opisać diagramy} 
 System składa się z trzech głównych modułów: API, klasyfikatora oraz baz danych.
 \begin{figure}[!h]
     % Wyrównanie obrazka, szerokość i plik
@@ -54,21 +54,22 @@ System składa się z trzech głównych modułów: API, klasyfikatora oraz baz d
     \label{fig:diagram-klasyfikatora}
 \end{figure}
 
-\it{Każda metoda będzie implementować interfejs odpowiedzialny za wczytanie danych i zapisanie wyniku. Dodatkowo będzie to oddzielny kontener}
+\textit{Każda metoda będzie implementować interfejs odpowiedzialny za wczytanie danych i zapisanie wyniku. Dodatkowo będzie to oddzielny kontener}
 
 \subsection{Decyzje projektowe}
-TODO: uzasadnić wybór
-Traktowanie modeli jako blackbox -> phish +1 klasa (benign) (najłatwiej tak uogólnić wyniki)
+\todo[inline]{uzasadnić wybór Traktowanie modeli jako blackbox -> phish +1 klasa (benign) (najłatwiej tak uogólnić wyniki)}
 
 \subsubsection{Wybór rozwiązań}
-TODO: opisać czemóóóó
+\todo[inline]{opisać czemóóóó}
 
 Poniżej przedstawiono kolejne wybrane narzędzia wraz z uzasadnieniem i inne rozwiązania, które były brane pod uwagę.
 
 \begin{itemize}
-    \item \bf{Język programowania} - został wybrany język programowania \bf{Python} ze względu na jego popluarność, dużą liczbę istniejących bibliotek oraz fakt, że jest to najczęściej wykorzystywany język w pracach naukowych. Analiza z \cite{golilarz2024learningalgorithmssimple}. 
-    \item \bf{Menadżer zależności} - jest potrzebny żeby tworzyć reprodukowalne środowisko, zwykłe \it{'requirements.txt'} nie wystarcza bo w trakcie developmentu można dodawac nowe paczki, które nie będą ze sobą kompatybilne. uv, poetry, conda, pdm. Wybrano \bf{uv} uv jest najszybszy, wszystkie oferują podobne możliwości. Conda wspiera różne języki na raz. Poetry ma własny format pyproject.toml i jest wolniejsze niż uv. Conda i uv oferują możliwość uruchomienia komend w środowisku. Wirtualne środowisko. Budowanie pakietu. Link: \href{https://github.com/pdm-project/pdm#comparisons-to-other-alternatives}{pdm}
-    \item \bf{api?} - fastapi bo wspiera asynchroniczne taski. Szybsze niz flask i wbudowana walidacja i opis api.
+    \item Język programowania - został wybrany język programowania Python ze względu na jego popluarność, dużą liczbę istniejących bibliotek oraz fakt, że jest to najczęściej wykorzystywany język w pracach naukowych. Analiza z \cite{golilarz2024learningalgorithmssimple}. 
+    \item Menadżer zależności - jest potrzebny żeby tworzyć reprodukowalne środowisko, zwykłe 
+    \it{'requirements.txt'} 
+    nie wystarcza bo w trakcie developmentu można dodawac nowe paczki, które nie będą ze sobą kompatybilne. uv, poetry, conda, pdm. Wybrano \bf{uv} uv jest najszybszy, wszystkie oferują podobne możliwości. Conda wspiera różne języki na raz. Poetry ma własny format pyproject.toml i jest wolniejsze niż uv. Conda i uv oferują możliwość uruchomienia komend w środowisku. Wirtualne środowisko. Budowanie pakietu. Link: \href{https://github.com/pdm-project/pdm#comparisons-to-other-alternatives}{pdm}
+    \item api? - fastapi bo wspiera asynchroniczne taski. Szybsze niz flask i wbudowana walidacja i opis api.
     automatic API documentation generation. Django REST Framework (DRF): Built on top of Django, DRF is a powerful and flexible toolkit for building Web APIs. It's ideal for large-scale projects that require robust authentication, serialization, and comprehensive features (overkill)
     \item \bf{konteneryzacja} - \bf{docker}
     \item \bf{baza danych dla predykcji} - \bf{SQLite} co z minIO?

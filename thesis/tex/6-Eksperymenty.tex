@@ -1,6 +1,17 @@
 \clearpage
 \section{Metodyka badawcza i badania eksperymentalne}
+
+W tym rozdziale zostaną opisane metody oceny konkretnych rozwiązań. Udzielono również odpowiedzi na pytanie, jakich zbiorów danych użyto? Jakie metryki zostały wykorzystane, a także jakie są wyniki poszczególnych modeli? Ponadto zostanie poruszona tematyka dalszego rozwoju systemu.
+
 \subsection{Metodyka badawcza}
+W ramach tej pracy skupiono się na dwóch metodach "zaawansowanych" opisanych szczegółowo we wcześniejszych rozdziałach (\textit{VisualPhishNet} i \textit{Phishpedia}) oraz zestawiono je z metodą bazową.
+\todo[inline]{nadać temu jakąś nazwę}
+Żeby móc ocenić je między sobą, nie tylko na zbiorach danych przygotowanych przez autorów tych prac, postanowiono dokonać predykcji parami każdego zbioru i metody. Rozwiązania wymienione wyżej traktują zadanie rozpoznania phishingu jako zadanie klasyfikacji binarnej, czy dana strona jest prawdziwa? Natomiast założeniem tej pracy jest klasyfikacja wieloklasowa. Nie tylko czy strona jest prawdziwa ale też jak jest strona fałszywa to pod jaki cel się podszywa. Wobec tego pierwszym założeniem jest klasyfikacja wieloklasowa z $N+1$ klasami, gdzie $N$ oznacza liczbę podmiotów chronionych a dodatkowa klasa opisuje klasę prawdziwą z ang \textit{benign}.
+
+
+Z racji różnych wyjść metod, \todo[inline]{vp daje odległości, pp daje 0/1 i pewność sieci syjamskich. Phash daje odległość} zdecydowano się zastosować miarę entropii krzyżowej. Dodatkowo by móc łatwiej porównywać metody binarne F1 do określenia, czy strona jest prawdziwa. Na potrzeby wizualizacji użyto miary ROC AUC
+\todo[inline]{czy uzyc wieloklasowej F1?}
+
 TODO: opis w jakim setupie, na jakich datasetach, posługując się jakimi metrykami i w jaki sposób zostały przeprowadzone badania
 
 \subsection{Ocena jakości poszczególnych modeli}

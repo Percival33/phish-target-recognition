@@ -1,7 +1,7 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Podstawy teoretyczne}
 W tym rozdziale scharakteryzowano podstawy teoretyczne zagrożenia typu phishing jak i pojęć związanych z automatycznycmi systemami, które są wykorzystywane w pracy.
-TODO: uzupełnić wstęp teoretyczny potrzebny do zrozumienia tematyki - co to jest phishing, jakie są metody jego rozpoznawania - pojęcia, pomysły, sieci konowucyjne, sieci syjamskie + transfer learning, deskryptory wizualne, hasze wizualne
+\todo[inline]{uzupełnić wstęp teoretyczny potrzebny do zrozumienia tematyki - co to jest phishing, jakie są metody jego rozpoznawania - pojęcia, pomysły, sieci konowucyjne, sieci syjamskie + transfer learning, deskryptory wizualne, hasze wizualne}
 
 \noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
 
@@ -14,7 +14,8 @@ Przytoczone rozwiązania określają czy strona internetowa jest stroną phishin
 - przykłady
 - kto jest celem
 
-TODO: dodać jakieś inforamcje jak to wygląda w innych krajach np albo jakiś rys historyczny :xD: tak żeby wspomnieć na wstępie o tym że jest to współpraca z CERT Polska
+\todo[inline]{dodać jakieś inforamcje jak to wygląda w innych krajach np albo jakiś rys historyczny :xD: tak żeby wspomnieć na wstępie o tym że jest to współpraca z CERT Polska}
+
 
 \subsection{CERT Polska}
 - co to jest CERT Polska
@@ -62,11 +63,12 @@ Zależy nam na minimalizacji liczby kolizji, czyli przypadków gdy otrzymano tak
 
 Do wykrywania podobnych informacji by wykrywać naruszenia praw autorskich lub wykrywać nielegalne treści, wykorzystuje się technikę zwaną \textit{Locality-sensitive hash}, które mają na celu pogrupowanie elementów tak, że podobne do siebie trafiają do jednej grupy. W tym celu, przeciwnie niż do zastosowań kryptograficznych maksymalizowana jest liczba kolizji. Tak aby bardziej podobne dane wejściowe uzyskały bliższe sobie wartości skrótu, uzyskując przy tym odcisk palca - \textit{fingerprint} \cite{Zauner2010ImplementationAB}.
 
-TODO: czym są deskryptory?
-
+\todo[inline]{czym są deskryptory?}
+\todo[inline]{co to są zanurzenia}
 \subsection{Sieci neuronowe}
 Z racji że rozwiązania opierające się wyłącznie na rozpoznawaniu stron na podstawie kolorów \cite{EMD} jest mało skuteczne, autorzy prac skupiają się na zastosowaniu sieci głębokich a dokładniej sieci konwolucyjnych.
 
+\todo[inline]{opisać sieci syjamnskie}
 
 Sieć konwolucyjna (CNN) jest to klasa sztucznych sieci neuronowych, najczęściej wykorzystywana w zadaniach wizji komputerowej, ze względu na efektywne przetwarzanie danych o strukturze przestrzennej. Kluczowym elementem sieci są warstwy konwolucyjne. Każda z nich zawiera zestaw filtrów, które wykonują operację konwolucji na danych wejściowych. Filtry te uczą się rozpoznawać określone cechy, takie jak krawędzie, tekstury czy bardziej złożone wzory. Filtry sterowane są hiperparametrami, które określają wielkość macierzy, wypełnienie oraz przesunięcie zależne od architektury modelu \cite{alexnet}.
 
@@ -100,6 +102,12 @@ gdzie:
 
 Do rozpoznawania na zrzucie ekranu loga firm i pól tekstowych do wprowadzania danych autorzy wykorzystują model Faster-RCNN \cite{FasterR-CNN} modyfikując go tak aby wspólnie trenować sieć do rozpoznawania regionów i model Fast-RCNN.
 
+\section{Metody miary}
+metryki: Entropia Krzyżowa, F1 (binarne i wieloklasowe), ROC AUC
+
+F1 macro averaged
+
+Zadanie postawione w tej pracy jest problemem klasyfikacji wieloklasowej. Trzeba zbalansować czy chcemy skupić się na tym żeby każda klasa była dobrze odwzorowana czy żeby model częściej miał większą dokładność
 
 
 % % Równanie typu 'inline':
