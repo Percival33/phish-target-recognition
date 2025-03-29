@@ -11,8 +11,6 @@ RUN mkdir -p /code/app
 
 COPY ModelServing.py /code
 COPY __init__.py /code
-
 COPY visualphishnet/VisualPhishServing.py /code/app
-
 
 CMD ["python", "-m", "app.VisualPhishServing"]

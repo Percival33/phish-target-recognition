@@ -20,9 +20,17 @@ visualphishnet = [
 dev = [
     "ruff>=0.11.2",
 ]
-#phishpedia = [
-#    "torch==1.9.0+cpu",
-#    "torchvision==0.10.0+cpu",
-#    "torchaudio==0.9.0",
-#    "detectron2",
-#]
+phishpedia = [
+    "torch==1.9.0+cpu",
+    "torchvision==0.10.0+cpu",
+    "torchaudio==0.9.0",
+    "detectron2",
+]
+
+[tool.uv.package-index.phishpedia-torch]
+url = "https://download.pytorch.org/whl/torch_stable.html"
+package = ["torch", "torchvision", "torchaudio"]
+
+[tool.uv.package-index.phishpedia-detectron2]
+url = "https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html"
+package = ["detectron2"]
