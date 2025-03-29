@@ -9,6 +9,7 @@ SERVICE_PORTS = {
     "phishpedia": os.getenv("PP_PORT", 8888),
 }
 URLS = [f"http://{model}:{SERVICE_PORTS.get(model, 8888)}/predict" for model in MODELS]
+
 router = APIRouter()
 
 

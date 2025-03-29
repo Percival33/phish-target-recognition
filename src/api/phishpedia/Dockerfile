@@ -7,8 +7,8 @@ COPY uv.lock /code/uv.lock
 COPY pyproject.toml /code/pyproject.toml
 
 RUN uv pip install --system --no-cache-dir -r pyproject.toml
-RUN uv pip install --system --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 --index-url https://download.pytorch.org/whl/torch_stable.html
-RUN uv pip install --system --no-cache-dir detectron2 --index-url https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html
+RUN uv pip install --system --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+RUN uv pip install --system --no-cache-dir --prerelease=allow detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html
 RUN mkdir -p /code/app
 
 
