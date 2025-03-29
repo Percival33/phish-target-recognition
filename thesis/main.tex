@@ -12,7 +12,13 @@
 
 \graphicspath{{tex/img/}} % Katalog z obrazkami.
 \addbibresource{bibliografia.bib} % Plik .bib z bibliografią
-\usepackage{todonotes}
+\RequirePackage[
+    colorinlistoftodos,
+    textsize=scriptsize
+]{todonotes}
+\RequirePackage{marginnote}
+\let\marginpar\marginnote
+\RequirePackage{placeins}
 %-------------------------------------------------------------
 % Wybór wydziału:
 %  \facultyeiti: Wydział Elektroniki i Technik Informacyjnych
@@ -86,8 +92,8 @@
 \pagestyle{headings}
 
 \input{tex/1-Wprowadzenie}
-\input{tex/2-Wstęp}
-\input{tex/3-Wymagania}
+\input{tex/2-Wstep}
+\input{tex/3-Przeglad-literatury}
 \input{tex/4-Decyzje-projektowe}
 \input{tex/5-Implementacja}
 \input{tex/6-Eksperymenty}
@@ -107,11 +113,11 @@
 % Makro \acronym dodaje skrót/symbol do listy,
 % zapewniając podstawowe formatowanie.
 \acronymlist
-% TODO: wytłumaczyć co to api
 \acronym{API}{ang. \emph{Application Programming Interface}}
 \acronym{EiTI}{Wydział Elektroniki i Technik Informacyjnych}
+\acronym{JSON}{ang. \emph{JavaScript Object Notation}}
 \acronym{PW}{Politechnika Warszawska}
-\acronym{WEIRD}{ang. \emph{Western, Educated, Industrialized, Rich and Democratic}}
+\acronym{URL}{ang. \emph{unifrom resource locator}}
 \vspace{0.8cm}
 
 %--------------------------------------

@@ -1,20 +1,30 @@
 \clearpage % Rozdziały zaczynamy od nowej strony.
 \section{Wstęp}
-\subsection{Wprowadzenie}
-Wraz z rozwojem internetu i postępem cyfryzacji istnieje coraz więcej stron internetowych, a co za tym idzie, więcej oszustw internetowych.
-Powstają strony phishingowe, które mają na celu wyłudzanie poufnych danych poprzez specjalnie przygotowane wiadomości e-mail lub SMS, 
-które zawierają linki prowadzące na specjalnie przygotowane strony internetowe, łudząco podobne do tych prawdziwych. 
-Zapobieganie tej formie cyberprzestępczości jest jednym z zadań zespołu CERT Polska, pełniącego obowiązki CSIRT\footnote{\textit{Computer Security Incident Response Team} - Zespół Reagowania na Incydenty Bezpieczeństwa Komputerowego}  NASK\cite{certpl}. 
-Do tej pory stosowano różne sposoby zapobiegania oszustwom, w których stosowano podejścia blacklist \cite{google-blacklist}, (również CERT Polska udostępnia listę\footnote{\href{https://cert.pl/lista-ostrzezen/}{https://cert.pl/lista-ostrzezen/}} podejrzanych domen). 
-Oprócz tego wykorzystywane są rozwiązania opierające się na kodzie HTML danej strony np. \cite{PhishZoo}, jednak rozwiązania te są mało efektywne, ponieważ podobne wizualnie strony mogą mieć zupełnie inny kod źródłowy. 
-Celem tego artykułu jest przybliżenie tematyki phishingu w kontekście systemu rozpoznającego atakowany podmiot na podstawie podobieństwa wizualnego.
+
+\todo[inline]{
+- [ ] Ad 1. wstęp jest za krótki i nie ma w nim w zasadzie żadnych cytowań literatury. Można zacząć od ogółu do szczegółu - czyli że w Internecie jest wiele zagrożeń a jednym z najważniejszych jest obecnie phishing (tutaj trzeba podeprzeć się raportami np. CERT i innymi, które to potwierdzają, można przytoczyć statystki). Potem trzeba krótko opisać co jest phishing, na czym polega oraz że należy opracowywać nowe zautomatyzowane sposoby detekcji stron. Poza tym trzeba wyjaśnić dlaczego rozpoznawanie celu podszycia jest istotne i co daje np. CERT.}
+
+
+Wraz z postępęm technologicznym równie szybko postępuje rozwój internetu co przekłada się na rozwój cyfryzacji. Skutkuje to coraz większą liczbą stron internetowych oraz faktem że coraz więcej firm oferuje swoje usługi online. Dodatkowo powstają systemy, które ułatwiają dostęp do danych. 
+Takimi systemami są między innymi systemy bankowe czy też rządowe jak Internetowe Konto Pacjenta (IKP) \footnote{https://pacjent.gov.pl/}. 
+W obliczu takowego rozwoju powstaje również coraz więcej oszustw internetowych. 
+Począwszy od fałszywych sklepów internetowych, złośliwego oprogramowania przez podejrzane załączniki w e-mailach aż do złośliwych domen wyłudzających dane osobowe lub środki finansowe. 
+Te ostatnie nazywane są również phishingiem. Zapobieganie tej formie cyberprzestępczości jest jednym z zadań zespołu CERT Polska \cite{certpl}, z którym nawiązałem współpracę podczas realizacji tej pracy. 
 
 \subsection{Cel pracy}
-TODO: albo motywacja pracy
-Zbadanie tematyki rozpoznawania stron phishingowych na podstawie podobieństwa wizualnego oraz stworzenie systemu, który będzie w stanie rozpoznać cel podszycia strony phishingowej
+Celem niniejszej pracy dyplomowej jest stworzenie systemu rozpoznawania stron phishingowych na podstawie podobieństwa wizualnego oraz rozpoznawanie celu ich podszycia.
+Ma on być zbudowany w celu ułatwienia pracy zespołu CERT Polska w wykrywaniu stron phishingowych, informowaniem o potencjalnych zagrożeniach oraz udaremnianiem ataków.
+System ten ma pozwalać na łatwe dodawanie nowych metod rozpoznawania oraz nowych danych wejściowych.
+Kolejnym celem jest wykorzystanie uczenia maszynowego, które na podstawie wyników z różnych metod, wyda ostateczną decyzję o prawdziwości strony i w przypadku fałszywej strony, rozpozna cel ataku.
+Działania tej organizacji zainspirowały mnie do zgłębienia tematyki phishingu oraz metod ich zapobiegania jako że jest to temat, który dotyka ludzi na co dzień coraz częściej.
+Dodatkowo CERT Polska dostarczył zbiór danych, który posłużył do ewaluacji systemu, stworzonego w tej pracy.
+
+Przy okazji budowania systemu, zostanie przybliżona tematyka phishingu.
+Zostaną zbadane i ewaluowane istniejące rozwiązania rozpoznawania na podstawie podobieństwa wizualnego
 
 \subsection{Struktura pracy}
-TODO: 
+\todo[inline]{poprawić ten tekst, czas przyszły czy przeszły?}
+W rozdziale drugim przedstawiono podstawy teoretyczne, na których opierają się zastosowane rozwiązania z przeglądu literatury naukowej w tym zakresie. Przegląd ten został on przeprowadzony w rozdziale trzecim. Dalej w rozdziale czwartym najpierw wymienione są wymagania wobec systemu i decyzje projektowe, które zostały podjęte aby takowe wymagania spełnić. Kolejny rozdział traktuje o implementacji systemu, w którym opisane są technologie w zrealizowanym systemie a także opis w jaki sposób zostały one zintegrowane ze sobą. W rozdziale szóstym opisane są eksperymenty, które zostały przeprowadzone w celu sprawdzenia skuteczności systemu. Zostały tam porównane każda z metod na każdym zbiorze danych z literatury naukowej oraz na zbiorze przygotowanym przez CERT. Na końcu znajduje się podsumowanie pracy, w którym zawarte są wnioski z przeprowadzonych eksperymentów oraz możliwości dalszego rozwoju systemu.
 
 % % Akapit z cytatem
 % \lipsum[1] \cite{goossens93}
