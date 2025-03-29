@@ -1,10 +1,12 @@
 """
 This script prepares sample dataset from VisualPhish/browsers/X dataset
 """
+
 import os
 import shutil
 import csv
 from src.config import PROJ_ROOT
+
 
 def move_images(input_dir, output_dir):
     """
@@ -14,27 +16,28 @@ def move_images(input_dir, output_dir):
 
     for folder_name in os.listdir(input_dir):
         folder_path = os.path.join(input_dir, folder_name)
-        
+
         if os.path.isdir(folder_path):  # Check if it's a directory
             for file_name in os.listdir(folder_path):
                 if file_name.endswith(".PNG"):  # Check if it's a PNG file
                     # Extract the number from the file name
                     file_number = os.path.splitext(file_name)[0]
-                    
+
                     # Create the new folder name
                     new_folder_name = f"{folder_name}-{file_number}"
                     new_folder_path = os.path.join(output_dir, new_folder_name)
-                    
+
                     # Create the new folder
                     os.makedirs(new_folder_path, exist_ok=True)
-                    
+
                     # Define the new file path
                     new_file_path = os.path.join(new_folder_path, "shot.png")
-                    
+
                     # Copy the file to the new location
                     shutil.copy(os.path.join(folder_path, file_name), new_file_path)
 
     print("Folder restructuring complete!")
+
 
 def move_url(input_folder, urls_file):
     """
@@ -60,13 +63,17 @@ def move_url(input_folder, urls_file):
 
     # Read URLs from urls.txt
     with open(urls_file, "r") as f:
-        urls = [line.strip() for line in f if line.strip()]  # Remove empty lines and whitespace
+        urls = [
+            line.strip() for line in f if line.strip()
+        ]  # Remove empty lines and whitespace
 
     # Create a mapping of folder prefixes to their respective folders
     folder_mapping = {}
     for folder_name in os.listdir(input_folder):
         if os.path.isdir(os.path.join(input_folder, folder_name)):
-            prefix = folder_name.rsplit('-', 1)[0]  # Extract the prefix (e.g., "boa" from "boa-1")
+            prefix = folder_name.rsplit("-", 1)[
+                0
+            ]  # Extract the prefix (e.g., "boa" from "boa-1")
             if prefix not in folder_mapping:
                 folder_mapping[prefix] = []
             folder_mapping[prefix].append(folder_name)
@@ -78,7 +85,9 @@ def move_url(input_folder, urls_file):
     # Match URLs to folders and write info.txt
     url_assigned = set()  # Track used URLs
     for prefix, folders in folder_mapping.items():
-        keyword = prefix_to_keyword.get(prefix, prefix)  # Get the corresponding keyword for the prefix
+        keyword = prefix_to_keyword.get(
+            prefix, prefix
+        )  # Get the corresponding keyword for the prefix
         for folder in folders:
             # Find the first unused URL that matches the keyword
             matched_url = None
@@ -95,6 +104,7 @@ def move_url(input_folder, urls_file):
                 info_file.write(matched_url if matched_url else "No URL available")
 
     print("info.txt files created successfully!")
+
 
 def create_csv(root_folder, csv_output_file):
     """
@@ -119,7 +129,7 @@ def create_csv(root_folder, csv_output_file):
                 url = "No URL available"
 
             # Prepare the target and path
-            target = folder_name.rsplit('-', 1)[0]
+            target = folder_name.rsplit("-", 1)[0]
             path = shot_file_path if os.path.exists(shot_file_path) else "No shot.png"
 
             # Append the data to the CSV list
@@ -132,13 +142,14 @@ def create_csv(root_folder, csv_output_file):
 
     print(f"CSV file created successfully: {csv_output_file}")
 
+
 # Main execution
 if __name__ == "__main__":
     print(os.getcwd())
-    dataset_path = PROJ_ROOT / 'data' / 'raw' / 'VisualPhish'
-    input_dir = dataset_path / 'browsers' 'chrome'
-    output_dir = PROJ_ROOT / 'data' / 'processed' / 'miniDataset'
-    urls_file = dataset_path / 'browsers' / 'urls.txt'
+    dataset_path = PROJ_ROOT / "data" / "raw" / "VisualPhish"
+    input_dir = dataset_path / "browsers" "chrome"
+    output_dir = PROJ_ROOT / "data" / "processed" / "miniDataset"
+    urls_file = dataset_path / "browsers" / "urls.txt"
     csv_output_file = f"{output_dir}/output.csv"
 
     move_images(input_dir, output_dir)
