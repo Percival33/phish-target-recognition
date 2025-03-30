@@ -24,7 +24,7 @@ class ModelHelper:
         model = self.define_triplet_network(input_shape, new_conv_params)
         model.summary(print_fn=self.logger.debug)
 
-        optimizer = optimizers.Adam(lr=lr)
+        optimizer = optimizers.Adam(learning_rate=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
         self.logger.debug("Model compiled")
         return model
@@ -35,7 +35,7 @@ class ModelHelper:
             custom_objects={"loss": self.custom_loss(margin)},
         )
 
-        optimizer = optimizers.Adam(lr=lr)
+        optimizer = optimizers.Adam(learning_rate=lr)
         model.compile(loss=self.custom_loss(margin), optimizer=optimizer)
 
         return model
