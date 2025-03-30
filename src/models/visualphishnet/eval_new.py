@@ -89,7 +89,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
         total_processed += len(imgs)
 
         # Free memory
-        if total_processed % 1024 == 0:
+        if total_processed % 4096 == 0:
             del imgs
             gc.collect()
 
@@ -97,6 +97,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
     all_embeddings = np.concatenate(embeddings_list, axis=0)
 
     if save_path:
+        save_path.mkdir(parents=True, exist_ok=True)
         all_labels = np.concatenate(labels_list, axis=0)
         all_filenames = np.concatenate(filenames_list, axis=0)
 
@@ -203,7 +204,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         args.data_dir / phish_folder,
         args.reshape_size,
         model,
-        save_path=args.emb_dir if args.save_intermediate else None,
+        save_path=args.save_folder / phish_folder.name if args.save_intermediate else None,
         batch_size=batch_size,
     )
     logger.info(f"Processed {phish_count} phishing images")
@@ -213,25 +214,19 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         args.data_dir / benign_folder,
         args.reshape_size,
         model,
-        save_path=args.emb_dir if args.save_intermediate else None,
+        save_path=args.save_folder / benign_folder.name if args.save_intermediate else None,
         batch_size=batch_size,
     )
     logger.info(f"Processed {benign_count} benign images")
-
+    args.save_folder.mkdir(parents=True, exist_ok=True)
     # Combine embeddings
     data_emb = np.concatenate([benign_emb, phish_emb], axis=0)
-    np.save(args.emb_dir / "all_embeddings.npy", data_emb)
+    np.save(args.save_folder / "all_embeddings.npy", data_emb)
 
     # Combine labels and filenames if they were saved
     if args.save_intermediate:
         y = np.concatenate([benign_labels, phish_labels], axis=0)
         file_names = np.concatenate([benign_files, phish_files], axis=0)
-
-        # Random shuffle
-        idx = np.random.permutation(len(data_emb))
-        data_emb = data_emb[idx]
-        y = y[idx]
-        file_names = file_names[idx]
     else:
         # For evaluation, create file names that indicate source
         benign_files = np.array([f"benign/file_{i}" for i in range(benign_count)])
@@ -239,9 +234,12 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         file_names = np.concatenate([benign_files, phish_files])
         y = np.array(["benign"] * benign_count + ["phish"] * phish_count)
 
+    np.save(args.save_folder / "all_labels.npy", y)
+    np.save(args.save_folder / "all_file_names.npy", file_names)
+
     # Compute pairwise distances
     pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, targetlist_emb)
-    np.save(args.emb_dir / "pairwise_distances.npy", pairwise_distance)
+    np.save(args.save_folder / "pairwise_distances.npy", pairwise_distance)
 
     return data_emb, pairwise_distance, y, file_names
 
@@ -301,6 +299,9 @@ if __name__ == "__main__":
     parser.add_argument("--save-intermediate", action="store_true", help="Save intermediate results")
     parser.add_argument("--phish-folder", type=str, default="newly_crawled_phishing")
     parser.add_argument("--benign-folder", type=str, default="benign_test")
+    parser.add_argument("--save-folder", type=Path, default=LOGS_DIR / "VisualPhish-Results")
+    parser.add_argument("--batch-size", type=int, default=512)
+    parser.add_argument("--weights-only", action="store_true", help="Load only weights")
 
     args = parser.parse_args()
     logger.info("Evaluating VisualPhishNet")
@@ -311,7 +312,15 @@ if __name__ == "__main__":
         args.emb_dir / "whitelist_file_names.npy",
     )
     modelHelper = ModelHelper()
-    model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin).layers[3]
+    model = None
+    if args.weights_only:
+        input_shape = [224, 224, 3]
+        new_conv_params = [3, 3, 512]
+        model = modelHelper.define_triplet_network(input_shape, new_conv_params)
+        model.load_weights("/Users/mjarczewski/Repositories/inz/data/processed/VP-from-baseline-pp/my_model2.h5")
+    else:
+        model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin)
+    model = model.layers[3]
     logger.info("Loaded targetlist and model, number of protected target screenshots {}".format(len(targetlist_emb)))
 
     data_emb, pairwise_distance, y, file_names = process_and_evaluate(
