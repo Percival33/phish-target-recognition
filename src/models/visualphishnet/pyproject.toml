@@ -23,6 +23,7 @@ macos = [
 
 [dependency-groups]
 dev = [
+    "pandas>=2.2.3",
     "ruff>=0.9.4",
 ]
 
