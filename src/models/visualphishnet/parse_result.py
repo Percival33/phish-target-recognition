@@ -57,7 +57,8 @@ def parse_to_dataframe(file_path):
                 "vp_class": vp_class,
                 "vp_distance": vp_distance,
                 "vp_target": vp_target,
-                "true_class": true_class
+                "true_class": true_class,
+                "true_target": filename.split("/")[0],
             })
 
     return pd.DataFrame(data)
