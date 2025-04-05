@@ -1,18 +1,142 @@
 \clearpage
 \section{Implementacja}
-\subsection{Środowisko}
+\todo[inline]{dodać wstęp w tym rozdziale}
+% JAK ZROBIONO?
+- docker (compose)
+- jak wyglada jeden kontener
+- jakie systemy zintegrowano
+- co było trudne
+- jakie zmiany wprowadzono w trakcie
+- testowanie
+- jak to adresuje pierwotne założenia
+
+W tym rozdziale opisano jak zrealizowano wymagania funkcjonalne i niefunkcjonalne a także jak dostosowano system do wymagań wynikających z posiadanej mocy obliczeniowej.
+Udało się wprowadzić śledzenie eksperymentów, zapisywanie dokładnych parametrów początkowych treningów, metryk systemowych jak i wskaźników jakości modelu, korzystając z platformy \href{wandb.ai}{https://wandb.ai/}. Dodatkowo zmodyfikowano istniejące rozwiązania, opierając się na skryptach języka Python, rezygnując z notatników Jupyter, ze względu na szybkość działania i łatwość przeprowadzania eksperymentów.
+
+W trakcie implementacji napotkano różne problemy, pogrupowane ze względu na metodę, z którą są związane.
+
+
+
+\subsection{System - API}
+W implementacji rozwiązania wykorzystano konteneryzację. Każde rozwiązanie jest zawarte w oddzielnym kontenerze i rozszerza klasę bazową \textbf{\textit{ModelServing}}, która jest odpowiedzialna za uruchomienie API danego rozwiązania. W celu zapewnienia integracji z systemem, konfiguracja dodatkowo jest zawarta w pliku $docker-compose.yml$, gdzie zdefiniowane są polecenia budowania kontenera i połączenia sieciowego.
+
+Rozszerzając klasę bazową, należy zaimplementować metodę $predict()$, by dokonać interferencji modelu. Możliwe jest też nadpisanie metod $on\_startup()$ i $on\_shutdown()$, które są odpowiedzialne odpowiednio za przygotowanie rozwiązania do odpytywania oraz zwolnienie zasobów. Dzięki czemu system jest zoptymalizowany (zapytania nie są spowolnione przez ładowanie modelu do pamięci i zasoby są odpowiednio utylizowane). Przykładowo w Phishpedii jest to wczytanie modelu i jego wag. 
+
+\todo[inline]{zamiast klasy bazować wylistować wyłącznie metody i je opisać}
+\begin{figure}[!htbp]
+\begin{minted}{python}
+class ModelServing(ABC):
+    def __init__(self, port=None):
+        self.port = port if port is not None else int(os.getenv("PORT", 8888))
+        self.app = FastAPI()
+
+        # Set up lifespan context
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            await self.on_startup()
+            yield
+            await self.on_shutdown()
+
+        self.app.router.lifespan_context = lifespan
+
+        # Register routes - this lets subclasses define their own implementations
+        self.register_routes()
+
+    def register_routes(self):
+        """Register routes for the FastAPI application"""
+
+        @self.app.post("/predict")
+        async def predict_route(image: UploadFile = File(...), url: str = Form(...)):
+            # Convert the uploaded file to a dict with content and metadata
+            image_content = await image.read()
+            data = {
+                "url": url,
+                "image_content": image_content,
+                "image_filename": image.filename,
+                "image_content_type": image.content_type,
+            }
+            return await self.predict(data)
+
+    async def on_startup(self):
+        """Startup logic (e.g., loading resources)"""
+        print("Starting up...")
+
+    async def on_shutdown(self):
+        """Shutdown logic (e.g., cleaning up resources)"""
+        print("Shutting down...")
+
+    def run(self):
+        """Run the FastAPI application"""
+        import uvicorn
+
+        uvicorn.run(self.app, host="0.0.0.0", port=self.port)
+
+    @abstractmethod
+    async def predict(self, data: dict):
+        """Abstract method that subclasses must implement"""
+        pass
+\end{minted}
+\captionof{lstlisting}{My terrific code}
+\label{lst:code}
+\end{figure}
+
+Listing \ref{lst:code} demonstrates good code.
+
+\todo[inline]{opisać zależności w kontenerze i jak to się dodaje}
+\begin{minted}{docker}
+FROM python:3.9.21-bookworm
+COPY --from=ghcr.io/astral-sh/uv:0.5.15 /uv /uvx /bin/
+
+WORKDIR /code
+
+COPY uv.lock /code/uv.lock
+COPY pyproject.toml /code/pyproject.toml
+
+RUN uv pip install --system --no-cache-dir -r pyproject.toml --extra visualphishnet
+RUN mkdir -p /code/app
+
+COPY ModelServing.py /code
+COPY __init__.py /code
+COPY visualphishnet/VisualPhishServing.py /code/app
+
+CMD ["python", "-m", "app.VisualPhishServing"]
+\end{minted}
+
+\todo[inline]{opisać przykładową konfigurację w compose. Jakie pliki i zmienne trzeba dodać}
+\begin{minted}{yml}
+phishpedia:
+    build:
+      context: .
+      dockerfile: phishpedia/Dockerfile
+    networks:
+      - net
+    ports:
+      - "8002:${PP_PORT:-8888}"
+    environment:
+      - PORT=${PP_PORT:-8888}
+\end{minted}
+
+
 \subsection{Integracja nowych zbiorów danych}
-\subsection{Testy}
+\todo[inline]{jak rozszerzyć VP i PP opisać istniejące skrypty i ich zadania}
 
-TODO: w którym rozdziale dać metody które testowałem?
-\subsection{Porównywanie wizualne}
-\subsubsection{EMD}
-\subsubsection{Phash}
-
-\subsection{Porównywanie wizualne}
-\subsubsection{deskryptory wizualne}
-\subsubsection{bovw}
-
-\subsection{Sieci neuronowe}
-\subsubsection{Phishpedia}
 \subsubsection{VisualPhishNet}
+
+\todo[inline]{opisać czym są notataniki Jupyter i dlaczego są gorsze niż python}.
+\todo[inline]{cite logging - https://docs.python.org/3/library/logging.html}
+\todo[inline]{cite wandb}
+
+Autorzy danej pracy udostępnili kod w postaci notatników Jupyter. Zawierają one notatniki z procesem treningu a także notatki z procesami ewaluacji jak i interferencji. \textbf{wstawka}. Z tych powodów zdecydowano się na przepisanie rozwiązań w postaci kodu w języku Python. Dodatkowo rozszerzono to rozwiązanie o informacje pomocnicze wykorzystujące bibliotekę \textbf{logging} oraz śledzenie eksperymentów wykorzystując platformę \textbf{wandb.ai}. Dzięki temu ułatwiono wersjonowanie modeli ich treningu i ewaluacji. Ponadto uproszczono wizualizację i śledzenie eksperymentów.
+
+W trakcie przeprowadzania eksperymentów napotkano problemy, które rozwiązano za pomocą częstszego zapisywania wyników pośrednich oraz szybszej weryfikacji poprawności metod uczących, korzystając z mniejszego zbioru treningowego. Dodatkowo, zapisywano przetransformowane dane uczące, by w razie awarii, szybciej wznowić eksperymenty.
+
+\subsubsection{Phishpedia}
+Natomiast autorzy tej pracy, udostępnili swoje rozwiązanie w postaci skryptów języka Python. Jednakże posiadają one wyłącznie skrypty do interferencji modelu. Z tego względu zaimplementowano skrypty do ewaluacji wyników oraz treningu modeli bazowych. System Phishpedia nie wymaga treningu co zostało wspomniane w \textbf{wstawka}
+
+\todo[inline]{zaimplementować treningu modelu z logo2k+}
+\todo[inline]{phishpedia nie wymaga treningu - dodać odniesienie przy opisie literatury}
+
+Podczas ewaluacji napotkano problemy z niespójnym kodowaniem plików w zbiorach ewaluacyjnych oraz brakującymi danymi. Przykładowo, plik \textbf{domain\_map.pkl} nie zawierał wszystkich stron chronionych. Objawiało się to logotypami, które chroniono, lecz brakowało domen tych podmiotów. Dlatego zaimplementowano normalizację danych tekstowych oraz uzupełnianie brakujących danych w skryptach \textbf{wstawka}
+
+\todo[inline]{skrytpy z nazwy\: convert\_encodings, find\_missing\_files, fix\_script}
+\subsubsection{Baseline}

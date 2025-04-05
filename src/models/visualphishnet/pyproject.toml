@@ -1,0 +1,41 @@
+[project]
+name = "visualphishnet"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9,<3.10"
+dependencies = [
+    "matplotlib>=3.7.5",
+    "pre-commit>=4.2.0",
+    "scikit-image>=0.21.0",
+    "scikit-learn>=1.3.2",
+    "tensorflow==2.13",
+    "tools",
+    "tqdm>=4.67.1",
+    "wandb>=0.18.7",
+]
+
+[project.optional-dependencies]
+macos = [
+    "tensorflow-macos>=2.13.1",
+    "tensorflow-metal>=1.2.0",
+]
+
+[tool.uv.sources]
+tools = { path = "../../tools" }
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.4",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]  # Enable specific rules (E: pycodestyle, F: Pyflakes, I: isort)
+ignore = ["E203", "E501"]  # Ignore certain rules
+
+[tool.ruff.format]
+docstring-code-format = true

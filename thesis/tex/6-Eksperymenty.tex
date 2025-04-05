@@ -1,4 +1,162 @@
 \clearpage
-\section{Eksperymenty}
-\subsection{Ocena wydajność modelu klasyfikacji?}
+\section{Metodyka badawcza i badania eksperymentalne}
+
+W tym rozdziale zostaną opisane metody oceny konkretnych rozwiązań. Udzielono również odpowiedzi na pytanie, jakich zbiorów danych użyto? Jakie metryki zostały wykorzystane, a także jakie są wyniki poszczególnych modeli? Ponadto zostanie poruszona tematyka dalszego rozwoju systemu.
+
+\subsection{Metodyka badawcza}
+W ramach tej pracy skupiono się na dwóch metodach "zaawansowanych" opisanych szczegółowo we wcześniejszych rozdziałach (\textit{VisualPhishNet} i \textit{Phishpedia}) oraz zestawiono je z metodą bazową.
+\todo[inline]{nadać temu jakąś nazwę}
+Żeby móc ocenić je między sobą, nie tylko na zbiorach danych przygotowanych przez autorów tych prac, postanowiono dokonać predykcji parami każdego zbioru i metody. Rozwiązania wymienione wyżej traktują zadanie rozpoznania phishingu jako zadanie klasyfikacji binarnej, czy dana strona jest prawdziwa? Natomiast założeniem tej pracy jest klasyfikacja wieloklasowa. Nie tylko czy strona jest prawdziwa ale też jak jest strona fałszywa to pod jaki cel się podszywa. Wobec tego pierwszym założeniem jest klasyfikacja wieloklasowa z $N+1$ klasami, gdzie $N$ oznacza liczbę podmiotów chronionych a dodatkowa klasa opisuje klasę prawdziwą z ang \textit{benign}.
+
+
+Z racji różnych wyjść metod, \todo[inline]{vp daje odległości, pp daje 0/1 i pewność sieci syjamskich. Phash daje odległość} zdecydowano się zastosować miarę entropii krzyżowej. Dodatkowo by móc łatwiej porównywać metody binarne F1 do określenia, czy strona jest prawdziwa. Na potrzeby wizualizacji użyto miary ROC AUC
+\todo[inline]{czy uzyc wieloklasowej F1?}
+
+TODO: opis w jakim setupie, na jakich datasetach, posługując się jakimi metrykami i w jaki sposób zostały przeprowadzone badania
+
+\subsection{Ocena jakości poszczególnych modeli}
+tj. testowanie każdego modelu na każdym zbiorze danych
+
+model / dane | pp | vp | bovw | phash |
+pp |
+vp |
+bovw |
+phash |
+
+
+metryki: f1, precision, recall
+zbior certu jako zbiór testowy
+
+
+% Przykładowa tabela: wyśrodkowana i renderowana
+% w miejscu wstawienia: !h = !h[ere]
+% Domyślnie tabele trafiają na górę strony
+\todo[inline]{dodać wykresiki jakieś kolorowe}
+\begin{table}[!h] \centering
+    % Podpis tabeli umieszczamy od góry
+    \caption{Przykładowa tabela. Phishpedia na zbiorze phishpedii}
+    \label{tab:tabela1}
+
+    % Tabela z trzema kolumnami:
+    % dwie wyrównanie do środka [c], a ostatnia do prawej [r]
+    % szerokość kolumn automatyczna (równa szerokości tekstu)
+    \begin{tabular}{|l|c|}
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Prawdziwa / Phishingowa}} \\
+        \hline
+        \textbf{Metryka} & \textbf{Wartość} \\
+        \hline
+        F1 Micro & 0.8929 \\
+        F1 Weighted & 0.8920 \\
+        ROC AUC & 0.8905 \\
+        MCC & 0.7954 \\
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Cel podszycia}} \\
+        \hline
+        F1 Micro & 0.6109 \\
+        F1 Weighted & 0.5829 \\
+        MCC & 0.4540 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Prawdziwa / Phishingowa}} \\
+        \hline
+        \textbf{Metryka} & \textbf{Wartość} \\
+        \hline
+        F1 Micro & 0.7814 \\
+        F1 Weighted & 0.7261 \\
+        ROC AUC & 0.5648 \\
+        MCC & 0.2374 \\
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Cel podszycia}} \\
+        \hline
+        F1 Micro & 0.7447 \\
+        F1 Weighted & 0.6670 \\
+        MCC & 0.1090 \\
+        \hline
+    \end{tabular}
+    \caption{Phishpedia na nowych danych z VisualPhishNet (newly\_crawdled\_phishing)}
+    \label{tab:evaluation_metrics}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Prawdziwa / Phishingowa}} \\
+        \hline
+        \textbf{Metryka} & \textbf{Wartość} \\
+        \hline
+        F1 Micro & 0.7649 \\
+        F1 Weighted & 0.6630 \\
+        ROC AUC & 0.5000 \\
+        MCC & 0.0000 \\
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Cel podszycia}} \\
+        \hline
+        F1 Micro & 0.7649 \\
+        F1 Weighted & 0.6630 \\
+        MCC & 0.0000 \\
+        \hline
+    \end{tabular}
+    \caption{VisualPhishNet na nowych danych z progiem 8 (newly\_crawdled\_phishing)}
+    \label{tab:metrics}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Prawdziwa / Phishingowa}} \\
+        \hline
+        \textbf{Metryka} & \textbf{Wartość} \\
+        \hline
+        F1 Micro & 0.7646 \\
+        F1 Weighted & 0.6629 \\
+        ROC AUC & 0.4998 \\
+        MCC & -0.0087 \\
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Cel podszycia}} \\
+        \hline
+        F1 Micro & 0.7646 \\
+        F1 Weighted & 0.6629 \\
+        MCC & -0.0043 \\
+        \hline
+    \end{tabular}
+    \caption{VisualPhishNet na nowych danych z progiem 20 (newly\_crawdled\_phishing)}
+    \label{tab:metrics}
+\end{table}
+
+
+
+% % Przykładowa tabela: wyśrodkowana i renderowana
+% % w miejscu wstawienia: !h = !h[ere]
+% % Domyślnie tabele trafiają na górę strony
+% \begin{table}[!h] \centering
+%     % Podpis tabeli umieszczamy od góry
+%     \caption{Przykładowa tabela.}
+%     \label{tab:tabela1}
+
+%     % Tabela z trzema kolumnami:
+%     % dwie wyrównanie do środka [c], a ostatnia do prawej [r]
+%     % szerokość kolumn automatyczna (równa szerokości tekstu)
+%     \begin{tabular}{| c | c | r |} \hline
+%         Kolumna 1       & Kolumna 2 & Liczba \\ \hline\hline
+%         cell1           & cell2     & 60     \\ \hline
+%         cell4           & cell5     & 43     \\ \hline
+%         cell7           & cell8     & 20,45  \\ \hline
+%         % Komórka o szerokości dwóch kolumn, wyrównana do prawej
+%         % Przypisy dolne w tabelach wstawiamy przez \tablefootnote
+%         \multicolumn{2}{|r|}{Suma\tablefootnote{Table footnote.}} & 123,45 \\ \hline
+%     \end{tabular}
+
+% \end{table}
+
+\subsection{Ocena całościowa klasyfikatora}
 \subsection{Dalsze kierunki rozwoju}
+
