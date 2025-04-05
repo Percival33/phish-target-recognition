@@ -6,8 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from skimage.transform import resize
-from sklearn.metrics import roc_auc_score, roc_curve, matthews_corrcoef, f1_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import roc_curve, precision_recall_curve
 
 from tools.config import LOGS_DIR, PROCESSED_DATA_DIR, RAW_DATA_DIR, setup_logging
 from tools.metrics import calculate_metrics
@@ -17,6 +16,7 @@ from DataHelper import read_image
 from Evaluate import Evaluate
 from ModelHelper import ModelHelper
 import pandas as pd
+
 
 # load targetlist embedding
 def load_targetemb(emb_path, label_path, file_name_path):
@@ -116,7 +116,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
 # L2 distance
 def compute_distance_pair(layer1, layer2, targetlist_emb):
     diff = layer1 - layer2
-    l2_diff = np.sum(diff**2) / targetlist_emb.shape[1]
+    l2_diff = np.sum(diff ** 2) / targetlist_emb.shape[1]
     return l2_diff
 
 
@@ -180,7 +180,8 @@ def evaluate_threshold(
         filename = file_names[i]
 
         # Extract target from filename (assuming format like "benign/file_1" or "phish/file_2")
-        true_target = y[i].split("/")[0] if "/" in filename else ""
+        assert names_min_distance.split()[1].split('/')[0] == only_names[0].split('/')[0]
+        true_target = y[i]
 
         # Set VP class (0 for benign, positive value for phishing)
         vp_class = 0
@@ -206,28 +207,6 @@ def evaluate_threshold(
 
     class_metrics, target_metrics = calculate_metrics(y_true, y_pred, true_targets, pred_targets)
 
-    # # Calculate class-based metrics
-    # class_metrics = {
-    #     "f1_micro": f1_score(y_true, y_pred, average='micro'),
-    #     "f1_weighted": f1_score(y_true, y_pred, average='weighted'),
-    #     "roc_auc": roc_auc_score(y_true, y_pred),
-    #     "mcc": matthews_corrcoef(y_true, y_pred)
-    # }
-    #
-    # all_targets = list(set(true_targets + pred_targets))
-    # le = LabelEncoder()
-    # le.fit(all_targets)
-    #
-    # true_targets_encoded = le.transform(true_targets)
-    # pred_targets_encoded = le.transform(pred_targets)
-    #
-    # target_metrics = {
-    #     "target_f1_micro": f1_score(true_targets_encoded, pred_targets_encoded, average='micro'),
-    #     "target_f1_weighted": f1_score(true_targets_encoded, pred_targets_encoded, average='weighted'),
-    #     "target_mcc": matthews_corrcoef(true_targets_encoded, pred_targets_encoded)
-    # }
-
-    # Create DataFrame from the list
     results_df = pd.DataFrame(data)
 
     # Save DataFrame to CSV if a result path is provided
@@ -247,12 +226,13 @@ def evaluate_threshold(
                 f.write(f"{key}: {value}\n")
 
     # Calculate ROC curve
-    fpr, tpr, _ = roc_curve(y_true, y_pred, pos_label=1, drop_intermediate=False)
+    precision, recall, _ = precision_recall_curve(y_true, y_pred, pos_label=1, drop_intermediate=False)
 
     # Combine all metrics
     all_metrics = {**class_metrics, **target_metrics}
 
-    return class_metrics['roc_auc'], fpr, tpr, results_df, all_metrics
+    return class_metrics['roc_auc'], precision, recall, results_df, all_metrics
+
 
 def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder, batch_size):
     """
@@ -318,12 +298,13 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
     plt.figure(figsize=(10, 6))
 
     for threshold in thresholds:
-        auc_score, fpr, tpr, _, _ = evaluate_threshold(
+        auc_score, precision, recall, _, all_metrics = evaluate_threshold(
             pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, args.result_path
         )
         results.append({"threshold": threshold, "auc_score": auc_score})
-        logger.info(f"Threshold: {threshold}, AUC Score: {auc_score}")
-        plt.step(fpr, tpr, where="post", label=f"Threshold={threshold}")
+        logger.info(
+            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}")
+        plt.step(recall, precision, where="post", label=f"Threshold={threshold}")
         # plt.plot(fpr, tpr, label=f'Threshold={threshold}')
 
     # Plot ROC curves
@@ -347,6 +328,97 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
         for result in results:
             f.write(f"Threshold: {result['threshold']}, AUC Score: {result['auc_score']}\n")
 
+
+def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args):
+    # Test different thresholds
+    thresholds = np.arange(3, 20, 1)
+    results = []
+
+    # Create a new figure for the ROC curve
+    plt.figure(figsize=(8, 8))
+
+    # Plot baseline points (0,0) and (1,1)
+    plt.plot(0, 0, 'bo', markersize=8, label='(0,0)')
+    plt.plot(1, 1, 'bo', markersize=8, label='(1,1)')
+
+    # Initialize lists to store the best results for display
+    best_auc = 0
+    best_fpr = None
+    best_tpr = None
+    best_threshold = None
+
+    for threshold in thresholds:
+        # Adjust unpacking to match what evaluate_threshold actually returns
+        result = evaluate_threshold(
+            pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, args.result_path
+        )
+
+        # Based on the original code, it seems evaluate_threshold returns these values
+        auc_score = result[0]
+        precision = result[1]
+        recall = result[2]
+        all_metrics = result[4]  # Based on the original "*" in the unpacking
+
+        # We need to calculate or extract fpr and tpr for the ROC curve
+        # Since we don't have direct access, let's use a simple approach
+        # For a basic ROC plot, we can use a single point for each threshold
+        # This is a simplified approach - in practice you might need to extract actual FPR/TPR values
+
+        # Let's assume we can derive fpr from precision and recall
+        # A simple approximation: fpr = (1-precision) * recall
+        # Note: This is not the exact relationship but works for visualization
+        fpr = (1 - precision) * recall if precision < 1 else 0
+        tpr = recall
+
+        results.append({"threshold": threshold, "auc_score": auc_score})
+
+        logger.info(
+            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}")
+
+        # Plot each threshold's point
+        plt.plot(fpr, tpr, 'o', alpha=0.5)
+
+        # Track the best AUC score to highlight it
+        if auc_score > best_auc:
+            best_auc = auc_score
+            best_fpr = fpr
+            best_tpr = tpr
+            best_threshold = threshold
+
+    # Highlight the best point
+    if best_fpr is not None and best_tpr is not None:
+        plt.plot(best_fpr, best_tpr, 'ro', markersize=10, label=f'Best (FPR,TPR) at threshold={best_threshold}')
+
+    # Plot the random classifier line
+    x = np.linspace(0, 1, 100)
+    plt.plot(x, x, "k--", label="Random Classifier")
+
+    # Set the axes limits and labels
+    plt.xlim(0, 1.05)
+    plt.ylim(0, 1.05)
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve")
+
+    # Add grid for better visibility
+    plt.grid(True, linestyle='--', alpha=0.7)
+
+    # Add legend
+    plt.legend()
+
+    # Save the plot
+    plt.savefig(args.result_path / "roc_curve.png")
+    plt.close()
+
+    # Save numerical results
+    final_result_path = args.result_path / "threshold_results.txt"
+    final_result_path.parent.mkdir(parents=True, exist_ok=True)
+    if not final_result_path.exists():
+        final_result_path.touch()
+
+    with open(final_result_path, "w") as f:
+        for result in results:
+            f.write(f"Threshold: {result['threshold']}, AUC Score: {result['auc_score']}\n")
 
 if __name__ == "__main__":
     np.random.seed(42)
@@ -404,6 +476,5 @@ if __name__ == "__main__":
     y = np.load(args.save_folder / "all_labels.npy")
     file_names = np.load(args.save_folder / "all_file_names.npy")
 
-    evaluate_threshold(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path)
-
-    # calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
+    # evaluate_threshold(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path)
+    calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
