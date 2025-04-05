@@ -1,4 +1,5 @@
 from ModelServing import ModelServing
+from phishpedia import PhishpediaWrapper
 
 
 class PhishpediaServing(ModelServing):
@@ -6,8 +7,16 @@ class PhishpediaServing(ModelServing):
         super().__init__()
 
     async def predict(self, data: dict):
-        """Implementation of the predict method for Phishpedia"""
+        url = data.get("url", None)
+        img = data.get("image_content", None)
+
+        phish_category, pred_target, matched_domain, plotvis, siamese_conf, _, logo_recog_time, logo_match_time = phishpedia_cls.test_orig_phishpedia(
+            url, None, None, img)
         return {"prediction": "phishpedia"}
+
+    async def on_startup(self):
+        """Startup logic (e.g., loading resources)"""
+        self.phishpedia_cls = PhishpediaWrapper()
 
 
 serving = PhishpediaServing()
