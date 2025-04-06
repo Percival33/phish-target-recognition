@@ -10,13 +10,19 @@ class PhishpediaServing(ModelServing):
         url = data.get("url", None)
         img = data.get("image_content", None)
 
-        phish_category, pred_target, matched_domain, plotvis, siamese_conf, _, logo_recog_time, logo_match_time = phishpedia_cls.test_orig_phishpedia(
+        phish_category, pred_target, matched_domain, plotvis, siamese_conf, _, logo_recog_time, logo_match_time = self.phishpedia.test_orig_phishpedia(
             url, None, None, img)
-        return {"prediction": "phishpedia"}
+
+        return {
+            "url": url,
+            "class": phish_category,
+            "target": pred_target,
+            "confidence": siamese_conf,
+        }
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""
-        self.phishpedia_cls = PhishpediaWrapper()
+        self.phishpedia = PhishpediaWrapper()
 
 
 serving = PhishpediaServing()
