@@ -9,4 +9,4 @@ COPY common/*.whl /code/common/
 RUN uv sync --frozen --no-cache
 COPY * /code
 
-CMD ["uv", "run", "VisualPhishServing.py"]
+CMD ["uv", "run", "--no-dev", "VisualPhishServing.py"]

@@ -11,5 +11,4 @@ RUN mkdir -p /code/app
 
 COPY main.py /code
 COPY routes.py /code
-
-CMD ["python", "-m", "main"]
+CMD ["uv", "run", "--no-dev", "main.py"]
