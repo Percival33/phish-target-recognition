@@ -5,9 +5,8 @@ WORKDIR /code
 
 COPY uv.lock /code/uv.lock
 COPY pyproject.toml /code/pyproject.toml
-COPY common /code/common
-
+COPY common/*.whl /code/common/
 RUN uv sync --frozen --no-cache
 COPY * /code
 
-CMD ["python", "-m", "app.VisualPhishServing"]
+CMD ["uv", "run", "VisualPhishServing.py"]

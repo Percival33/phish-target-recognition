@@ -7,9 +7,11 @@ build-common:
     cd src/tools && uv build
 
 copy-vp: build-common
+    mkdir -p src/models/visualphishnet/common
     cp src/tools/dist/*.whl src/models/visualphishnet/common
 
 copy-pp: build-common
+    mkdir -p src/models/phishpedia/common
     cp src/tools/dist/*.whl src/models/phishpedia/common
 
 tools: copy-vp copy-pp
