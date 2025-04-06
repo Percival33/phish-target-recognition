@@ -26,7 +26,7 @@ install-macos:
     uv sync --frozen
 
     # Install PyTorch stack for macOS
-    uv pip install torch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0
+    uv pip install torch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0 --index https://download.pytorch.org/whl/cpu
 
     # Install Detectron2 from GitHub for macOS
     uv pip install 'git+https://github.com/facebookresearch/detectron2.git'
@@ -42,10 +42,10 @@ install-cuda:
     uv sync --frozen
 
     # Install PyTorch stack with CUDA support
-    uv pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 --index-url https://download.pytorch.org/whl/torch_stable.html
+    uv pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 --index https://download.pytorch.org/whl/torch_stable.html
 
     # Install Detectron2 with CUDA support
-    uv pip install detectron2 --index-url https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html
+    uv pip install detectron2 --index https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html
 
     echo "CUDA installation complete!"
 
@@ -61,7 +61,7 @@ install-cpu:
     uv pip install torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 --index-url https://download.pytorch.org/whl/torch_stable.html
 
     # Install Detectron2 for CPU
-    uv pip install detectron2 --index-url https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html
+    uv pip install detectron2 --index https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html --no-build-isolation
 
     echo "CPU-only installation complete!"
 
@@ -100,6 +100,11 @@ download-models:
 extract-targetlist:
     #!/usr/bin/env bash
     cd "{{ models_dir }}" || exit 1
+
+    if [ -d "expand_targetlist" ]; then
+        echo "Directory 'expand_targetlist' already exists. Skipping extraction."
+        exit 0
+    fi
 
     # Extract the zip file
     echo "Extracting expand_targetlist.zip..."

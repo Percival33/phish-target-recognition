@@ -17,5 +17,9 @@ copy-pp: build-common
 tools: copy-vp copy-pp
     echo "Tools package was built"
 
-docker: tools
+run-pp recipe-name:
+    just -f src/models/phishpedia/justfile {{recipe-name}}
+
+docker: tools 
+    just run-pp setup-models
     docker compose up

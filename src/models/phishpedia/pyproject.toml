@@ -31,3 +31,10 @@ dev = [
 
 [tool.uv.sources]
 tools = { path = "common/tools-0.1.5-py3-none-any.whl" }
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+torchaudio = { index = "pytorch" }
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cpu"

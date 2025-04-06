@@ -40,6 +40,8 @@ services:
       - "8002:${PP_PORT:-8888}"
     environment:
       - PORT=${PP_PORT:-8888}
+    volumes:
+      - ./src/models/phishpedia/models:/code/models
 
 networks:
   net:
