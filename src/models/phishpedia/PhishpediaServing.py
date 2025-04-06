@@ -1,4 +1,4 @@
-from ModelServing import ModelServing
+from tools.ModelServing import ModelServing
 from phishpedia import PhishpediaWrapper
 
 

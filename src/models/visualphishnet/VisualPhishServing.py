@@ -1,4 +1,4 @@
-from ModelServing import ModelServing
+from tools.ModelServing import ModelServing
 
 
 class VisualPhishServing(ModelServing):

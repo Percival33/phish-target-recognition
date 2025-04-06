@@ -6,9 +6,20 @@ readme = "README.md"
 authors = [
     { name = "Marcin Jarczewski", email = "marcin.jarc@gmail.com" }
 ]
-requires-python = ">=3.8"
-dependencies = []
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.98.0",
+    "httpx>=0.28.1",
+    "opencv-python-headless>=4.8.1.78",
+    "python-multipart>=0.0.20",
+    "uvicorn>=0.34.0",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.4",
+]

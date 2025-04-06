@@ -7,31 +7,11 @@ requires-python = ">=3.9"
 dependencies = [
     "fastapi>=0.98.0",
     "httpx>=0.28.1",
-    "opencv-python-headless>=4.8.1.78",
     "python-multipart>=0.0.20",
     "uvicorn>=0.34.0",
-]
-
-[project.optional-dependencies]
-visualphishnet = [
-    "tensorflow==2.13",
-]
-phishpedia = [
-    "torch==1.9.0+cpu",
-    "torchaudio==0.9.0",
-    "torchvision==0.10.0+cpu",
 ]
 
 [dependency-groups]
 dev = [
     "ruff>=0.11.2",
 ]
-
-[tool.uv.sources]
-torch = { index = "pytorch" }
-torchvision = { index = "pytorch" }
-torchaudio = { index = "pytorch" }
-
-[[tool.uv.index]]
-name = "pytorch"
-url = "https://download.pytorch.org/whl/cpu"
