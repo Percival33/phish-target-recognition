@@ -4,9 +4,7 @@ prepare-visualphish:
     uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar zxvf - -C ../../data/raw/VisualPhish
 
 build-common:
-    cd src/tools && \
-    uv build && \
-    cp dist/*.whl ../models/common
+    cd src/tools && uv build
 
 copy-vp: build-common
     cp src/tools/dist/*.whl src/models/visualphishnet/common
