@@ -6,7 +6,7 @@ WORKDIR /code
 COPY uv.lock /code/uv.lock
 COPY pyproject.toml /code/pyproject.toml
 
-RUN uv pip install --system --no-cache-dir -r pyproject.toml
+RUN uv sync --frozen
 RUN mkdir -p /code/app
 
 COPY main.py /code

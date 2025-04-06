@@ -21,9 +21,6 @@ macos = [
     "tensorflow-metal>=1.2.0",
 ]
 
-[tool.uv.sources]
-tools = { path = "../../tools" }
-
 [dependency-groups]
 dev = [
     "ruff>=0.9.4",
@@ -39,3 +36,6 @@ ignore = ["E203", "E501"]  # Ignore certain rules
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.uv.sources]
+tools = { path = "common/tools-0.1.5-py3-none-any.whl" }

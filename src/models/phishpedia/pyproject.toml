@@ -19,6 +19,7 @@ dependencies = [
     "scikit-learn>=1.6.1",
     "scipy>=1.13.1",
     "tldextract>=5.1.3",
+    "tools",
     "tqdm>=4.67.1",
     "wandb>=0.19.8",
 ]
@@ -27,3 +28,6 @@ dependencies = [
 dev = [
     "ruff>=0.11.0",
 ]
+
+[tool.uv.sources]
+tools = { path = "common/tools-0.1.5-py3-none-any.whl" }

@@ -5,12 +5,9 @@ WORKDIR /code
 
 COPY uv.lock /code/uv.lock
 COPY pyproject.toml /code/pyproject.toml
+COPY common /code/common
 
-RUN uv pip install --system --no-cache-dir -r pyproject.toml --extra visualphishnet
-RUN mkdir -p /code/app
-
-COPY ModelServing.py /code
-COPY __init__.py /code
-COPY visualphishnet/VisualPhishServing.py /code/app
+RUN uv sync --frozen --no-cache
+COPY * /code
 
 CMD ["python", "-m", "app.VisualPhishServing"]

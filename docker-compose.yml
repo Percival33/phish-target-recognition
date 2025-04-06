@@ -7,7 +7,7 @@ x-service-vars:
 services:
   api:
     build:
-      context: .
+      context: src/api
       dockerfile: Dockerfile
     ports:
       - "8000:${API_PORT:-8888}"
@@ -21,8 +21,8 @@ services:
 
   visualphish:
     build:
-      context: .
-      dockerfile: visualphishnet/Dockerfile
+      context: src/models/visualphishnet
+      dockerfile: Dockerfile
     ports:
       - "8001:${VP_PORT:-8888}"
     networks:
@@ -32,8 +32,8 @@ services:
 
   phishpedia:
     build:
-      context: .
-      dockerfile: phishpedia/Dockerfile
+      context: src/models/phishpedia
+      dockerfile: Dockerfile 
     networks:
       - net
     ports:
