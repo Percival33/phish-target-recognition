@@ -1,0 +1,127 @@
+# !/usr/bin/env just --justfile
+default:
+    just --list
+
+# Install depencies based on the operating system
+install:
+    #!/usr/bin/env bash
+    OS=$(uname -s)
+    if [[ "$OS" == "Darwin" ]]; then
+        just install-macos
+    else
+        # Check for NVIDIA GPU by looking for 'nvcc' or 'nvidia-smi'
+        if command -v nvcc > /dev/null 2>&1 || command -v nvidia-smi > /dev/null 2>&1; then
+            just install-cuda
+        else
+            just install-cpu
+        fi
+    fi
+
+# Install dependencies for macOS
+install-macos:
+    #!/usr/bin/env bash
+    echo "Installing dependencies for macOS..."
+
+    # Install base dependencies from pyproject.toml
+    uv sync --frozen
+
+    # Install PyTorch stack for macOS
+    uv pip install torch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0
+
+    # Install Detectron2 from GitHub for macOS
+    uv pip install 'git+https://github.com/facebookresearch/detectron2.git' --no-build-isolation
+
+    echo "macOS installation complete!"
+
+# Install dependencies for systems with CUDA
+install-cuda:
+    #!/usr/bin/env bash
+    echo "Installing dependencies with CUDA support..."
+
+    # Install base dependencies from pyproject.toml
+    uv sync --frozen
+
+    # Install PyTorch stack with CUDA support
+    uv pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 --index-url https://download.pytorch.org/whl/torch_stable.html
+
+    # Install Detectron2 with CUDA support
+    uv pip install detectron2 --index-url https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html
+
+    echo "CUDA installation complete!"
+
+# Install dependencies for CPU-only systems
+install-cpu:
+    #!/usr/bin/env bash
+    echo "Installing CPU-only dependencies..."
+
+    # Install base dependencies from pyproject.toml
+    uv sync --frozen
+
+    # Install PyTorch stack for CPU
+    uv pip install torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 --index-url https://download.pytorch.org/whl/torch_stable.html
+
+    # Install Detectron2 for CPU
+    uv pip install detectron2 --index-url https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html
+
+    echo "CPU-only installation complete!"
+
+models_dir := justfile_directory() + "/models"
+
+# Download all model files
+download-models:
+    #!/usr/bin/env bash
+    # Create models directory if it doesn't exist
+    mkdir -p "{{ models_dir }}"
+    cd "{{ models_dir }}"
+
+    # Dictionary of files to download (filename -> Google Drive ID)
+    declare -A MODEL_FILES=(
+      ["rcnn_bet365.pth"]="1tE2Mu5WC8uqCxei3XqAd7AWaP5JTmVWH"
+      ["faster_rcnn.yaml"]="1Q6lqjpl4exW7q_dPbComcj0udBMDl8CW"
+      ["resnetv2_rgb_new.pth.tar"]="1H0Q_DbdKPLFcZee8I14K62qV7TTy7xvS"
+      ["expand_targetlist.zip"]="1fr5ZxBKyDiNZ_1B6rRAfZbAHBBoUjZ7I"
+      ["domain_map.pkl"]="1qSdkSSoCYUkZMKs44Rup_1DPBxHnEKl1"
+    )
+
+    # Download each file if it doesn't exist
+    for FILE_NAME in "${!MODEL_FILES[@]}"; do
+        FILE_ID="${MODEL_FILES[$FILE_NAME]}"
+        if [ -f "$FILE_NAME" ]; then
+            echo "$FILE_NAME already exists. Skipping download."
+        else
+            echo "Downloading $FILE_NAME..."
+            uv run gdown "$FILE_ID" -O "$FILE_NAME"
+        fi
+    done
+
+    echo "All model files downloaded successfully."
+
+# Extract the target list archive
+extract-targetlist:
+    #!/usr/bin/env bash
+    cd "{{ models_dir }}" || exit 1
+
+    # Extract the zip file
+    echo "Extracting expand_targetlist.zip..."
+    unzip -o expand_targetlist.zip -d expand_targetlist
+
+    # Check if there's a nested directory and fix it
+    if [ -d "expand_targetlist/expand_targetlist" ]; then
+        echo "Moving files from nested directory..."
+        mv expand_targetlist/expand_targetlist/* expand_targetlist/
+        rmdir expand_targetlist/expand_targetlist
+    fi
+
+    echo "Extraction completed successfully."
+
+# Combined recipe for downloading and extracting all files
+setup-models: download-models extract-targetlist
+    echo "Model setup complete. All files downloaded and extracted."
+
+# Setup the environment (install dependencies and download models)
+setup: install setup-models
+    echo "Setup complete."
+
+# Clean environment (remove installed packages)
+clean:
+    uv pip uninstall torch torchvision torchaudio detectron2
