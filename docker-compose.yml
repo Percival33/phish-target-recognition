@@ -42,6 +42,8 @@ services:
       - PORT=${PP_PORT:-8888}
     volumes:
       - ./src/models/phishpedia/models:/code/models
+      - ./src/models/phishpedia/LOGO_FEATS.npy:/code/LOGO_FEATS.npy
+      - ./src/models/phishpedia/LOGO_FILES.npy:/code/LOGO_FILES.npy
 
 networks:
   net:
