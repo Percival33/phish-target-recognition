@@ -4,7 +4,6 @@ from pathlib import Path
 
 import numpy as np
 from eval_new import find_names_min_distances
-from tools.config import PROCESSED_DATA_DIR
 from tools.ModelServing import ModelServing
 
 from Evaluate import Evaluate
@@ -63,7 +62,6 @@ class VisualPhishServing(ModelServing):
 
 
 if __name__ == "__main__":
-    serving = VisualPhishServing()
 
     parser = ArgumentParser()
     parser.add_argument("--emb-dir", type=Path, default="/code/model")
@@ -71,7 +69,8 @@ if __name__ == "__main__":
     parser.add_argument("--saved-model-name", type=str, default="model2")
     args = parser.parse_args()
 
-    serving.run(args)
+    serving = VisualPhishServing(args)
+    serving.run()
 
 # in api folder
 # uv run python -m visualphishnet.VisualPhishServing

@@ -5,7 +5,10 @@ import logging.config
 from pathlib import Path
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[8]
+for idx, x in enumerate(Path(__file__).resolve().parents):
+    print(f'i: {idx} {x}')
+    
+PROJ_ROOT = Path(__file__).resolve().parents[6]
 print(PROJ_ROOT)
 DATA_DIR = PROJ_ROOT / "data"
 LOGS_DIR = PROJ_ROOT / "logs"

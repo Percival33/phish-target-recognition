@@ -30,7 +30,7 @@ services:
     environment:
       - PORT=${VP_PORT:-8888}
     volumes:
-      - ./data/processed/VisualPhish/model2.h5:/code/model/models2.h5
+      - ./data/processed/VisualPhish/model2.h5:/code/model/model2.h5
       - ./data/processed/VisualPhish/whitelist_emb.npy:/code/model/whitelist_emb.npy
       - ./data/processed/VisualPhish/whitelist_file_names.npy:/code/model/whitelist_file_names.npy
       - ./data/processed/VisualPhish/whitelist_labels.npy:/code/model/whitelist_labels.npy

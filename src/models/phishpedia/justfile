@@ -26,10 +26,10 @@ install-macos:
     uv sync --frozen
 
     # Install PyTorch stack for macOS
-    uv pip install torch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0 --index https://download.pytorch.org/whl/cpu
+    uv pip install torch==1.9.0 torchvision==0.10.0 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
     # Install Detectron2 from GitHub for macOS
-    uv pip install 'git+https://github.com/facebookresearch/detectron2.git'
+    uv pip install 'git+https://github.com/facebookresearch/detectron2.git' --no-build-isolation
 
     echo "macOS installation complete!"
 
@@ -45,7 +45,7 @@ install-cuda:
     uv pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 --index https://download.pytorch.org/whl/torch_stable.html
 
     # Install Detectron2 with CUDA support
-    uv pip install detectron2 --index https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html
+    uv pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html --no-build-isolation
 
     echo "CUDA installation complete!"
 
@@ -58,10 +58,10 @@ install-cpu:
     uv sync --frozen
 
     # Install PyTorch stack for CPU
-    uv pip install torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 --index-url https://download.pytorch.org/whl/torch_stable.html
+    uv pip install torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
     # Install Detectron2 for CPU
-    uv pip install detectron2 --index https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html --no-build-isolation
+    uv pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cpu/torch1.9/index.html --no-build-isolation --prerelease=allow
 
     echo "CPU-only installation complete!"
 
