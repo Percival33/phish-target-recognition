@@ -66,7 +66,7 @@ if __name__ == "__main__":
     serving = VisualPhishServing()
 
     parser = ArgumentParser()
-    parser.add_argument("--emb-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
+    parser.add_argument("--emb-dir", type=Path, default="/code/model")
     parser.add_argument("--margin", type=float, default=2.2)
     parser.add_argument("--saved-model-name", type=str, default="model2")
     args = parser.parse_args()
