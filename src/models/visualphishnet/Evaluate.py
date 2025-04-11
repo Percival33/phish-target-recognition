@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
-
+from tqdm import tqdm
 import DataHelper as data
 
 
@@ -66,6 +66,27 @@ class Evaluate:
         distances.rstrip(",")
 
         return names_min_distance, only_names, distances
+
+    @staticmethod
+    def compute_all_distances_batched(test_matrix, targetlist_emb, batch_size=256):
+        """
+        Computes pairwise L2 distances between test_matrix and targetlist_emb in a batch-wise manner.
+        """
+        train_size = targetlist_emb.shape[0]
+        test_size = test_matrix.shape[0]
+        pairwise_distance = np.zeros((test_size, train_size))
+
+        for batch_start in tqdm(range(0, test_size, batch_size), desc="Computing pairwise distances (batched)"):
+            batch_end = min(batch_start + batch_size, test_size)
+            batch = test_matrix[batch_start:batch_end]
+
+            # Compute pairwise L2 distances efficiently
+            diff = batch[:, np.newaxis, :] - targetlist_emb[np.newaxis, :, :]
+            l2_diff = np.sum(diff**2, axis=2) / targetlist_emb.shape[1]
+
+            pairwise_distance[batch_start:batch_end] = l2_diff
+
+        return pairwise_distance
 
     # Find Smallest n distances
     @staticmethod
