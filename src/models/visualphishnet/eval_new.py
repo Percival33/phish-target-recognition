@@ -167,27 +167,6 @@ def compute_all_distances(test_matrix, targetlist_emb):
     return pairwise_distance
 
 
-def compute_all_distances_batched(test_matrix, targetlist_emb, batch_size=256):
-    """
-    Computes pairwise L2 distances between test_matrix and targetlist_emb in a batch-wise manner.
-    """
-    train_size = targetlist_emb.shape[0]
-    test_size = test_matrix.shape[0]
-    pairwise_distance = np.zeros((test_size, train_size))
-
-    for batch_start in tqdm(range(0, test_size, batch_size), desc="Computing pairwise distances (batched)"):
-        batch_end = min(batch_start + batch_size, test_size)
-        batch = test_matrix[batch_start:batch_end]
-
-        # Compute pairwise L2 distances efficiently
-        diff = batch[:, np.newaxis, :] - targetlist_emb[np.newaxis, :, :]
-        l2_diff = np.sum(diff**2, axis=2) / targetlist_emb.shape[1]
-
-        pairwise_distance[batch_start:batch_end] = l2_diff
-
-    return pairwise_distance
-
-
 # Find names of examples with min distance
 def find_names_min_distances(idx, values, all_file_names):
     names_min_distance = ""
@@ -299,7 +278,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         y = np.array(["benign"] * benign_count + ["phish"] * phish_count)
 
     # Compute pairwise distances
-    pairwise_distance = compute_all_distances_batched(data_emb, targetlist_emb)
+    pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, targetlist_emb)
     np.save(args.emb_dir / "pairwise_distances.npy", pairwise_distance)
 
     return data_emb, pairwise_distance, y, file_names

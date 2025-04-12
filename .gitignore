@@ -240,3 +240,5 @@ fabric.properties
 
 # Data
 /tmp/
+/src/models/phishpedia/models/
+**/*.whl

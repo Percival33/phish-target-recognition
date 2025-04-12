@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 import httpx
 import asyncio
 import os
+import base64
 
 MODELS = os.getenv("MODELS", "").split(",") if os.getenv("MODELS") else []
 SERVICE_PORTS = {
@@ -14,14 +15,26 @@ router = APIRouter()
 
 
 async def fetch_data(
-    client: httpx.AsyncClient, url: str, image_data, image_filename, url_param
+    client: httpx.AsyncClient, url: str, image: str, url_param: str
 ):
     try:
-        files = {"image": (image_filename, image_data, "application/octet-stream")}
-        data = {"url": url_param}
+        # Create JSON payload with exact structure: image first, then url
+        json_data = {
+            "image": image,
+            "url": url_param
+        }
 
         print(f"Fetching {url} with URL param: {url_param}")
-        response = await client.post(url, files=files, data=data)
+        print(f"Image data type: {type(image)}, length: {len(image)}")
+        
+        print(f"JSON data keys: {json_data.keys()}")
+
+        response = await client.post(url, json=json_data)
+        
+        # Debug response
+        if response.status_code != 200:
+            print(f"Error response from {url}: {response.status_code} - {response.text[:1000]}")
+            
         response.raise_for_status()
         return response.json()
     except (httpx.HTTPError, KeyError, ValueError) as e:
@@ -35,13 +48,23 @@ async def models_list():
 
 
 @router.post("/predict")
-async def predict(image: UploadFile = File(...), url: str = Form(...)):
-    image_data = await image.read()
-
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        tasks = [
-            fetch_data(client, model_url, image_data, image.filename, url)
-            for model_url in URLS
-        ]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-    return results
+async def predict(image: str = Form(...), url: str = Form(...)):
+    try:
+        # Validate base64 string by attempting to decode it
+        try:
+            # Test if this is valid base64
+            base64.b64decode(image)
+        except Exception as e:
+            print(f"Invalid base64 encoding: {e}")
+            raise HTTPException(status_code=400, detail=f"Invalid base64 encoding: {e}")
+            
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            tasks = [
+                fetch_data(client, model_url, image, url)
+                for model_url in URLS
+            ]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+        return results
+    except Exception as e:
+        print(f"Error in predict endpoint: {e}")
+        raise HTTPException(status_code=500, detail=f"Error in predict endpoint: {e}")
