@@ -21,7 +21,10 @@ class VisualPhishServing(ModelServing):
         img = data.get("image", None)
         url = data.get("url", None)
         resized = resize(img, (self.args.reshape_size[0], self.args.reshape_size[1]), anti_aliasing=True)
-        data_emb = self.model.predict([resized], verbose=0)
+        print(f"Resized image shape: {resized.shape}")
+        if len(resized.shape) == 3:
+            resized = np.expand_dims(resized, axis=0)
+        data_emb = self.model.predict(resized, verbose=0)
         pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, self.targetlist_emb)
 
         min_distances = None
