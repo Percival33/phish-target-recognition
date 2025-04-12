@@ -18,17 +18,16 @@ async def fetch_data(
     client: httpx.AsyncClient, url: str, image: str, url_param: str
 ):
     try:
-        # Ensure we're sending valid JSON data
-        data = {
+        form_data = {
             "url": url_param,
-            "image": image  # Pass the base64 string directly
+            "image": image
         }
 
         print(f"Fetching {url} with URL param: {url_param}")
         print(f"Image data type: {type(image)}, length: {len(image)}")
         
-        # Send as JSON instead of form data
-        response = await client.post(url, json=data)
+        # Send as form data
+        response = await client.post(url, data=form_data)
         
         # Debug response
         if response.status_code != 200:

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Form
 from contextlib import asynccontextmanager
 import os
 import base64
@@ -28,27 +28,19 @@ class ModelServing(ABC):
         """Register routes for the FastAPI application"""
 
         @self.app.post("/predict")
-        async def predict_route(request: Request):
-            # Get JSON data from request
+        async def predict_route(image: str = Form(...), url: str = Form(...)):
             try:
-                data = await request.json()
-                url = data.get("url")
-                base64_image = data.get("image")
-                
-                if not url or not base64_image:
-                    return {"error": "Missing required fields: url and image"}
-
                 print(f"Received request with URL: {url}")
-                print(f"Received base64 image of type: {type(base64_image)}, length: {len(base64_image) if base64_image else 0}")
+                print(f"Received base64 image of type: {type(image)}, length: {len(image) if image else 0}")
                 
                 # Try to decode a small part of the string to verify it's base64
                 try:
-                    start_sample = base64_image[:20]
-                    end_sample = base64_image[-20:] if len(base64_image) > 20 else ""
+                    start_sample = image[:20]
+                    end_sample = image[-20:] if len(image) > 20 else ""
                     print(f"Base64 sample - start: {start_sample}, end: {end_sample}")
                     
                     # Decode base64 image
-                    image_data = base64.b64decode(base64_image)
+                    image_data = base64.b64decode(image)
                     print(f"Successfully decoded base64 to binary, length: {len(image_data)}")
                     
                     # Convert binary image to cv2 format
