@@ -2,13 +2,23 @@
 # from pydantic_settings import BaseSettings
 import logging
 import logging.config
+import os
 from pathlib import Path
 
+
+# Determine Project Root
+PROJECT_ROOT_DIR_ENV = os.getenv("PROJECT_ROOT_DIR")
+
+if PROJECT_ROOT_DIR_ENV:
+    PROJ_ROOT: Path = Path(PROJECT_ROOT_DIR_ENV)
+    print(f"Using PROJECT_ROOT_DIR from env: {PROJ_ROOT}")
+else:
+    raise ValueError("PROJECT_ROOT_DIR environment variable not set")
+
 # Paths
-for idx, x in enumerate(Path(__file__).resolve().parents):
-    print(f'i: {idx} {x}')
+# for idx, x in enumerate(Path(__file__).resolve().parents):
+#     print(f'i: {idx} {x}')
     
-PROJ_ROOT = Path(__file__).resolve().parents[6]
 print(PROJ_ROOT)
 DATA_DIR = PROJ_ROOT / "data"
 LOGS_DIR = PROJ_ROOT / "logs"

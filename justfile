@@ -20,6 +20,6 @@ tools: copy-vp copy-pp
 run-pp recipe-name:
     just -f src/models/phishpedia/justfile {{recipe-name}}
 
-docker: tools 
+docker: tools
     just run-pp setup-models
     docker compose up
