@@ -5,10 +5,8 @@ WORKDIR /code
 
 COPY uv.lock /code/uv.lock
 COPY pyproject.toml /code/pyproject.toml
+COPY common/*.whl /code/common/
+RUN uv sync --frozen --no-cache --no-dev
+COPY * /code
 
-RUN uv sync --frozen
-RUN mkdir -p /code/app
-
-COPY main.py /code
-COPY routes.py /code
-CMD ["uv", "run", "--no-dev", "main.py"]
+CMD ["uv", "run", "--no-dev", "VisualPhishServing.py"]

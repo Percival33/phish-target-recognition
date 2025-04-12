@@ -14,3 +14,6 @@ git checkout thesis-t
 git merge overleaf/master  # Or use `git rebase overleaf/master`
 
 git push overleaf thesis-t:master
+
+
+echo "export PROJECT_ROOT_DIR=?" >> ~/.zshrc

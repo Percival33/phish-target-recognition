@@ -1,0 +1,58 @@
+x-service-vars:
+  &service-vars
+  VP_PORT: 8008
+  PP_PORT: 8888
+  API_PORT: 8888
+
+services:
+  api:
+    build:
+      context: src/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:${API_PORT:-8888}"
+    networks:
+      - net
+    environment:
+      - MODELS=visualphish,phishpedia
+      - PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR:-/code}
+      - PORT=${API_PORT:-8888}
+      - VP_PORT=${VP_PORT:-8888}
+      - PP_PORT=${PP_PORT:-8888}
+
+  visualphish:
+    build:
+      context: src/models/visualphishnet
+      dockerfile: Dockerfile
+    ports:
+      - "8001:${VP_PORT:-8888}"
+    networks:
+      - net
+    environment:
+      - PORT=${VP_PORT:-8888}
+      - PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR:-/code}
+    volumes:
+      - ./data/processed/VisualPhish/model2.h5:/code/model/model2.h5
+      - ./data/processed/VisualPhish/whitelist_emb.npy:/code/model/whitelist_emb.npy
+      - ./data/processed/VisualPhish/whitelist_file_names.npy:/code/model/whitelist_file_names.npy
+      - ./data/processed/VisualPhish/whitelist_labels.npy:/code/model/whitelist_labels.npy
+
+  phishpedia:
+    build:
+      context: src/models/phishpedia
+      dockerfile: Dockerfile
+    networks:
+      - net
+    ports:
+      - "8002:${PP_PORT:-8888}"
+    environment:
+      - PORT=${PP_PORT:-8888}
+      - PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR:-/code}
+    volumes:
+      - ./src/models/phishpedia/models:/code/models
+      - ./src/models/phishpedia/LOGO_FEATS.npy:/code/LOGO_FEATS.npy
+      - ./src/models/phishpedia/LOGO_FILES.npy:/code/LOGO_FILES.npy
+
+networks:
+  net:
+    driver: bridge
