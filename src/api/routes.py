@@ -15,19 +15,16 @@ router = APIRouter()
 
 
 async def fetch_data(
-    client: httpx.AsyncClient, url: str, image_data: bytes, url_param: str
+    client: httpx.AsyncClient, url: str, image: str, url_param: str
 ):
     try:
-        # Send the image as a binary file
-        files = {
-            "image": image_data,
-        }
         data = {
             "url": url_param,
+            "image": image
         }
 
-        print(f"Fetching {url} with URL param: {url_param} and binary image data...")
-        response = await client.post(url, data=data, files=files)
+        print(f"Fetching {url} with URL param: {url_param} and base64 image data...")
+        response = await client.post(url, json=data)
         response.raise_for_status()
         return response.json()
     except (httpx.HTTPError, KeyError, ValueError) as e:
@@ -41,16 +38,17 @@ async def models_list():
 
 
 @router.post("/predict")
-async def predict(image: UploadFile = File(...), url: str = Form(...)):
+async def predict(image: str = Form(...), url: str = Form(...)):
     try:
-        image_data = await image.read()
+        # Decode base64 string to binary
+        image_data = base64.b64decode(image)
     except Exception as e:
-        print(f"Error reading image: {e}")
-        raise HTTPException(status_code=500, detail=f"Error reading image: {e}")
+        print(f"Error decoding base64 image: {e}")
+        raise HTTPException(status_code=500, detail=f"Error decoding base64 image: {e}")
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         tasks = [
-            fetch_data(client, model_url, image_data, url)
+            fetch_data(client, model_url, image, url)
             for model_url in URLS
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)

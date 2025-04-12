@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 import os
 import base64
@@ -28,26 +28,38 @@ class ModelServing(ABC):
         """Register routes for the FastAPI application"""
 
         @self.app.post("/predict")
-        async def predict_route(image: UploadFile = File(...), url: str = Form(...)):
-            # Process the binary image data
+        async def predict_route(request: Request):
+            # Get JSON data from request
             try:
-                image_data = await image.read()
-                # Convert binary image to cv2 format
-                nparr = np.frombuffer(image_data, np.uint8)
-                image_cv2 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                data = await request.json()
+                url = data.get("url")
+                base64_image = data.get("image")
                 
-                if image_cv2 is None:
-                    return {"error": "Failed to decode image"}
+                if not url or not base64_image:
+                    return {"error": "Missing required fields: url and image"}
+                
+                # Decode base64 image
+                try:
+                    image_data = base64.b64decode(base64_image)
+                    # Convert binary image to cv2 format
+                    nparr = np.frombuffer(image_data, np.uint8)
+                    image_cv2 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    
+                    if image_cv2 is None:
+                        return {"error": "Failed to decode image"}
+                except Exception as e:
+                    # Handle potential decoding or conversion errors
+                    print(f"Error decoding base64 image: {e}")
+                    return {"error": "Invalid base64 image data"}
             except Exception as e:
-                # Handle potential decoding or conversion errors
-                print(f"Error processing image: {e}")
-                return {"error": "Invalid image data"}
+                print(f"Error processing request: {e}")
+                return {"error": "Invalid request data"}
 
-            data = {
+            prediction_data = {
                 "url": url,
                 "image": image_cv2,
             }
-            return await self.predict(data)
+            return await self.predict(prediction_data)
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""
