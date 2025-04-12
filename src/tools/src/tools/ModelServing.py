@@ -32,6 +32,8 @@ class ModelServing(ABC):
             try:
                 # Parse JSON request body
                 data = await request.json()
+                print(f"JSON data keys: {data.keys()}")
+
                 url = data.get("url")
                 image_str = data.get("image")
                 

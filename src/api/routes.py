@@ -18,16 +18,17 @@ async def fetch_data(
     client: httpx.AsyncClient, url: str, image: str, url_param: str
 ):
     try:
-        # Create JSON payload with base64 image string and URL
+        # Create JSON payload with exact structure: image first, then url
         json_data = {
-            "url": url_param,
-            "image": image
+            "image": image,
+            "url": url_param
         }
 
         print(f"Fetching {url} with URL param: {url_param}")
         print(f"Image data type: {type(image)}, length: {len(image)}")
         
-        # Send as JSON in request body
+        print(f"JSON data keys: {json_data.keys()}")
+
         response = await client.post(url, json=json_data)
         
         # Debug response
