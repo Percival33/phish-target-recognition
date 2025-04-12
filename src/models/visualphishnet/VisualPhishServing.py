@@ -34,10 +34,10 @@ class VisualPhishServing(ModelServing):
 
         # distance lower than threshold ==> report as phishing
         return {
-            "url": url,
+            "url": str(url),
             "class": 1 if float(min_distances) <= self.args.threshold else 0,
-            "target": only_names[0],
-            "distance": min_distances,
+            "target": str(only_names[0]),
+            "distance": float(min_distances),
         }
 
     async def on_startup(self):
