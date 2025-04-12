@@ -278,7 +278,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         y = np.array(["benign"] * benign_count + ["phish"] * phish_count)
 
     # Compute pairwise distances
-    pairwise_distance = compute_all_distances_batched(data_emb, targetlist_emb)
+    pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, targetlist_emb)
     np.save(args.emb_dir / "pairwise_distances.npy", pairwise_distance)
 
     return data_emb, pairwise_distance, y, file_names

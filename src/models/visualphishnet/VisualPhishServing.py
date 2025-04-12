@@ -1,11 +1,11 @@
-import logging
 from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
-from eval_new import find_names_min_distances
-from tools.ModelServing import ModelServing
 from skimage.transform import resize
+from tools.ModelServing import ModelServing
+
+from eval_new import find_names_min_distances
 from Evaluate import Evaluate
 from ModelHelper import ModelHelper
 
@@ -14,7 +14,6 @@ class VisualPhishServing(ModelServing):
     def __init__(self, args=None):
         super().__init__()
         self.args = args
-        self.logger = logging.getLogger(__name__)
 
     async def predict(self, data: dict):
         """Implementation of the predict method for VisualPhish"""
@@ -52,9 +51,6 @@ class VisualPhishServing(ModelServing):
 
         modelHelper = ModelHelper()
         self.model = modelHelper.load_model(self.args.emb_dir, self.args.saved_model_name, self.args.margin).layers[3]
-        self.logger.info(
-            "Loaded targetlist and model, number of protected target screenshots {}".format(len(self.targetlist_emb))
-        )
 
     def load_targetemb(self, emb_path, label_path, file_name_path):
         targetlist_emb = np.load(emb_path)
@@ -64,7 +60,6 @@ class VisualPhishServing(ModelServing):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser()
     parser.add_argument("--emb-dir", type=Path, default="/code/model")
     parser.add_argument("--margin", type=float, default=2.2)
