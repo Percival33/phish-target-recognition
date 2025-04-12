@@ -37,7 +37,10 @@ class ModelServing(ABC):
                 
                 if not url or not base64_image:
                     return {"error": "Missing required fields: url and image"}
-                
+
+                print(f"URL: {url}")
+                print(f"Base64 image length: {len(base64_image)}")
+
                 # Decode base64 image
                 try:
                     image_data = base64.b64decode(base64_image)
