@@ -34,10 +34,13 @@ class VisualPhishServing(ModelServing):
             idx, values = Evaluate.find_min_distances(np.ravel(distances_to_target), 1)
             names_min_distance, only_names, min_distances = find_names_min_distances(idx, values, self.all_file_names)
 
+        cls = 1 if float(min_distances) <= self.args.threshold else 0
+        target = str(only_names[0]) if cls else "unknown"
+
         return {
             "url": str(url),
-            "class": 1 if float(min_distances) <= self.args.threshold else 0,
-            "target": str(only_names[0]),
+            "class": cls,
+            "target": target,
             "distance": float(min_distances),
         }
 
