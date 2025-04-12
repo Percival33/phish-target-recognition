@@ -28,16 +28,20 @@ class ModelServing(ABC):
         """Register routes for the FastAPI application"""
 
         @self.app.post("/predict")
-        async def predict_route(image_base64: str = Form(...), url: str = Form(...)):
-            # Convert the base64 encoded image to cv2 format
+        async def predict_route(image: UploadFile = File(...), url: str = Form(...)):
+            # Process the binary image data
             try:
-                image_cv2 = self.convert_image(image_base64)
+                image_data = await image.read()
+                # Convert binary image to cv2 format
+                nparr = np.frombuffer(image_data, np.uint8)
+                image_cv2 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                
+                if image_cv2 is None:
+                    return {"error": "Failed to decode image"}
             except Exception as e:
                 # Handle potential decoding or conversion errors
-                # You might want to log the error and return a specific HTTP status code
-                print(f"Error converting image: {e}")
-                # Example: raise HTTPException(status_code=400, detail="Invalid image data")
-                return {"error": "Invalid image data"} # Or re-raise, or return appropriate response
+                print(f"Error processing image: {e}")
+                return {"error": "Invalid image data"}
 
             data = {
                 "url": url,
