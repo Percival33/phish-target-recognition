@@ -10,7 +10,7 @@ import cv2
 
 class PredictRequest(BaseModel):
     url: str
-    image: np.ndarray
+    image: str
 
 
 

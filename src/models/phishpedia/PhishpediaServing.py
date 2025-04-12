@@ -25,10 +25,10 @@ class PhishpediaServing(ModelServing):
         ) = self.phishpedia.test_orig_phishpedia(url, None, None, img)
 
         return {
-            "url": url,
-            "class": phish_category,
-            "target": pred_target,
-            "confidence": siamese_conf,
+            "url": str(url),
+            "class": int(phish_category),
+            "target": str(pred_target),
+            "confidence": float(siamese_conf),
         }
 
     async def on_startup(self):
