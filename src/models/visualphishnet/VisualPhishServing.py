@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 from eval_new import find_names_min_distances
 from tools.ModelServing import ModelServing
-
+from skimage.transform import resize
 from Evaluate import Evaluate
 from ModelHelper import ModelHelper
 
@@ -21,7 +21,7 @@ class VisualPhishServing(ModelServing):
         img = data.get("image", None)
         url = data.get("url", None)
 
-        data_emb = self.model.predict(img, verbose=0)
+        data_emb = self.model.predict(resize(img, (self.args.reshape_size[0], self.args.reshape_size[1])), verbose=0)
         pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, self.targetlist_emb)
 
         min_distances = None
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("--emb-dir", type=Path, default="/code/model")
     parser.add_argument("--margin", type=float, default=2.2)
     parser.add_argument("--saved-model-name", type=str, default="model2")
+    parser.add_argument("--reshape-size", default=[224, 224, 3])
     args = parser.parse_args()
 
     serving = VisualPhishServing(args)
