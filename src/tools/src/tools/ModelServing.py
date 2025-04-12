@@ -38,31 +38,46 @@ class ModelServing(ABC):
                 if not url or not base64_image:
                     return {"error": "Missing required fields: url and image"}
 
-                print(f"URL: {url}")
-                print(f"Base64 image length: {len(base64_image)}")
-
-                # Decode base64 image
+                print(f"Received request with URL: {url}")
+                print(f"Received base64 image of type: {type(base64_image)}, length: {len(base64_image) if base64_image else 0}")
+                
+                # Try to decode a small part of the string to verify it's base64
                 try:
+                    start_sample = base64_image[:20]
+                    end_sample = base64_image[-20:] if len(base64_image) > 20 else ""
+                    print(f"Base64 sample - start: {start_sample}, end: {end_sample}")
+                    
+                    # Decode base64 image
                     image_data = base64.b64decode(base64_image)
+                    print(f"Successfully decoded base64 to binary, length: {len(image_data)}")
+                    
                     # Convert binary image to cv2 format
                     nparr = np.frombuffer(image_data, np.uint8)
                     image_cv2 = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
                     
                     if image_cv2 is None:
-                        return {"error": "Failed to decode image"}
+                        print("Failed to decode image to cv2 format")
+                        return {"error": "Failed to decode image to OpenCV format"}
+                    
+                    print(f"Successfully converted to cv2 image with shape: {image_cv2.shape}")
                 except Exception as e:
                     # Handle potential decoding or conversion errors
-                    print(f"Error decoding base64 image: {e}")
-                    return {"error": "Invalid base64 image data"}
+                    print(f"Error decoding base64 image: {str(e)}")
+                    return {"error": f"Invalid base64 image data: {str(e)}"}
             except Exception as e:
-                print(f"Error processing request: {e}")
-                return {"error": "Invalid request data"}
+                print(f"Error processing request: {str(e)}")
+                return {"error": f"Invalid request data: {str(e)}"}
 
             prediction_data = {
                 "url": url,
                 "image": image_cv2,
             }
-            return await self.predict(prediction_data)
+            try:
+                result = await self.predict(prediction_data)
+                return result
+            except Exception as e:
+                print(f"Error in prediction: {str(e)}")
+                return {"error": f"Prediction failed: {str(e)}"}
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""
