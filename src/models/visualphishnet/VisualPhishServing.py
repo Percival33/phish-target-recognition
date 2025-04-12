@@ -35,7 +35,6 @@ class VisualPhishServing(ModelServing):
             idx, values = Evaluate.find_min_distances(np.ravel(distances_to_target), 1)
             names_min_distance, only_names, min_distances = find_names_min_distances(idx, values, self.all_file_names)
 
-        # distance lower than threshold ==> report as phishing
         return {
             "url": str(url),
             "class": 1 if float(min_distances) <= self.args.threshold else 0,
@@ -71,6 +70,7 @@ if __name__ == "__main__":
     parser.add_argument("--margin", type=float, default=2.2)
     parser.add_argument("--saved-model-name", type=str, default="model2")
     parser.add_argument("--reshape-size", default=[224, 224, 3])
+    parser.add_argument("--threshold", type=float, default=8)
     args = parser.parse_args()
 
     serving = VisualPhishServing(args)
