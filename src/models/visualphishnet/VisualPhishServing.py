@@ -20,8 +20,8 @@ class VisualPhishServing(ModelServing):
         """Implementation of the predict method for VisualPhish"""
         img = data.get("image", None)
         url = data.get("url", None)
-
-        data_emb = self.model.predict(resize(img, (self.args.reshape_size[0], self.args.reshape_size[1])), verbose=0)
+        resized = resize(img, (self.args.reshape_size[0], self.args.reshape_size[1]), anti_aliasing=True)
+        data_emb = self.model.predict([resized], verbose=0)
         pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, self.targetlist_emb)
 
         min_distances = None
