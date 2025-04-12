@@ -8,7 +8,7 @@ class PhishpediaServing(ModelServing):
 
     async def predict(self, data: dict):
         url = data.get("url", None)
-        img = data.get("image_content", None)
+        img = data.get("image", None)
 
         (
             phish_category,

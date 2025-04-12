@@ -28,15 +28,20 @@ class ModelServing(ABC):
         """Register routes for the FastAPI application"""
 
         @self.app.post("/predict")
-        async def predict_route(image: UploadFile = File(...), url: str = Form(...)):
-            # Convert the uploaded file to a dict with content and metadata
-            image_content = await image.read()
-            # TODO: convert image_content from base64
+        async def predict_route(image_base64: str = Form(...), url: str = Form(...)):
+            # Convert the base64 encoded image to cv2 format
+            try:
+                image_cv2 = self.convert_image(image_base64)
+            except Exception as e:
+                # Handle potential decoding or conversion errors
+                # You might want to log the error and return a specific HTTP status code
+                print(f"Error converting image: {e}")
+                # Example: raise HTTPException(status_code=400, detail="Invalid image data")
+                return {"error": "Invalid image data"} # Or re-raise, or return appropriate response
+
             data = {
                 "url": url,
-                "image_content": image_content,
-                "image_filename": image.filename,
-                "image_content_type": image.content_type,
+                "image": image_cv2,
             }
             return await self.predict(data)
 
