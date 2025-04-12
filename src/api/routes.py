@@ -24,6 +24,7 @@ async def fetch_data(
         }
 
         print(f"Fetching {url} with URL param: {url_param} and base64 image data...")
+        print(data)
         response = await client.post(url, json=data)
         response.raise_for_status()
         return response.json()

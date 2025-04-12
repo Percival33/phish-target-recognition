@@ -75,15 +75,6 @@ class ModelServing(ABC):
 
         uvicorn.run(self.app, host="0.0.0.0", port=self.port)
 
-    def convert_image(self, image_content):
-        try:
-            im_bytes = base64.b64decode(image_content)
-            im_arr = np.frombuffer(im_bytes, dtype=np.uint8)
-            return cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
-        except Exception as e:
-            print(f"Error converting image: {e}")
-            raise
-
 
     @abstractmethod
     async def predict(self, data: dict):

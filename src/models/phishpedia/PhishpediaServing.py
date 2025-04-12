@@ -10,6 +10,9 @@ class PhishpediaServing(ModelServing):
         url = data.get("url", None)
         img = data.get("image", None)
 
+        print(f"URL: {url}")
+        print(f"type img: {type(img)}")
+
         (
             phish_category,
             pred_target,
