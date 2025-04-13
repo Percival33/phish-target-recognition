@@ -9,7 +9,6 @@ import os
 import sys
 import shutil
 import argparse
-from pathlib import Path
 
 
 def load_labels(labels_file):
