@@ -40,7 +40,7 @@ def parse_phishpedia_csv(file_path, is_phish=False):
                     "logo_match_time",
                 ],
                 encoding=encoding,
-                on_bad_lines="skip",  # Skip problematic lines
+                # on_bad_lines="skip",  # Skip problematic lines
             )
 
             # Handle any Unicode conversion for string columns
