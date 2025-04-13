@@ -9,7 +9,7 @@ def process_and_evaluate(path_to_csv, plot=False):
     # Load CSV files
     df = pd.read_csv(path_to_csv)
     # Fill NaN values in pp_target with 0
-    df["pp_class"] = df["pp_class"].fillna(0)
+    # df["pp_class"] = df["pp_class"].fillna(0)
 
     class_metrics, target_metrics = calculate_metrics(
         cls_true=df["true_class"],
@@ -26,11 +26,11 @@ def process_and_evaluate(path_to_csv, plot=False):
         print(f"{metric}: {value:.4f}")
 
     if plot:
-
+        auc_score = roc_auc_score(df["true_class"], df["pp_class"])
         fpr, tpr, _ = roc_curve(df["true_class"], df["pp_class"])
         plt.figure(figsize=(8, 6))
         plt.plot(
-            fpr, tpr, label=f"ROC Curve (AUC = {roc_auc_score(df["true_class"], df["pp_class"]):.4f})"
+            fpr, tpr, label=f"ROC Curve (AUC = {auc_score:.4f})"
         )
         plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
         plt.xlabel("False Positive Rate")

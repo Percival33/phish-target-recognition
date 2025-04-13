@@ -17,7 +17,7 @@ def calculate_metrics(cls_true, cls_pred, targets_true, targets_pred):
         "recall": recall_score(cls_true, cls_pred, average="macro"),
     }
 
-    all_targets = list(set(targets_true + targets_pred))
+    all_targets = list(targets_true) + list(targets_pred)
     le = LabelEncoder()
     le.fit(all_targets)
 
