@@ -5,9 +5,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from skimage.transform import resize
-from sklearn.metrics import roc_curve, precision_recall_curve
-
+from sklearn.metrics import precision_recall_curve
 from tools.config import LOGS_DIR, PROCESSED_DATA_DIR, RAW_DATA_DIR, setup_logging
 from tools.metrics import calculate_metrics
 from tqdm import tqdm
@@ -15,7 +15,6 @@ from tqdm import tqdm
 from DataHelper import read_image
 from Evaluate import Evaluate
 from ModelHelper import ModelHelper
-import pandas as pd
 
 
 # load targetlist embedding
@@ -116,7 +115,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
 # L2 distance
 def compute_distance_pair(layer1, layer2, targetlist_emb):
     diff = layer1 - layer2
-    l2_diff = np.sum(diff ** 2) / targetlist_emb.shape[1]
+    l2_diff = np.sum(diff**2) / targetlist_emb.shape[1]
     return l2_diff
 
 
@@ -152,7 +151,7 @@ def find_names_min_distances(idx, values, all_file_names):
 
 
 def evaluate_threshold(
-        pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
+    pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
 ):
     """
     Evaluate model performance for a given threshold and return results as a pandas DataFrame
@@ -180,7 +179,7 @@ def evaluate_threshold(
         filename = file_names[i]
 
         # Extract target from filename (assuming format like "benign/file_1" or "phish/file_2")
-        assert names_min_distance.split()[1].split('/')[0] == only_names[0].split('/')[0]
+        assert names_min_distance.split()[1].split("/")[0] == only_names[0].split("/")[0]
         true_target = y[i]
 
         # Set VP class (0 for benign, positive value for phishing)
@@ -192,18 +191,20 @@ def evaluate_threshold(
 
         # Store targets for later metric calculation
         true_targets.append(true_target)
-        vp_target = "benign" if vp_class == 0 else only_names[0].split('/')[0]
+        vp_target = "benign" if vp_class == 0 else only_names[0].split("/")[0]
         pred_targets.append(vp_target)
 
         # Add data to the list
-        data.append({
-            "file": filename,
-            "vp_class": int(vp_class),
-            "vp_distance": float(min_distances),
-            "vp_target": vp_target,
-            "true_class": y_true[i],
-            "true_target": true_target,
-        })
+        data.append(
+            {
+                "file": filename,
+                "vp_class": int(vp_class),
+                "vp_distance": float(min_distances),
+                "vp_target": vp_target,
+                "true_class": y_true[i],
+                "true_target": true_target,
+            }
+        )
 
     class_metrics, target_metrics = calculate_metrics(y_true, y_pred, true_targets, pred_targets)
 
@@ -231,7 +232,7 @@ def evaluate_threshold(
     # Combine all metrics
     all_metrics = {**class_metrics, **target_metrics}
 
-    return class_metrics['roc_auc'], precision, recall, results_df, all_metrics
+    return class_metrics["roc_auc"], precision, recall, results_df, all_metrics
 
 
 def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder, batch_size):
@@ -303,7 +304,8 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
         )
         results.append({"threshold": threshold, "auc_score": auc_score})
         logger.info(
-            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}")
+            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}"
+        )
         plt.step(recall, precision, where="post", label=f"Threshold={threshold}")
         # plt.plot(fpr, tpr, label=f'Threshold={threshold}')
 
@@ -338,8 +340,8 @@ def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_n
     plt.figure(figsize=(8, 8))
 
     # Plot baseline points (0,0) and (1,1)
-    plt.plot(0, 0, 'bo', markersize=8, label='(0,0)')
-    plt.plot(1, 1, 'bo', markersize=8, label='(1,1)')
+    plt.plot(0, 0, "bo", markersize=8, label="(0,0)")
+    plt.plot(1, 1, "bo", markersize=8, label="(1,1)")
 
     # Initialize lists to store the best results for display
     best_auc = 0
@@ -373,10 +375,11 @@ def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_n
         results.append({"threshold": threshold, "auc_score": auc_score})
 
         logger.info(
-            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}")
+            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}"
+        )
 
         # Plot each threshold's point
-        plt.plot(fpr, tpr, 'o', alpha=0.5)
+        plt.plot(fpr, tpr, "o", alpha=0.5)
 
         # Track the best AUC score to highlight it
         if auc_score > best_auc:
@@ -387,7 +390,7 @@ def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_n
 
     # Highlight the best point
     if best_fpr is not None and best_tpr is not None:
-        plt.plot(best_fpr, best_tpr, 'ro', markersize=10, label=f'Best (FPR,TPR) at threshold={best_threshold}')
+        plt.plot(best_fpr, best_tpr, "ro", markersize=10, label=f"Best (FPR,TPR) at threshold={best_threshold}")
 
     # Plot the random classifier line
     x = np.linspace(0, 1, 100)
@@ -401,7 +404,7 @@ def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_n
     plt.title("ROC Curve")
 
     # Add grid for better visibility
-    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.grid(True, linestyle="--", alpha=0.7)
 
     # Add legend
     plt.legend()
@@ -419,6 +422,7 @@ def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_n
     with open(final_result_path, "w") as f:
         for result in results:
             f.write(f"Threshold: {result['threshold']}, AUC Score: {result['auc_score']}\n")
+
 
 if __name__ == "__main__":
     np.random.seed(42)

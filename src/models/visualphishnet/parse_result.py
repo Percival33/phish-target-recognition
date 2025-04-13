@@ -1,13 +1,15 @@
+import argparse
 import csv
 import os
-import argparse
-import pandas as pd
 from dataclasses import dataclass
+
+import pandas as pd
 
 
 @dataclass
 class ImageSimilarityRecord:
     """Data class to hold image similarity information"""
+
     filename: str
     is_benign: bool  # True if class is [0.], False if class is [1.]
     distance: float
@@ -27,8 +29,8 @@ def parse_to_dataframe(file_path):
     """
     data = []
 
-    with open(file_path, 'r') as file:
-        reader = csv.reader(file, delimiter='\t')
+    with open(file_path, "r") as file:
+        reader = csv.reader(file, delimiter="\t")
         for row in reader:
             # Handle empty rows
             if not row:
@@ -52,14 +54,16 @@ def parse_to_dataframe(file_path):
             # Assuming filename starts with either "benign/" or something else
             true_class = 0 if filename.startswith("benign/") else 1
 
-            data.append({
-                "file": filename,
-                "vp_class": vp_class,
-                "vp_distance": vp_distance,
-                "vp_target": vp_target,
-                "true_class": true_class,
-                "true_target": filename.split("/")[0],
-            })
+            data.append(
+                {
+                    "file": filename,
+                    "vp_class": vp_class,
+                    "vp_distance": vp_distance,
+                    "vp_target": vp_target,
+                    "true_class": true_class,
+                    "true_target": filename.split("/")[0],
+                }
+            )
 
     return pd.DataFrame(data)
 
@@ -94,7 +98,7 @@ def analyze_records(records):
         "benign_count": benign_count,
         "malicious_count": malicious_count,
         "avg_benign_distance": avg_benign_distance,
-        "avg_malicious_distance": avg_malicious_distance
+        "avg_malicious_distance": avg_malicious_distance,
     }
 
 
@@ -109,18 +113,18 @@ def analyze_dataframe(df):
         dict: Analysis results
     """
     total = len(df)
-    benign_pred_count = sum(df['vp_class'] == 0)
-    malicious_pred_count = sum(df['vp_class'] == 1)
+    benign_pred_count = sum(df["vp_class"] == 0)
+    malicious_pred_count = sum(df["vp_class"] == 1)
 
-    benign_true_count = sum(df['true_class'] == 0)
-    malicious_true_count = sum(df['true_class'] == 1)
+    benign_true_count = sum(df["true_class"] == 0)
+    malicious_true_count = sum(df["true_class"] == 1)
 
     # Calculate accuracy
-    accuracy = sum(df['vp_class'] == df['true_class']) / total
+    accuracy = sum(df["vp_class"] == df["true_class"]) / total
 
     # Calculate average distances
-    avg_benign_distance = df[df['vp_class'] == 0]['vp_distance'].mean()
-    avg_malicious_distance = df[df['vp_class'] == 1]['vp_distance'].mean()
+    avg_benign_distance = df[df["vp_class"] == 0]["vp_distance"].mean()
+    avg_malicious_distance = df[df["vp_class"] == 1]["vp_distance"].mean()
 
     return {
         "total_records": total,
@@ -130,7 +134,7 @@ def analyze_dataframe(df):
         "malicious_actual": malicious_true_count,
         "accuracy": accuracy,
         "avg_benign_distance": avg_benign_distance,
-        "avg_malicious_distance": avg_malicious_distance
+        "avg_malicious_distance": avg_malicious_distance,
     }
 
 
@@ -156,13 +160,17 @@ def main():
     print("\nAnalysis from DataFrame:")
     print(f"Total records: {df_analysis['total_records']}")
     print(
-        f"Predicted benign: {df_analysis['benign_predicted']} ({df_analysis['benign_predicted'] / df_analysis['total_records'] * 100:.2f}%)")
+        f"Predicted benign: {df_analysis['benign_predicted']} ({df_analysis['benign_predicted'] / df_analysis['total_records'] * 100:.2f}%)"
+    )
     print(
-        f"Predicted malicious: {df_analysis['malicious_predicted']} ({df_analysis['malicious_predicted'] / df_analysis['total_records'] * 100:.2f}%)")
+        f"Predicted malicious: {df_analysis['malicious_predicted']} ({df_analysis['malicious_predicted'] / df_analysis['total_records'] * 100:.2f}%)"
+    )
     print(
-        f"Actual benign: {df_analysis['benign_actual']} ({df_analysis['benign_actual'] / df_analysis['total_records'] * 100:.2f}%)")
+        f"Actual benign: {df_analysis['benign_actual']} ({df_analysis['benign_actual'] / df_analysis['total_records'] * 100:.2f}%)"
+    )
     print(
-        f"Actual malicious: {df_analysis['malicious_actual']} ({df_analysis['malicious_actual'] / df_analysis['total_records'] * 100:.2f}%)")
+        f"Actual malicious: {df_analysis['malicious_actual']} ({df_analysis['malicious_actual'] / df_analysis['total_records'] * 100:.2f}%)"
+    )
     print(f"Accuracy: {df_analysis['accuracy'] * 100:.2f}%")
     print(f"Average distance for benign predictions: {df_analysis['avg_benign_distance']:.4f}")
     print(f"Average distance for malicious predictions: {df_analysis['avg_malicious_distance']:.4f}")

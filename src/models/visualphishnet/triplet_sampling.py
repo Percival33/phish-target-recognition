@@ -3,18 +3,24 @@ import tensorflow as tf
 
 # TODO: refactor to HardSubsetSampling.py
 
+
 # Don't sample negative image from the same category as the positive image (e.g. google and google drive)
 # Create clusters of same-company websites (e.g. all microsoft websites)
 class TargetHelper:
     # targets names of parent and sub websites
-    target_lists = [['microsoft', 'ms_outlook', 'ms_office', 'ms_bing', 'ms_onedrive', 'ms_skype'],
-                    ['apple', 'itunes', 'icloud'], ['google', 'google_drive'], ['alibaba', 'aliexpress']]
+    target_lists = [
+        ["microsoft", "ms_outlook", "ms_office", "ms_bing", "ms_onedrive", "ms_skype"],
+        ["apple", "itunes", "icloud"],
+        ["google", "google_drive"],
+        ["alibaba", "aliexpress"],
+    ]
 
     def __init__(self, data_path):
-        targets_file = open(data_path / 'targets.txt', "r")
+        targets_file = open(data_path / "targets.txt", "r")
         self.all_targets = targets_file.read().splitlines()
-        self.parents_ids, self.sub_target_lists_idx = self._get_associated_targets_idx(self.target_lists,
-                                                                                       self.all_targets)
+        self.parents_ids, self.sub_target_lists_idx = self._get_associated_targets_idx(
+            self.target_lists, self.all_targets
+        )
 
     def check_if_same_category(self, img_label1, img_label2):
         if_same = 0
