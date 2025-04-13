@@ -23,7 +23,7 @@ def copy_and_rename_images(src_folder, dest_folder, is_phish):
         new_path = dest_folder / new_name
         shutil.copy(image_path / 'shot.png', new_path)
         data.append({
-            # old path should start from this path: /Users/mjarczewski/Repositories/inz/data/raw/phishpedia
+            # old path should start from this path: data/raw/phishpedia
             'new_name': new_name,
             # 'path': str(image_path),
             'path': str(image_path.relative_to(src_folder.parent)),
@@ -37,10 +37,8 @@ def copy_and_rename_images(src_folder, dest_folder, is_phish):
 
 
 if __name__ == "__main__":
-    # src_folder = Path('/Users/mjarczewski/Library/Application Support/JetBrains/PyCharm2024.3/scratches/tmp')
     # src_folder = RAW_DATA_DIR / 'phishpedia' / 'benign_sample_30k'
     src_folder = RAW_DATA_DIR / 'phishpedia' / 'phish_sample_30k'
-    # dest_folder = INTERIM_DATA_DIR / 'phishpedia' / 'tmp'
     # dest_folder = INTERIM_DATA_DIR / 'phishpedia' / 'benign_sample_30k'
     dest_folder = INTERIM_DATA_DIR / 'phishpedia' / 'phish_sample_30k'
     copy_and_rename_images(src_folder, dest_folder, is_phish=True)

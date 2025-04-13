@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import sys
 
 
 def get_unique_folder_names(directory, folder_type):
@@ -17,7 +18,7 @@ def main(dir1, dir2):
 
     union_folders = unique_folders1.union(unique_folders2)
     data = {
-        'Folder Name':  [folder[0] for folder in union_folders],
+        'Folder Name': [folder[0] for folder in union_folders],
         'isPhish': [folder[1] for folder in union_folders],
         'Count in Dir1': [folder[0] in {f[0] for f in unique_folders1} for folder in union_folders],
         'Count in Dir2': [folder[0] in {f[0] for f in unique_folders2} for folder in union_folders]
@@ -29,7 +30,12 @@ def main(dir1, dir2):
     print(df)
     return df
 
+
 if __name__ == "__main__":
-    dir1 = '/Users/mjarczewski/Repositories/inz/data/raw/phishpedia/benign_sample_30k'
-    dir2 = '/Users/mjarczewski/Repositories/inz/data/raw/phishpedia/phish_sample_30k'
+    if len(sys.argv) < 3:
+        print("Usage: python dataset_to_visualphish.py <benign_directory> <phish_directory>")
+        sys.exit(1)
+
+    dir1 = sys.argv[1]  # Benign samples directory
+    dir2 = sys.argv[2]  # Phish samples directory
     main(dir1, dir2)
