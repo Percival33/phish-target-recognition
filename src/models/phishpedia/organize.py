@@ -9,14 +9,13 @@ import os
 import sys
 import shutil
 import argparse
-from pathlib import Path
 
 
 def load_labels(labels_file):
     """Load company labels from the labels.txt file."""
-    with open(labels_file, 'r') as f:
+    with open(labels_file, "r") as f:
         # Strip whitespace and commas from each line
-        return [line.strip().rstrip(',') for line in f if line.strip()]
+        return [line.strip().rstrip(",") for line in f if line.strip()]
 
 
 def get_special_domain_mapping():
@@ -177,7 +176,7 @@ def get_special_domain_mapping():
         "ms_office": "office.com",
         "itunes": "itunes.apple.com",
         "icloud": "icloud.com",
-        "zoominfo": "zoominfo.com"
+        "zoominfo": "zoominfo.com",
     }
     return special_domains
 
@@ -201,13 +200,21 @@ def organize_images(images_dir, labels_file, output_dir):
     os.makedirs(output_dir, exist_ok=True)
 
     # Get list of image files sorted numerically
-    image_files = sorted([f for f in os.listdir(images_dir)
-                          if (f.endswith('.png') or f.endswith('.PNG') or f.endswith('.jpg')) and f.split('.')[0].isdigit()],
-                         key=lambda x: int(x.split('.')[0]))
+    image_files = sorted(
+        [
+            f
+            for f in os.listdir(images_dir)
+            if (f.endswith(".png") or f.endswith(".PNG") or f.endswith(".jpg"))
+            and f.split(".")[0].isdigit()
+        ],
+        key=lambda x: int(x.split(".")[0]),
+    )
 
     # Check if we have enough labels for the images
     if len(image_files) > len(labels):
-        print(f"Warning: Found {len(image_files)} images but only {len(labels)} labels.")
+        print(
+            f"Warning: Found {len(image_files)} images but only {len(labels)} labels."
+        )
         print("Some images will not be processed.")
 
     # Process each image with corresponding label
@@ -236,21 +243,32 @@ def organize_images(images_dir, labels_file, output_dir):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Organize images into folders based on labels.')
-    parser.add_argument('images_dir', help='Directory containing the images')
-    parser.add_argument('labels_file', help='Path to labels.txt file')
-    parser.add_argument('output_dir', help='Directory where to create the folder structure')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
+    parser = argparse.ArgumentParser(
+        description="Organize images into folders based on labels."
+    )
+    parser.add_argument("images_dir", help="Directory containing the images")
+    parser.add_argument("labels_file", help="Path to labels.txt file")
+    parser.add_argument(
+        "output_dir", help="Directory where to create the folder structure"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable verbose output"
+    )
 
     args = parser.parse_args()
 
     # Check if directories and files exist
     if not os.path.isdir(args.images_dir):
-        print(f"Error: Images directory '{args.images_dir}' does not exist", file=sys.stderr)
+        print(
+            f"Error: Images directory '{args.images_dir}' does not exist",
+            file=sys.stderr,
+        )
         return 1
 
     if not os.path.isfile(args.labels_file):
-        print(f"Error: Labels file '{args.labels_file}' does not exist", file=sys.stderr)
+        print(
+            f"Error: Labels file '{args.labels_file}' does not exist", file=sys.stderr
+        )
         return 1
 
     # Run the organization function

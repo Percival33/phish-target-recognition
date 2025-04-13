@@ -27,12 +27,14 @@ def setup_logging(base_dir):
     logs = {
         "main": log_dir / "main_conversion.log",
         "failed": log_dir / "failed_conversions.log",
-        "processed": log_dir / "processed_files.log"
+        "processed": log_dir / "processed_files.log",
     }
 
     # Initialize log files
     with open(logs["main"], "w") as f:
-        f.write(f"=== Encoding Conversion Log {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===\n")
+        f.write(
+            f"=== Encoding Conversion Log {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===\n"
+        )
         f.write(f"Processing folder: {base_dir}\n")
 
     with open(logs["failed"], "w") as f:
@@ -46,7 +48,7 @@ def setup_logging(base_dir):
 
 def log_message(message, log_file):
     """Append a timestamped message to the log file."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(log_file, "a") as f:
         f.write(f"[{timestamp}] {message}\n")
 
@@ -67,7 +69,9 @@ def detect_encoding(file_path):
             result1 = chardet.detect(raw_data)
             result2 = chardet.detect(middle_chunk)
             # Use the result with higher confidence
-            result = result1 if result1["confidence"] > result2["confidence"] else result2
+            result = (
+                result1 if result1["confidence"] > result2["confidence"] else result2
+            )
 
     encoding = result["encoding"].lower() if result["encoding"] else "unknown"
     return encoding
@@ -93,15 +97,15 @@ def convert_to_utf8(file_info):
         shutil.copy2(file_path, backup_path)
 
         # Convert encoding
-        with open(file_path, 'rb') as source:
+        with open(file_path, "rb") as source:
             content = source.read()
 
         try:
             # Try to decode with the detected encoding
-            decoded_content = content.decode(encoding, errors='replace')
+            decoded_content = content.decode(encoding, errors="replace")
 
             # Write with UTF-8 encoding
-            with open(temp_path, 'w', encoding='utf-8') as target:
+            with open(temp_path, "w", encoding="utf-8") as target:
                 target.write(decoded_content)
 
             # Replace original file with the converted one
@@ -169,6 +173,7 @@ def main():
     with tqdm(total=total_files, desc="Detecting encodings") as pbar:
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             for file_path in info_files:
+
                 def detect_and_update(file_path):
                     encoding = detect_encoding(file_path)
                     pbar.update(1)
@@ -178,7 +183,10 @@ def main():
                 file_encodings.append(future)
 
             # Get results
-            file_encodings = [future.result() for future in concurrent.futures.as_completed(file_encodings)]
+            file_encodings = [
+                future.result()
+                for future in concurrent.futures.as_completed(file_encodings)
+            ]
 
     # Convert files to UTF-8
     print("Converting files to UTF-8...")
@@ -187,7 +195,10 @@ def main():
 
     with tqdm(total=len(file_encodings), desc="Converting files") as pbar:
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            future_to_file = {executor.submit(convert_to_utf8, file_info): file_info for file_info in file_encodings}
+            future_to_file = {
+                executor.submit(convert_to_utf8, file_info): file_info
+                for file_info in file_encodings
+            }
 
             for future in concurrent.futures.as_completed(future_to_file):
                 result = future.result()
@@ -206,7 +217,9 @@ def main():
                     results["failed"] += 1
                     failed_files.append(result)
                     with open(logs["failed"], "a") as f:
-                        f.write(f"{result['path']} - {result.get('reason', 'unknown error')}\n")
+                        f.write(
+                            f"{result['path']} - {result.get('reason', 'unknown error')}\n"
+                        )
 
                 pbar.update(1)
 
@@ -225,7 +238,9 @@ Failed conversions: {results["failed"]}
 
     # Report failures
     if results["failed"] > 0:
-        print(f"WARNING: {results['failed']} conversions failed. Check {logs['failed']} for details.")
+        print(
+            f"WARNING: {results['failed']} conversions failed. Check {logs['failed']} for details."
+        )
         return 1
     else:
         print("All conversions completed successfully!")

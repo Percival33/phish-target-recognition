@@ -11,34 +11,38 @@ def copy_and_rename_images(src_folder, dest_folder, is_phish):
     dest_folder.mkdir(parents=True, exist_ok=True)
     data = []
 
-    images = sorted(src_folder.glob('*'))
+    images = sorted(src_folder.glob("*"))
     num_images = len(images)
     name_length = len(str(num_images - 1))
 
     for i, image_path in tqdm(enumerate(images), total=num_images):
-        if not image_path.is_dir() or image_path.name == '.DS_Store':
+        if not image_path.is_dir() or image_path.name == ".DS_Store":
             continue
 
         new_name = f"{str(i).zfill(name_length)}.png"
         new_path = dest_folder / new_name
-        shutil.copy(image_path / 'shot.png', new_path)
-        data.append({
-            # old path should start from this path: data/raw/phishpedia
-            'new_name': new_name,
-            # 'path': str(image_path),
-            'path': str(image_path.relative_to(src_folder.parent)),
-            'target': image_path.name.split('+')[0].lower(),
-            'isPhish': is_phish
-        })
+        shutil.copy(image_path / "shot.png", new_path)
+        data.append(
+            {
+                # old path should start from this path: data/raw/phishpedia
+                "new_name": new_name,
+                # 'path': str(image_path),
+                "path": str(image_path.relative_to(src_folder.parent)),
+                "target": image_path.name.split("+")[0].lower(),
+                "isPhish": is_phish,
+            }
+        )
 
     df = pd.DataFrame(data)
-    df.to_csv(dest_folder.parent / ('phish.csv' if is_phish else 'benign.csv'), index=False)
+    df.to_csv(
+        dest_folder.parent / ("phish.csv" if is_phish else "benign.csv"), index=False
+    )
     return df
 
 
 if __name__ == "__main__":
     # src_folder = RAW_DATA_DIR / 'phishpedia' / 'benign_sample_30k'
-    src_folder = RAW_DATA_DIR / 'phishpedia' / 'phish_sample_30k'
+    src_folder = RAW_DATA_DIR / "phishpedia" / "phish_sample_30k"
     # dest_folder = INTERIM_DATA_DIR / 'phishpedia' / 'benign_sample_30k'
-    dest_folder = INTERIM_DATA_DIR / 'phishpedia' / 'phish_sample_30k'
+    dest_folder = INTERIM_DATA_DIR / "phishpedia" / "phish_sample_30k"
     copy_and_rename_images(src_folder, dest_folder, is_phish=True)
