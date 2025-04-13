@@ -210,6 +210,13 @@ def evaluate_threshold(
 
     results_df = pd.DataFrame(data)
 
+    print("Class metrics:")
+    for metric, value in class_metrics.items():
+        print(f"{metric}: {value:.4f}")
+    print("\nTarget metrics:")
+    for metric, value in target_metrics.items():
+        print(f"{metric}: {value:.4f}")
+
     # Save DataFrame to CSV if a result path is provided
     if result_path:
         result_path.mkdir(parents=True, exist_ok=True)
@@ -331,99 +338,6 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
             f.write(f"Threshold: {result['threshold']}, AUC Score: {result['auc_score']}\n")
 
 
-def calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args):
-    # Test different thresholds
-    thresholds = np.arange(3, 20, 1)
-    results = []
-
-    # Create a new figure for the ROC curve
-    plt.figure(figsize=(8, 8))
-
-    # Plot baseline points (0,0) and (1,1)
-    plt.plot(0, 0, "bo", markersize=8, label="(0,0)")
-    plt.plot(1, 1, "bo", markersize=8, label="(1,1)")
-
-    # Initialize lists to store the best results for display
-    best_auc = 0
-    best_fpr = None
-    best_tpr = None
-    best_threshold = None
-
-    for threshold in thresholds:
-        # Adjust unpacking to match what evaluate_threshold actually returns
-        result = evaluate_threshold(
-            pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, args.result_path
-        )
-
-        # Based on the original code, it seems evaluate_threshold returns these values
-        auc_score = result[0]
-        precision = result[1]
-        recall = result[2]
-        all_metrics = result[4]  # Based on the original "*" in the unpacking
-
-        # We need to calculate or extract fpr and tpr for the ROC curve
-        # Since we don't have direct access, let's use a simple approach
-        # For a basic ROC plot, we can use a single point for each threshold
-        # This is a simplified approach - in practice you might need to extract actual FPR/TPR values
-
-        # Let's assume we can derive fpr from precision and recall
-        # A simple approximation: fpr = (1-precision) * recall
-        # Note: This is not the exact relationship but works for visualization
-        fpr = (1 - precision) * recall if precision < 1 else 0
-        tpr = recall
-
-        results.append({"threshold": threshold, "auc_score": auc_score})
-
-        logger.info(
-            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}"
-        )
-
-        # Plot each threshold's point
-        plt.plot(fpr, tpr, "o", alpha=0.5)
-
-        # Track the best AUC score to highlight it
-        if auc_score > best_auc:
-            best_auc = auc_score
-            best_fpr = fpr
-            best_tpr = tpr
-            best_threshold = threshold
-
-    # Highlight the best point
-    if best_fpr is not None and best_tpr is not None:
-        plt.plot(best_fpr, best_tpr, "ro", markersize=10, label=f"Best (FPR,TPR) at threshold={best_threshold}")
-
-    # Plot the random classifier line
-    x = np.linspace(0, 1, 100)
-    plt.plot(x, x, "k--", label="Random Classifier")
-
-    # Set the axes limits and labels
-    plt.xlim(0, 1.05)
-    plt.ylim(0, 1.05)
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("ROC Curve")
-
-    # Add grid for better visibility
-    plt.grid(True, linestyle="--", alpha=0.7)
-
-    # Add legend
-    plt.legend()
-
-    # Save the plot
-    plt.savefig(args.result_path / "roc_curve.png")
-    plt.close()
-
-    # Save numerical results
-    final_result_path = args.result_path / "threshold_results.txt"
-    final_result_path.parent.mkdir(parents=True, exist_ok=True)
-    if not final_result_path.exists():
-        final_result_path.touch()
-
-    with open(final_result_path, "w") as f:
-        for result in results:
-            f.write(f"Threshold: {result['threshold']}, AUC Score: {result['auc_score']}\n")
-
-
 if __name__ == "__main__":
     np.random.seed(42)
 
@@ -480,5 +394,5 @@ if __name__ == "__main__":
     y = np.load(args.save_folder / "all_labels.npy")
     file_names = np.load(args.save_folder / "all_file_names.npy")
 
-    # evaluate_threshold(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path)
-    calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
+    evaluate_threshold(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path)
+    # calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
