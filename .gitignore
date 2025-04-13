@@ -242,3 +242,14 @@ fabric.properties
 /tmp/
 /src/models/phishpedia/models/
 **/*.whl
+
+# Wandb
+**/wandb
+/src/models/phishpedia/models/
+**/*.whl
+
+# Logs
+logs/
+
+# Pycharm
+src/models/visualphishnet/243_22562_220-pycharm-support-libs
