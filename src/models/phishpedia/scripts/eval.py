@@ -8,8 +8,8 @@ import argparse
 def process_and_evaluate(path_to_csv, plot=False):
     # Load CSV files
     df = pd.read_csv(path_to_csv)
-    # Fill NaN values in pp_target with 0
-    # df["pp_class"] = df["pp_class"].fillna(0)
+    # Fill NaN values in pp_target with 'benign'
+    df["pp_target"] = df["pp_target"].fillna('benign')
 
     class_metrics, target_metrics = calculate_metrics(
         cls_true=df["true_class"],

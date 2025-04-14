@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.metrics import (
     f1_score,
     roc_auc_score,
@@ -6,9 +7,13 @@ from sklearn.metrics import (
     recall_score,
 )
 from sklearn.preprocessing import LabelEncoder
+import numpy as np
 
 
 def calculate_metrics(cls_true, cls_pred, targets_true, targets_pred):
+    cls_true = np.array(cls_true)
+    cls_pred = np.array(cls_pred)
+
     class_metrics = {
         "f1_weighted": f1_score(cls_true, cls_pred, average="weighted"),
         "roc_auc": roc_auc_score(cls_true, cls_pred),
@@ -23,6 +28,12 @@ def calculate_metrics(cls_true, cls_pred, targets_true, targets_pred):
 
     targets_true_encoded = le.transform(targets_true)
     targets_pred_encoded = le.transform(targets_pred)
+
+    # Repp_TP: Number of correctly reported true phishing webpages
+    Repp_TP = np.sum((cls_true == 1) & (cls_pred == 1))
+
+    # Idp: Number of correctly reported phishing webpages with brand reported correctly
+    Idp = np.sum((cls_true == 1) & (cls_pred == 1) & (targets_true_encoded == targets_pred_encoded))
 
     target_metrics = {
         "target_f1_micro": f1_score(
@@ -40,6 +51,10 @@ def calculate_metrics(cls_true, cls_pred, targets_true, targets_pred):
         ),
         "recall": recall_score(
             targets_true_encoded, targets_pred_encoded, average="macro"
+        ),
+        "identification_rate": (
+            # Identification rate = Idp / Repp_TP
+            Idp / Repp_TP if Repp_TP > 0 else 0
         ),
     }
 
