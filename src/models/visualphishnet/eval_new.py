@@ -394,5 +394,6 @@ if __name__ == "__main__":
     y = np.load(args.save_folder / "all_labels.npy")
     file_names = np.load(args.save_folder / "all_file_names.npy")
 
-    evaluate_threshold(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path)
-    # calculate_roc_curve2(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
+    evaluate_threshold(
+        pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path
+    )
