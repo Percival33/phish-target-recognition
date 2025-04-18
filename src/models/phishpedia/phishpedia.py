@@ -243,7 +243,7 @@ if __name__ == "__main__":
             pred_boxes,
             logo_recog_time,
             logo_match_time,
-        ) = phishpedia_cls.test_orig_phishpedia(url, screenshot_path, html_path, run)
+        ) = phishpedia_cls.test_orig_phishpedia(url, screenshot_path, html_path, img=None, run=run)
 
         try:
             with open(result_txt, "a+", encoding="ISO-8859-1") as f:
