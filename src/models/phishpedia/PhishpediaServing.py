@@ -22,7 +22,7 @@ class PhishpediaServing(ModelServing):
             _,
             logo_recog_time,
             logo_match_time,
-        ) = self.phishpedia.test_orig_phishpedia(url, None, None, img)
+        ) = self.phishpedia.test_orig_phishpedia(url, None, None, img, None)
 
         return {
             "url": str(url),
