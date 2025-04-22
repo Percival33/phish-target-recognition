@@ -13,7 +13,6 @@ class PredictRequest(BaseModel):
     image: str
 
 
-
 class ModelServing(ABC):
     def __init__(self, port=None):
         self.port = port if port is not None else int(os.getenv("PORT", 8888))
@@ -41,13 +40,17 @@ class ModelServing(ABC):
                 image_str = request_data.image
 
                 print(f"Received request with URL: {url}")
-                print(f"Received base64 image string, length: {len(image_str) if image_str else 0}")
+                print(
+                    f"Received base64 image string, length: {len(image_str) if image_str else 0}"
+                )
 
                 # Try to decode the base64 string
                 try:
                     # Decode base64 image
                     image_data = base64.b64decode(image_str)
-                    print(f"Successfully decoded base64 to binary, length: {len(image_data)}")
+                    print(
+                        f"Successfully decoded base64 to binary, length: {len(image_data)}"
+                    )
 
                     # Convert binary image to cv2 format
                     nparr = np.frombuffer(image_data, np.uint8)
@@ -55,16 +58,25 @@ class ModelServing(ABC):
 
                     if image_cv2 is None:
                         print("Failed to decode image to cv2 format")
-                        raise HTTPException(status_code=400, detail="Failed to decode image to OpenCV format")
+                        raise HTTPException(
+                            status_code=400,
+                            detail="Failed to decode image to OpenCV format",
+                        )
 
-                    print(f"Successfully converted to cv2 image with shape: {image_cv2.shape}")
+                    print(
+                        f"Successfully converted to cv2 image with shape: {image_cv2.shape}"
+                    )
                 except Exception as e:
                     # Handle potential decoding or conversion errors
                     print(f"Error decoding base64 image: {str(e)}")
-                    raise HTTPException(status_code=400, detail=f"Invalid base64 image data: {str(e)}")
+                    raise HTTPException(
+                        status_code=400, detail=f"Invalid base64 image data: {str(e)}"
+                    )
             except Exception as e:
                 print(f"Error processing request: {str(e)}")
-                raise HTTPException(status_code=400, detail=f"Invalid request data: {str(e)}")
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid request data: {str(e)}"
+                )
 
             prediction_data = {
                 "url": url,
@@ -75,7 +87,9 @@ class ModelServing(ABC):
                 return result
             except Exception as e:
                 print(f"Error in prediction: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+                raise HTTPException(
+                    status_code=500, detail=f"Prediction failed: {str(e)}"
+                )
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""
@@ -90,7 +104,6 @@ class ModelServing(ABC):
         import uvicorn
 
         uvicorn.run(self.app, host="0.0.0.0", port=self.port)
-
 
     @abstractmethod
     async def predict(self, data: dict):
