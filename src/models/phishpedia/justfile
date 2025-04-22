@@ -130,3 +130,29 @@ setup: install setup-models
 # Clean environment (remove installed packages)
 clean:
     uv pip uninstall torch torchvision torchaudio detectron2
+
+prepare:
+    #!/usr/bin/env bash
+    echo "Preparing domain mappings and datasets..."
+    
+    # Update domain mappings
+    python -c "
+import pickle
+with open('./models/domain_map.pkl', 'rb') as handle:
+    domain_map = pickle.load(handle)
+
+domain_map['Simplii Financial'] = 'simplii.com'
+domain_map['Bank of The Bahamas Limited'] = 'bankbahamas.com'
+domain_map['mdpd'] = 'mps.it'
+domain_map['sicil_shop'] = 'sicilshop.com'
+
+with open('./models/domain_map.pkl', 'wb') as handle:
+    pickle.dump(domain_map, handle)
+"
+    
+    # Process datasets
+    python convert_encodings.py datasets/phish_sample_30k
+    python find_missing_files.py datasets/benign_sample_30k > find_missing_files.log
+    python fix-script.py datasets/benign_sample_30k find_missing_files.log
+    
+    echo "Preparation complete!"

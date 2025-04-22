@@ -160,7 +160,7 @@ special_domains = {
     "ms_office": "office.com",
     "itunes": "itunes.apple.com",
     "icloud": "icloud.com",
-    "zoominfo": "zoominfo.com"
+    "zoominfo": "zoominfo.com",
 }
 
 
@@ -186,7 +186,11 @@ def parse_folder(folder_path, quiet_mode=False, csv_path=None):
     csv_data = []
 
     # Get all immediate subfolders in folder A
-    sub_folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
+    sub_folders = [
+        f
+        for f in os.listdir(folder_path)
+        if os.path.isdir(os.path.join(folder_path, f))
+    ]
 
     # Keep track of folders to remove later
     folders_to_remove = []
@@ -215,7 +219,9 @@ def parse_folder(folder_path, quiet_mode=False, csv_path=None):
                     print(f"Renamed folder: {sub_folder} -> {new_folder_name}")
                 else:
                     print(new_folder_path)
-                sub_folder_path = new_folder_path  # Update the path for subsequent operations
+                sub_folder_path = (
+                    new_folder_path  # Update the path for subsequent operations
+                )
             except Exception as e:
                 if not quiet_mode:
                     print(f"Error renaming folder {sub_folder}: {e}")
@@ -225,7 +231,9 @@ def parse_folder(folder_path, quiet_mode=False, csv_path=None):
         image_files = []
         for file in os.listdir(sub_folder_path):
             file_path = os.path.join(sub_folder_path, file)
-            if os.path.isfile(file_path) and file.lower().endswith(('.png', '.jpg', '.jpeg')):
+            if os.path.isfile(file_path) and file.lower().endswith(
+                (".png", ".jpg", ".jpeg")
+            ):
                 image_files.append(file)
 
         # Create new folders for each image and move the image
@@ -252,10 +260,9 @@ def parse_folder(folder_path, quiet_mode=False, csv_path=None):
 
                 # Store paths for CSV before moving
                 if csv_path:
-                    csv_data.append({
-                        "old_path": old_image_path,
-                        "new_path": new_image_path
-                    })
+                    csv_data.append(
+                        {"old_path": old_image_path, "new_path": new_image_path}
+                    )
 
                 shutil.move(old_image_path, new_image_path)
                 if not quiet_mode:
@@ -282,8 +289,8 @@ def parse_folder(folder_path, quiet_mode=False, csv_path=None):
     # Write CSV if path is provided
     if csv_path and csv_data:
         try:
-            with open(csv_path, 'w', newline='') as csvfile:
-                fieldnames = ['old_path', 'new_path']
+            with open(csv_path, "w", newline="") as csvfile:
+                fieldnames = ["old_path", "new_path"]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 writer.writeheader()
@@ -298,10 +305,19 @@ def parse_folder(folder_path, quiet_mode=False, csv_path=None):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process a folder and reorganize its subfolders and images.')
-    parser.add_argument('folder_path', help='Path to the main folder to process')
-    parser.add_argument('--quiet', '-q', action='store_true', help='Print only filepaths without additional output')
-    parser.add_argument('--csv', '-c', help='Path to save a CSV file with old and new image paths')
+    parser = argparse.ArgumentParser(
+        description="Process a folder and reorganize its subfolders and images."
+    )
+    parser.add_argument("folder_path", help="Path to the main folder to process")
+    parser.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        help="Print only filepaths without additional output",
+    )
+    parser.add_argument(
+        "--csv", "-c", help="Path to save a CSV file with old and new image paths"
+    )
 
     args = parser.parse_args()
 
