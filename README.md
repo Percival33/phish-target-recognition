@@ -15,16 +15,41 @@ source $HOME/.local/bin/env
 
 ### Phishpedia:
 1. Wywołaj `just setup` a następnie `just extract-targetlist`
-2. Wywołaj `uv run wandb login <LOGIN>`
-3. Uruchom poleceniem
+2. Przed uruchomieniem modelu, wywołaj `just prepare` aby zaktualizować mapowanie domen i przygotować zbiory danych
+3. Wywołaj `uv run wandb login <LOGIN>`
+4. Uruchom poleceniem
 ```sh
 uv run phishpedia.py --folder <FOLDER> --log
 ```
 gdzie `FOLDER` jest ścieżką do zbioru danych.
-4. Folder z logo i poprawnymi domenami 
+5. Aby przygotować dane w wymaganym formacie, użyj skryptu organize_by_sample.py:
+```sh
+uv run src/organize_by_sample.py --csv path/to/data.csv --screenshots path/to/screenshots --output path/to/output_directory
+```
 
 Zbiór danych powinien być w postaci:
-
+- Phishing
+    * sample1
+        - info.txt # zawierające pełny URL i informację o celu (target)
+        - shot.png # zrzut ekranu
+    * sample2
+        - info.txt
+        - shot.png
+    * sample3
+        - info.txt
+        - shot.png
+    * targets2.txt
+- trusted_list
+    * sample1
+        - info.txt
+        - shot.png
+    * sample2
+        - info.txt
+        - shot.png
+    * sample3
+        - info.txt
+        - shot.png
+    * targets.txt
 
 ### VisualPhish:
 1. Wywołaj `uv sync --frozen`
@@ -40,6 +65,22 @@ gdzie domyślnie:
 - `LOGDIR` to `PROJECT_ROOT_DIR/logdir`
 - `OUTPUT_DIR` to `PROJECT_ROOT_DIR/data/processed/VisualPhish`
 - profile_batch ??
+
+5. Aby przygotować dane w wymaganym formacie, użyj skryptu organize_by_target.py:
+```sh
+uv run organize_by_target.py --csv path/to/data.csv --screenshots path/to/screenshots --output path/to/output_directory
+```
+
+Skrypt wymaga pliku CSV z kolumnami: `url`, `fqdn`, `screenshot_object`, `screenshot_hash`, `affected_entity`. Oraz folderu ze screenshotami.
+Kolumna `is_phishing` jest opcjonalna - jeśli istnieje, wartość `False` oznacza próbki niezłośliwe (benign).
+Jeśli kolumna nie istnieje, wszystkie próbki są traktowane jako phishing.
+
+Nazwy katalogów z targetami są tworzone na podstawie kolumny `affected_entity`:
+- Wartość jest konwertowana na małe litery
+- Jeśli wartość jest pusta (NaN), używana jest nazwa 'unknown'
+- Pliki zrzutów ekranu są pobierane z kolumny `screenshot_object`
+- Targety są sortowane alfabetycznie
+- Skrypt tworzy pliki `targets2.txt` w folderze phishing i `targets.txt` w folderze trusted_list, zawierające posortowane nazwy targetów
 
 Zbiór danych powinien być w postaci:
 - Phishing
