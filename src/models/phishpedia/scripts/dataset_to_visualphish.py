@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import sys
+import argparse
 
 
 def get_unique_folder_names(directory, folder_type):
@@ -36,12 +37,13 @@ def main(dir1, dir2):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print(
-            "Usage: python dataset_to_visualphish.py <benign_directory> <phish_directory>"
-        )
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Compare folders between benign and phishing directories"
+    )
+    parser.add_argument("benign_dir", help="Directory containing benign samples")
+    parser.add_argument("phish_dir", help="Directory containing phishing samples")
+    args = parser.parse_args()
 
-    dir1 = sys.argv[1]  # Benign samples directory
-    dir2 = sys.argv[2]  # Phish samples directory
+    dir1 = args.benign_dir
+    dir2 = args.phish_dir
     main(dir1, dir2)
