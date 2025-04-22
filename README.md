@@ -24,7 +24,7 @@ uv run phishpedia.py --folder <FOLDER> --log
 gdzie `FOLDER` jest ścieżką do zbioru danych.
 5. Aby przygotować dane w wymaganym formacie, użyj skryptu organize_by_sample.py:
 ```sh
-uv run src/organize_by_sample.py --csv path/to/data.csv --screenshots path/to/screenshots --output path/to/output_directory
+uv run src/organize_by_sample.py --csv path/to/data.csv --screenshots path/to/parent_folder_of_screenshots --output path/to/output_directory
 ```
 
 Każda próbka jest umieszczana w osobnym folderze (sample1, sample2, itd.) bezpośrednio w folderach phishing/trusted_list. Każdy folder próbki zawiera plik info.txt z pełnym URL i informacją o celu (target) oraz shot.png ze zrzutem ekranu
@@ -71,7 +71,7 @@ gdzie domyślnie:
 
 5. Aby przygotować dane w wymaganym formacie, użyj skryptu organize_by_target.py:
 ```sh
-uv run organize_by_target.py --csv path/to/data.csv --screenshots path/to/screenshots --output path/to/output_directory
+uv run src/organize_by_target.py --csv path/to/data.csv --screenshots path/to/parent_folder_of_screenshots --output path/to/output_directory
 ```
 
 Skrypt wymaga pliku CSV z kolumnami: `url`, `fqdn`, `screenshot_object`, `screenshot_hash`, `affected_entity`. Oraz folderu ze screenshotami.

@@ -14,27 +14,24 @@ URLS = [f"http://{model}:{SERVICE_PORTS.get(model, 8888)}/predict" for model in 
 router = APIRouter()
 
 
-async def fetch_data(
-    client: httpx.AsyncClient, url: str, image: str, url_param: str
-):
+async def fetch_data(client: httpx.AsyncClient, url: str, image: str, url_param: str):
     try:
         # Create JSON payload with exact structure: image first, then url
-        json_data = {
-            "image": image,
-            "url": url_param
-        }
+        json_data = {"image": image, "url": url_param}
 
         print(f"Fetching {url} with URL param: {url_param}")
         print(f"Image data type: {type(image)}, length: {len(image)}")
-        
+
         print(f"JSON data keys: {json_data.keys()}")
 
         response = await client.post(url, json=json_data)
-        
+
         # Debug response
         if response.status_code != 200:
-            print(f"Error response from {url}: {response.status_code} - {response.text[:1000]}")
-            
+            print(
+                f"Error response from {url}: {response.status_code} - {response.text[:1000]}"
+            )
+
         response.raise_for_status()
         return response.json()
     except (httpx.HTTPError, KeyError, ValueError) as e:
@@ -57,12 +54,9 @@ async def predict(image: str = Form(...), url: str = Form(...)):
         except Exception as e:
             print(f"Invalid base64 encoding: {e}")
             raise HTTPException(status_code=400, detail=f"Invalid base64 encoding: {e}")
-            
+
         async with httpx.AsyncClient(timeout=30.0) as client:
-            tasks = [
-                fetch_data(client, model_url, image, url)
-                for model_url in URLS
-            ]
+            tasks = [fetch_data(client, model_url, image, url) for model_url in URLS]
             results = await asyncio.gather(*tasks, return_exceptions=True)
         return results
     except Exception as e:

@@ -25,7 +25,7 @@ def compute_accuracy(y_true, y_pred) -> tuple[float, float]:
     """
     accuracy = accuracy_score(y_true, y_pred)
     f1 = f1_score(y_true, y_pred, average="weighted")
-    print(f"acc:\t\t{accuracy * 100 :.5f}")
+    print(f"acc:\t\t{accuracy * 100:.5f}")
     print(f"f1:\t\t{f1 * 100:.5f}")
     return accuracy, f1
 
