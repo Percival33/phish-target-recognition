@@ -39,8 +39,11 @@ def find_missing_files(base_dir, max_workers=None, quiet=False):
         return []
 
     # Get all immediate subdirectories first
-    subdirs = [os.path.join(base_dir, d) for d in os.listdir(base_dir)
-               if os.path.isdir(os.path.join(base_dir, d))]
+    subdirs = [
+        os.path.join(base_dir, d)
+        for d in os.listdir(base_dir)
+        if os.path.isdir(os.path.join(base_dir, d))
+    ]
 
     # Results list
     missing_files_folders = []
@@ -48,7 +51,9 @@ def find_missing_files(base_dir, max_workers=None, quiet=False):
     # Process directories in parallel
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all directory checking tasks
-        future_to_folder = {executor.submit(check_folder, folder): folder for folder in subdirs}
+        future_to_folder = {
+            executor.submit(check_folder, folder): folder for folder in subdirs
+        }
 
         # Process results as they complete
         for future in concurrent.futures.as_completed(future_to_folder):
@@ -63,11 +68,19 @@ def find_missing_files(base_dir, max_workers=None, quiet=False):
 
 def main():
     # Use argparse for better command-line argument handling
-    parser = argparse.ArgumentParser(description='Find folders missing info.txt or shot.png files.')
-    parser.add_argument('folder_path', help='Path to the base directory to scan')
-    parser.add_argument('-q', '--quiet', action='store_true', help='Suppress all output except results')
-    parser.add_argument('--max-workers', type=int, default=None,
-                        help='Maximum number of worker threads (default: number of CPU cores)')
+    parser = argparse.ArgumentParser(
+        description="Find folders missing info.txt or shot.png files."
+    )
+    parser.add_argument("folder_path", help="Path to the base directory to scan")
+    parser.add_argument(
+        "-q", "--quiet", action="store_true", help="Suppress all output except results"
+    )
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=None,
+        help="Maximum number of worker threads (default: number of CPU cores)",
+    )
 
     args = parser.parse_args()
 
@@ -75,7 +88,9 @@ def main():
         print(f"Scanning subfolders in '{args.folder_path}' for missing files...")
 
     # Find folders with missing files
-    results = find_missing_files(args.folder_path, max_workers=args.max_workers, quiet=args.quiet)
+    results = find_missing_files(
+        args.folder_path, max_workers=args.max_workers, quiet=args.quiet
+    )
 
     # Print results
     if results:
@@ -99,7 +114,7 @@ if __name__ == "__main__":
     elapsed = time.time() - start_time
 
     # Only print execution time if not in quiet mode
-    if len(sys.argv) > 1 and not ('-q' in sys.argv or '--quiet' in sys.argv):
+    if len(sys.argv) > 1 and not ("-q" in sys.argv or "--quiet" in sys.argv):
         print(f"\nExecution time: {elapsed:.2f} seconds")
 
     sys.exit(exit_code)

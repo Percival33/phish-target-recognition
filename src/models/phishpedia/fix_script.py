@@ -13,7 +13,7 @@ import glob
 
 def create_info_txt(folder_path):
     """Create info.txt file with URL deduced from the folder name."""
-    folder_name = os.path.basename(folder_path).split('--')[0]
+    folder_name = os.path.basename(folder_path).split("--")[0]
 
     # Extract domain name
     domain = folder_name
@@ -115,8 +115,11 @@ def handle_multiple_png(folder_path):
 def ensure_shot_png(folder_path):
     """Ensure there's exactly one PNG file named 'shot.png' in the folder."""
     # Get all PNG files
-    png_files = glob.glob(os.path.join(folder_path, "*.png")) + glob.glob(os.path.join(folder_path, "*.PNG")) + glob.glob(os.path.join(folder_path, "*.jpg"))
-
+    png_files = (
+        glob.glob(os.path.join(folder_path, "*.png"))
+        + glob.glob(os.path.join(folder_path, "*.PNG"))
+        + glob.glob(os.path.join(folder_path, "*.jpg"))
+    )
 
     # If there are no PNG files, nothing to do
     if not png_files:
@@ -174,7 +177,7 @@ def main():
         return 1
 
     # Read error folders list
-    with open(error_list_file, 'r') as f:
+    with open(error_list_file, "r") as f:
         error_folders = [line.strip() for line in f if line.strip()]
 
     print(f"Processing {len(error_folders)} folders with errors...")
