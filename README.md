@@ -27,10 +27,13 @@ gdzie `FOLDER` jest ścieżką do zbioru danych.
 uv run src/organize_by_sample.py --csv path/to/data.csv --screenshots path/to/screenshots --output path/to/output_directory
 ```
 
+Każda próbka jest umieszczana w osobnym folderze (sample1, sample2, itd.) bezpośrednio w folderach phishing/trusted_list. Każdy folder próbki zawiera plik info.txt z pełnym URL i informacją o celu (target) oraz shot.png ze zrzutem ekranu
+
+
 Zbiór danych powinien być w postaci:
 - Phishing
     * sample1
-        - info.txt # zawierające pełny URL i informację o celu (target)
+        - info.txt # zawierające pełny URL
         - shot.png # zrzut ekranu
     * sample2
         - info.txt
