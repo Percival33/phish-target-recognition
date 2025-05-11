@@ -73,7 +73,7 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
             shutil.copy2(screenshot_path, destination)
 
             with open(sample_dir / "info.txt", "w") as f:
-                f.write(f"{row['url']}\n")
+                f.write(f"{row['url']}")
 
             print(f"Created sample {sample_id} in {parent_dir}")
         else:
