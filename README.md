@@ -235,6 +235,26 @@ PATH_TO_OUTPUT_DIRECTORY/
     └── targets.txt       # List of targets for the trusted dataset
 ```
 
+### Evaluation for VisualPhish
+
+To evaluate the VisualPhish model using pre-computed embeddings and a specific threshold, you can run the `eval_new.py` script. This script will load the target list embeddings from a specified directory and the test data embeddings from a default or specified save folder.
+
+**Note for macOS users:** If you encounter issues with TensorFlow, you might need to install it specifically for macOS. You can do this by running:
+```bash
+uv sync --extra macos
+```
+This command should be executed after the general `uv sync --frozen` if TensorFlow issues persist.
+
+**Example Evaluation Command:**
+
+The following command runs the evaluation script using target list embeddings from a specified directory. Replace `EMB_FOLDER` with the actual path to the directory containing the target list embedding files (e.g., `whitelist_emb.npy`, `whitelist_labels.npy`, `whitelist_file_names.npy`). The script also assumes that test embeddings and other necessary files (like `all_labels.npy`, `all_file_names.npy`, `pairwise_distances.npy`) are located in the directory specified by `--save-folder` (defaults to `logs/VisualPhish-Results/` if not overridden in the script or command line) or are generated if the script is modified to re-process data.
+
+```bash
+python src/models/visualphishnet/eval_new.py --emb-dir EMB_FOLDER --threshold 8.0
+```
+
+This will output metrics to the console and save detailed results to CSV and text files in the directory specified by `--result-path` (defaults to `logs/VisualPhish/`).
+
 ## Website
 
 This project includes a Streamlit-based web interface, defined in `src/website.py`, for analyzing images. The website relies on a backend API and associated model services, which can be managed using Docker Compose as defined in `docker-compose.yml`.

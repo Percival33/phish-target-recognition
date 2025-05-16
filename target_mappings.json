@@ -1,0 +1,259 @@
+{
+  "AT&T": [
+    "AT&T",
+    "att"
+  ],
+  "Adobe": [
+    "Adobe",
+    "adobe"
+  ],
+  "Alibaba": [
+    "Alibaba",
+    "alibaba"
+  ],
+  "Allegro": [
+    "Allegro",
+    "allegro"
+  ],
+  "Amazon": [
+    "Amazon",
+    "amazon"
+  ],
+  "American Express": [
+    "American Express",
+    "american_express"
+  ],
+  "BNP Paribas": [
+    "BNP Paribas",
+    "bnp paribas",
+    "bnp_paribas"
+  ],
+  "Bankia": [
+    "Bankia",
+    "bankia"
+  ],
+  "ExampleBank": [
+    "EB",
+    "ExampleBank",
+    "example bank"
+  ],
+  "Facebook": [
+    "Facebook",
+    "facebook",
+    "meta"
+  ],
+  "Google": [
+    "Google",
+    "gmail",
+    "google"
+  ],
+  "HSBC": [
+    "HSBC",
+    "HSBC Bank",
+    "hsbc"
+  ],
+  "IRS": [
+    "IRS",
+    "irs"
+  ],
+  "Instagram": [
+    "Instagram",
+    "instagram"
+  ],
+  "La Banque postale": [
+    "La Banque postale",
+    "la_banque_postale"
+  ],
+  "La Poste": [
+    "La Poste",
+    "la_poste"
+  ],
+  "LinkedIn Corporation": [
+    "LinkedIn Corporation",
+    "linkedin"
+  ],
+  "Microsoft": [
+    "Microsoft",
+    "microsoft",
+    "microsoft outlook",
+    "ms_bing",
+    "ms_office",
+    "ms_onedrive",
+    "ms_outlook",
+    "ms_skype"
+  ],
+  "Netflix": [
+    "Netflix",
+    "netflix"
+  ],
+  "Orange": [
+    "Orange",
+    "orange"
+  ],
+  "PayPal": [
+    "PayPal",
+    "paypal"
+  ],
+  "RuneScape": [
+    "RuneScape",
+    "runescape"
+  ],
+  "Steam": [
+    "Steam",
+    "steam"
+  ],
+  "Strato": [
+    "Strato",
+    "Strato AG",
+    "strato"
+  ],
+  "Twitter, Inc.": [
+    "Twitter, Inc.",
+    "twitter"
+  ],
+  "Wells Fargo & Company": [
+    "Wells Fargo & Company",
+    "wells_fargo"
+  ],
+  "Yahoo!": [
+    "Yahoo!",
+    "yahoo"
+  ],
+  "absa": [
+    "Absa Group",
+    "absa"
+  ],
+  "adidas": [
+    "Adidas",
+    "adidas"
+  ],
+  "apple": [
+    "Apple",
+    "apple"
+  ],
+  "aruba": [
+    "Aruba S.p.A",
+    "Aruba S.p.A.",
+    "aruba"
+  ],
+  "bahia": [
+    "Bahia",
+    "bahia"
+  ],
+  "barclaycard": [
+    "Barclaycard",
+    "barclaycard"
+  ],
+  "barclays": [
+    "Barclays Bank Plc",
+    "barclays"
+  ],
+  "bcp": [
+    "BCP",
+    "bcp"
+  ],
+  "boa": [
+    "Bank of America",
+    "boa"
+  ],
+  "bradesco": [
+    "Bradesco",
+    "bradesco"
+  ],
+  "bt": [
+    "BT Group plc",
+    "bt"
+  ],
+  "caixa_bank": [
+    "CaixaBank",
+    "caixa_bank"
+  ],
+  "capital_one": [
+    "Capital One Financial Corporation",
+    "capital_one"
+  ],
+  "chase": [
+    "Chase Personal Banking",
+    "chase"
+  ],
+  "cibc": [
+    "Canadian Imperial Bank of Commerce",
+    "cibc"
+  ],
+  "dhl": [
+    "DHL Airways",
+    "dhl"
+  ],
+  "dkb": [
+    "DKB",
+    "dkb"
+  ],
+  "dropbox": [
+    "Dropbox",
+    "dropbox"
+  ],
+  "eBay": [
+    "eBay",
+    "ebay"
+  ],
+  "google_drive": [
+    "Google Drive",
+    "google_drive"
+  ],
+  "gov_uk": [
+    "Government of the United Kingdom",
+    "gov_uk"
+  ],
+  "grupo_bancolombia": [
+    "Bancolombia",
+    "Grupo Bancolombia",
+    "grupo_bancolombia"
+  ],
+  "impots_gov": [
+    "DGI French Tax Authority",
+    "impots_gov"
+  ],
+  "itau": [
+    "Itau Unibanco S.A",
+    "itau"
+  ],
+  "lloyds_bank": [
+    "Lloyds TSB Group",
+    "lloyds_bank"
+  ],
+  "mdpd": [
+    "mdpd"
+  ],
+  "nab": [
+    "National Australia Bank Limited",
+    "nab"
+  ],
+  "nedbank": [
+    "NedBank Limited",
+    "nedbank"
+  ],
+  "ourtime": [
+    "OurTime Dating",
+    "ourtime"
+  ],
+  "sparkasse": [
+    "Sparkasse Bank",
+    "sparkasse"
+  ],
+  "suntrust": [
+    "SunTrust Bank",
+    "suntrust"
+  ],
+  "typeform": [
+    "Typeform",
+    "typeform"
+  ],
+  "usaa": [
+    "United Services Automobile Association",
+    "usaa"
+  ],
+  "walmart": [
+    "Walmart",
+    "walmart"
+  ]
+} 
