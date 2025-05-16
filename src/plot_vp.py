@@ -65,42 +65,13 @@ def plot_distance_distribution(df, output_path=None):
     )
 
     plt.title("Distance Score Distribution by True Class")
-    plt.xlabel("Visual Phish Distance")
+    plt.xlabel("Prediction Distance")
     plt.ylabel("Count")
 
     if output_path:
         plt.savefig(f"{output_path}/distance_distribution.png", bbox_inches="tight")
 
     plt.show()
-
-
-def plot_target_comparison(df, output_path=None):
-    """Plot comparison between predicted and true targets."""
-    # Count matches between predicted and true targets
-    target_match = df["vp_target"] == df["true_target"]
-    match_count = target_match.sum()
-    mismatch_count = len(df) - match_count
-
-    plt.figure(figsize=(8, 6))
-    plt.bar(["Matching Targets", "Mismatched Targets"], [match_count, mismatch_count])
-    plt.title("Target Prediction Accuracy")
-    plt.ylabel("Count")
-
-    # Add percentages on top of bars
-    for i, count in enumerate([match_count, mismatch_count]):
-        plt.text(i, count + 0.5, f"{count / len(df):.1%}", ha="center")
-
-    if output_path:
-        plt.savefig(f"{output_path}/target_comparison.png", bbox_inches="tight")
-
-    plt.show()
-
-    # Show top predicted targets
-    print("\nTop 5 Predicted Targets:")
-    print(df["vp_target"].value_counts().head(5))
-
-    print("\nTop 5 True Targets:")
-    print(df["true_target"].value_counts().head(5))
 
 
 def plot_roc_curve(df, output_path=None):
@@ -217,7 +188,7 @@ def plot_error_analysis(df, output_path=None):
 
         plt.title("Distance Scores for Misclassified Examples")
         plt.xlabel("Example Index")
-        plt.ylabel("Visual Phish Distance")
+        plt.ylabel("Prediction Distance")
         plt.colorbar(label="True Class")
 
         if output_path:
@@ -238,14 +209,121 @@ def plot_error_analysis(df, output_path=None):
         error_types = misclassified_df.groupby(["true_class", "vp_class"]).size()
         print("\nError Types:")
         print(error_types)
-
-        # Show target accuracy for misclassified examples
-        target_match = misclassified_df["vp_target"] == misclassified_df["true_target"]
-        print(
-            f"\nTarget match rate in misclassified examples: {target_match.mean():.2%}"
-        )
     else:
         print("No misclassified examples found!")
+
+
+def plot_target_analysis(df, output_path=None):
+    """Plot target prediction analysis."""
+    # Create a boolean mask for examples where target prediction is available
+    has_target = ~df["vp_target"].isna() & ~df["true_target"].isna()
+
+    if has_target.sum() > 0:
+        target_df = df[has_target].copy()
+
+        # Check if targets match
+        target_df["target_match"] = target_df["vp_target"] == target_df["true_target"]
+
+        plt.figure(figsize=(10, 6))
+
+        # Group by class and target match
+        group_data = (
+            target_df.groupby(["true_class", "target_match"])
+            .size()
+            .unstack(fill_value=0)
+        )
+
+        # Plot stacked bar chart
+        group_data.plot(kind="bar", stacked=True, figsize=(10, 6))
+        plt.title("Target Prediction Accuracy by Class")
+        plt.xlabel("True Class")
+        plt.ylabel("Count")
+        plt.legend(title="Target Match")
+
+        if output_path:
+            plt.savefig(f"{output_path}/target_analysis.png", bbox_inches="tight")
+
+        plt.show()
+
+        # Print some statistics about target predictions
+        print("\nTarget Prediction Analysis:")
+        print(f"Total examples with target info: {has_target.sum()}")
+        print(f"Target match rate: {target_df['target_match'].mean():.2%}")
+
+        # Group by true class
+        by_class = target_df.groupby("true_class")["target_match"].agg(
+            ["mean", "count"]
+        )
+        print("\nTarget Match Rate by Class:")
+        print(by_class)
+    else:
+        print("No target prediction information found!")
+
+
+def plot_distance_threshold_analysis(df, output_path=None):
+    """Plot how different distance thresholds affect classification metrics."""
+
+    # We'll use distance as a threshold - lower distance means higher confidence
+    thresholds = np.linspace(df["vp_distance"].min(), df["vp_distance"].max(), 100)
+
+    # Arrays to store metrics
+    accuracies = []
+    precisions = []
+    recalls = []
+    f1_scores = []
+
+    y_true = df["true_class"].values
+
+    # Convert to binary if needed
+    if df["true_class"].nunique() == 2:
+        # Map classes to 0 and 1
+        classes = sorted(df["true_class"].unique())
+        class_map = {cls: i for i, cls in enumerate(classes)}
+        y_true_bin = np.array([class_map[cls] for cls in y_true])
+
+        for threshold in thresholds:
+            # Predict positive class if distance is below threshold
+            y_pred = (df["vp_distance"] <= threshold).astype(int)
+
+            # Calculate metrics
+            tp = ((y_pred == 1) & (y_true_bin == 1)).sum()
+            fp = ((y_pred == 1) & (y_true_bin == 0)).sum()
+            tn = ((y_pred == 0) & (y_true_bin == 0)).sum()
+            fn = ((y_pred == 0) & (y_true_bin == 1)).sum()
+
+            accuracy = (tp + tn) / (tp + tn + fp + fn)
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+            recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+            f1 = (
+                2 * precision * recall / (precision + recall)
+                if (precision + recall) > 0
+                else 0
+            )
+
+            accuracies.append(accuracy)
+            precisions.append(precision)
+            recalls.append(recall)
+            f1_scores.append(f1)
+
+        # Plot metrics
+        plt.figure(figsize=(12, 8))
+        plt.plot(thresholds, accuracies, label="Accuracy")
+        plt.plot(thresholds, precisions, label="Precision")
+        plt.plot(thresholds, recalls, label="Recall")
+        plt.plot(thresholds, f1_scores, label="F1 Score")
+
+        plt.xlabel("Distance Threshold")
+        plt.ylabel("Metric Value")
+        plt.title("Classification Metrics vs. Distance Threshold")
+        plt.legend()
+        plt.grid(True, linestyle="--", alpha=0.7)
+
+        if output_path:
+            plt.savefig(f"{output_path}/threshold_analysis.png", bbox_inches="tight")
+
+        plt.show()
+    else:
+        print("Threshold analysis is only implemented for binary classification.")
 
 
 def main():
@@ -264,8 +342,10 @@ def main():
     # Load data
     df = load_data(args.file_path)
 
-    # Fill NaN values in vp_class with 'benign'
-    df["vp_class"] = df["vp_class"].fillna("benign")
+    # Fill NaN values in vp_class with a default value if needed
+    if df["vp_class"].isna().any():
+        print("Filling NaN values in vp_class with default value (benign)")
+        df["vp_class"] = df["vp_class"].fillna("benign")
 
     # Display summary info
     print(f"Loaded dataset with {len(df)} rows")
@@ -273,17 +353,12 @@ def main():
     print(df.head())
     print("\nClass distribution:")
     print(df["true_class"].value_counts())
-    print("\nPredicted class distribution:")
-    print(df["vp_class"].value_counts())
 
     # Plot confusion matrix
     plot_confusion_matrix(df, args.output)
 
-    # Plot distance distribution
+    # Plot distance distribution (replaced confidence with distance)
     plot_distance_distribution(df, args.output)
-
-    # Plot target comparison
-    plot_target_comparison(df, args.output)
 
     # Plot ROC curve (if binary classification)
     plot_roc_curve(df, args.output)
@@ -293,6 +368,14 @@ def main():
 
     # Plot error analysis
     plot_error_analysis(df, args.output)
+
+    # New visualizations for the new dataset
+
+    # Target analysis
+    plot_target_analysis(df, args.output)
+
+    # Distance threshold analysis
+    plot_distance_threshold_analysis(df, args.output)
 
 
 if __name__ == "__main__":

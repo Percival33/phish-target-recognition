@@ -33,6 +33,24 @@ precision: 0.0476
 recall: 0.0397
 identification_rate: 0.0000 (daje dobre linki i dlatego jest zero) # TODO
 
+--- 11.05 - class metrics do wywalenia bo jest tylko phishing
+Class metrics:
+f1_weighted: 0.8758
+roc_auc: nan
+mcc: 0.0000
+precision: 0.5000
+recall: 0.3895
+
+Target metrics:
+target_f1_micro: 0.0377
+target_f1_macro: 0.0786
+target_f1_weighted: 0.0407
+target_mcc: 0.0402
+precision: 0.0811
+recall: 0.0768
+identification_rate: 0.0484
+
+
 ## VisualPhish na VisualPhish newcly_crawled_phishing z progiem 8
 Class metrics:
 f1_weighted: 0.3919

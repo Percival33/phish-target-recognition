@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.9,<3.10"
 dependencies = [
     "matplotlib>=3.7.5",
+    "pandas>=2.2.3",
     "pre-commit>=4.2.0",
     "scikit-image>=0.21.0",
     "scikit-learn>=1.3.2",
@@ -38,4 +39,4 @@ ignore = ["E203", "E501"]  # Ignore certain rules
 docstring-code-format = true
 
 [tool.uv.sources]
-tools = { path = "common/tools-0.1.5-py3-none-any.whl" }
+tools = { path = "common/tools-0.1.8-py3-none-any.whl" }
