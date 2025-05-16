@@ -21,7 +21,7 @@ def plot_confusion_matrix(df, output_path=None):
     """Plot confusion matrix."""
     # Extract true and predicted classes
     y_true = df["true_class"].values
-    y_pred = df["vp_class"].values
+    y_pred = df["pp_class"].values
 
     # Get unique class labels
     labels = np.unique(np.concatenate([y_true, y_pred]))
@@ -47,8 +47,8 @@ def plot_confusion_matrix(df, output_path=None):
     print(classification_report(y_true, y_pred, labels=labels))
 
 
-def plot_distance_distribution(df, output_path=None):
-    """Plot distance score distribution by class."""
+def plot_confidence_distribution(df, output_path=None):
+    """Plot confidence score distribution by class."""
     plt.figure(figsize=(12, 6))
 
     # Convert true_class to string for better visualization
@@ -56,7 +56,7 @@ def plot_distance_distribution(df, output_path=None):
 
     sns.histplot(
         data=df,
-        x="vp_distance",
+        x="pp_conf",
         hue="true_class_str",
         bins=30,
         kde=True,
@@ -64,43 +64,14 @@ def plot_distance_distribution(df, output_path=None):
         common_norm=False,
     )
 
-    plt.title("Distance Score Distribution by True Class")
-    plt.xlabel("Visual Phish Distance")
+    plt.title("Confidence Score Distribution by True Class")
+    plt.xlabel("Prediction Confidence")
     plt.ylabel("Count")
 
     if output_path:
-        plt.savefig(f"{output_path}/distance_distribution.png", bbox_inches="tight")
+        plt.savefig(f"{output_path}/confidence_distribution.png", bbox_inches="tight")
 
     plt.show()
-
-
-def plot_target_comparison(df, output_path=None):
-    """Plot comparison between predicted and true targets."""
-    # Count matches between predicted and true targets
-    target_match = df["vp_target"] == df["true_target"]
-    match_count = target_match.sum()
-    mismatch_count = len(df) - match_count
-
-    plt.figure(figsize=(8, 6))
-    plt.bar(["Matching Targets", "Mismatched Targets"], [match_count, mismatch_count])
-    plt.title("Target Prediction Accuracy")
-    plt.ylabel("Count")
-
-    # Add percentages on top of bars
-    for i, count in enumerate([match_count, mismatch_count]):
-        plt.text(i, count + 0.5, f"{count / len(df):.1%}", ha="center")
-
-    if output_path:
-        plt.savefig(f"{output_path}/target_comparison.png", bbox_inches="tight")
-
-    plt.show()
-
-    # Show top predicted targets
-    print("\nTop 5 Predicted Targets:")
-    print(df["vp_target"].value_counts().head(5))
-
-    print("\nTop 5 True Targets:")
-    print(df["true_target"].value_counts().head(5))
 
 
 def plot_roc_curve(df, output_path=None):
@@ -110,8 +81,8 @@ def plot_roc_curve(df, output_path=None):
 
     if unique_classes == 2:
         y_true = df["true_class"].values
-        # Use vp_class for predictions
-        y_pred = df["vp_class"].values
+        # Use pp_class instead of pp_conf for predictions
+        y_pred = df["pp_class"].values
 
         # Convert string labels to binary if needed
         if isinstance(y_true[0], str) or isinstance(y_pred[0], str):
@@ -157,8 +128,8 @@ def plot_precision_recall_curve(df, output_path=None):
 
     if unique_classes == 2:
         y_true = df["true_class"].values
-        # Use vp_class for predictions
-        y_pred = df["vp_class"].values
+        # Use pp_class instead of pp_conf for predictions
+        y_pred = df["pp_class"].values
 
         # Convert string labels to binary if needed
         if isinstance(y_true[0], str) or isinstance(y_pred[0], str):
@@ -199,9 +170,9 @@ def plot_precision_recall_curve(df, output_path=None):
 
 
 def plot_error_analysis(df, output_path=None):
-    """Plot misclassified examples with distance."""
+    """Plot misclassified examples with confidence."""
     # Create a boolean mask for misclassified examples
-    misclassified = df["true_class"] != df["vp_class"]
+    misclassified = df["true_class"] != df["pp_class"]
 
     if misclassified.sum() > 0:
         misclassified_df = df[misclassified].copy()
@@ -209,20 +180,20 @@ def plot_error_analysis(df, output_path=None):
         plt.figure(figsize=(10, 6))
         plt.scatter(
             range(len(misclassified_df)),
-            misclassified_df["vp_distance"],
+            misclassified_df["pp_conf"],
             c=misclassified_df["true_class"],
             cmap="viridis",
             alpha=0.6,
         )
 
-        plt.title("Distance Scores for Misclassified Examples")
+        plt.title("Confidence Scores for Misclassified Examples")
         plt.xlabel("Example Index")
-        plt.ylabel("Visual Phish Distance")
+        plt.ylabel("Prediction Confidence")
         plt.colorbar(label="True Class")
 
         if output_path:
             plt.savefig(
-                f"{output_path}/misclassified_distance.png", bbox_inches="tight"
+                f"{output_path}/misclassified_confidence.png", bbox_inches="tight"
             )
 
         plt.show()
@@ -235,15 +206,9 @@ def plot_error_analysis(df, output_path=None):
         )
 
         # Group by true class and predicted class
-        error_types = misclassified_df.groupby(["true_class", "vp_class"]).size()
+        error_types = misclassified_df.groupby(["true_class", "pp_class"]).size()
         print("\nError Types:")
         print(error_types)
-
-        # Show target accuracy for misclassified examples
-        target_match = misclassified_df["vp_target"] == misclassified_df["true_target"]
-        print(
-            f"\nTarget match rate in misclassified examples: {target_match.mean():.2%}"
-        )
     else:
         print("No misclassified examples found!")
 
@@ -264,8 +229,8 @@ def main():
     # Load data
     df = load_data(args.file_path)
 
-    # Fill NaN values in vp_class with 'benign'
-    df["vp_class"] = df["vp_class"].fillna("benign")
+    # Fill NaN values in pp_class with 'benign'
+    df["pp_class"] = df["pp_class"].fillna("benign")
 
     # Display summary info
     print(f"Loaded dataset with {len(df)} rows")
@@ -273,20 +238,15 @@ def main():
     print(df.head())
     print("\nClass distribution:")
     print(df["true_class"].value_counts())
-    print("\nPredicted class distribution:")
-    print(df["vp_class"].value_counts())
 
     # Plot confusion matrix
     plot_confusion_matrix(df, args.output)
 
-    # Plot distance distribution
-    plot_distance_distribution(df, args.output)
-
-    # Plot target comparison
-    plot_target_comparison(df, args.output)
+    # Plot confidence distribution
+    plot_confidence_distribution(df, args.output)
 
     # Plot ROC curve (if binary classification)
-    plot_roc_curve(df, args.output)
+    # plot_roc_curve(df, args.output)
 
     # Plot precision-recall curve (if binary classification)
     plot_precision_recall_curve(df, args.output)

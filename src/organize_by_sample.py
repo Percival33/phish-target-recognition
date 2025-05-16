@@ -51,7 +51,7 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
 
         is_phishing = True
         if "is_phishing" in df.columns:
-            is_phishing = False if row["is_phishing"] == False else True
+            is_phishing = False if not row["is_phishing"] else True
 
         if is_phishing:
             phishing_targets.add(target)
@@ -73,7 +73,7 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
             shutil.copy2(screenshot_path, destination)
 
             with open(sample_dir / "info.txt", "w") as f:
-                f.write(f"{row['url']}\n")
+                f.write(f"{row['url']}")
 
             print(f"Created sample {sample_id} in {parent_dir}")
         else:

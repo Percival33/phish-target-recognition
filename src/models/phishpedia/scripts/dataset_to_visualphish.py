@@ -1,6 +1,5 @@
 from pathlib import Path
 import pandas as pd
-import sys
 import argparse
 
 
@@ -31,7 +30,6 @@ def main(dir1, dir2):
 
     df = pd.DataFrame(data)
     df = df.sort_values(by="Folder Name")
-    filtered_df = df[(df["Count in Dir1"]) & (df["Count in Dir2"])]
     print(df)
     return df
 

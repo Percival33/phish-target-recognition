@@ -5,9 +5,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from skimage.transform import resize
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import precision_recall_curve
 from tools.config import LOGS_DIR, PROCESSED_DATA_DIR, RAW_DATA_DIR, setup_logging
+from tools.metrics import calculate_metrics
 from tqdm import tqdm
 
 from DataHelper import read_image
@@ -63,43 +65,6 @@ def read_data_batched(data_path, reshape_size, batch_size=32):
             yield (np.asarray(batch_imgs), np.asarray(all_labels[start_idx:end_idx]), np.asarray(batch_files))
 
 
-def read_data(data_path, reshape_size):
-    """
-    read data
-    :param data_path:
-    :param reshape_size:
-    :return:
-    """
-    all_imgs = []
-    all_labels = []
-    all_file_names = []
-
-    if (data_path / "labels.txt").exists():
-        with open(data_path / "labels.txt", "r") as f:
-            for line in f:
-                all_labels.append(line.strip())
-    else:
-        all_labels = ["benign"] * len(list(data_path.iterdir()))
-
-    for file_path in tqdm(sorted(data_path.iterdir())):
-        if file_path.suffix == ".txt":
-            continue
-        img = read_image(file_path, logger)
-
-        if img is None:
-            img = read_image(file_path, logger, format="jpeg")
-
-        if img is None:
-            logger.error(f"Failed to process {file_path}")
-            exit(1)
-        all_imgs.append(resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True))
-        all_file_names.append(file_path.name)
-
-    all_imgs = np.asarray(all_imgs)
-    all_labels = np.asarray(all_labels)
-    return all_imgs, all_labels, all_file_names
-
-
 def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=256):
     """
     Process dataset in batches and compute embeddings
@@ -126,7 +91,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
         total_processed += len(imgs)
 
         # Free memory
-        if total_processed % 1024 == 0:
+        if total_processed % 4096 == 0:
             del imgs
             gc.collect()
 
@@ -134,6 +99,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
     all_embeddings = np.concatenate(embeddings_list, axis=0)
 
     if save_path:
+        save_path.mkdir(parents=True, exist_ok=True)
         all_labels = np.concatenate(labels_list, axis=0)
         all_filenames = np.concatenate(filenames_list, axis=0)
 
@@ -188,43 +154,95 @@ def evaluate_threshold(
     pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
 ):
     """
-    Evaluate model performance for a given threshold
-    """
-    # pairwise_distance = compute_all_distances_batched(data_emb, targetlist_emb)
-    """
+    Evaluate model performance for a given threshold and return results as a pandas DataFrame
+    with additional metrics including F1 score, ROC AUC, and Matthews correlation coefficient
     0 - benign
     1 - phishing
     """
     y_true = np.array([0 if label == "benign" else 1 for label in y])
-
     y_pred = np.zeros([len(data_emb), 1])
     n = 1  # Top-1 match
 
-    result_file = result_path / f"results_threshold_{threshold}.log"
-    result_file.parent.mkdir(parents=True, exist_ok=True)
+    # Create a list to hold all the data entries
+    data = []
 
-    if not result_file.exists():
-        result_file.touch()
+    # Lists to store true and predicted targets for target-based evaluation
+    true_targets = []
+    pred_targets = []
 
     for i in tqdm(range(data_emb.shape[0]), desc=f"Processing threshold {threshold}"):
         distances_to_target = pairwise_distance[i, :]
         idx, values = Evaluate.find_min_distances(np.ravel(distances_to_target), n)
         names_min_distance, only_names, min_distances = find_names_min_distances(idx, values, all_file_names)
 
+        # Get the filename
+        filename = file_names[i]
+
+        # Extract target from filename (assuming format like "benign/file_1" or "phish/file_2")
+        assert names_min_distance.split()[1].split("/")[0] == only_names[0].split("/")[0]
+        true_target = y[i]
+
+        # Set VP class (0 for benign, positive value for phishing)
+        vp_class = 0
         # distance lower than threshold ==> report as phishing
         if float(min_distances) <= threshold:
-            y_pred[i] = abs(float(min_distances) - threshold)
+            vp_class = 1
+            y_pred[i] = vp_class
 
-        with open(result_file, "a+", encoding="utf-8", errors="ignore") as f:
-            f.write(f"{file_names[i]}\t{y_pred[i]}\t{str(min_distances)}\t{str(only_names[0])}\n")
+        # Store targets for later metric calculation
+        true_targets.append(true_target)
+        vp_target = "benign" if vp_class == 0 else only_names[0].split("/")[0]
+        pred_targets.append(vp_target)
 
-    auc_score = roc_auc_score(y_true, y_pred)
-    fpr, tpr, _ = roc_curve(y_true, y_pred, pos_label=1, drop_intermediate=False)
+        # Add data to the list
+        data.append(
+            {
+                "file": filename,
+                "vp_class": int(vp_class),
+                "vp_distance": float(min_distances),
+                "vp_target": vp_target,
+                "true_class": y_true[i],
+                "true_target": true_target,
+            }
+        )
 
-    return auc_score, fpr, tpr
+    class_metrics, target_metrics = calculate_metrics(y_true, y_pred, true_targets, pred_targets)
+
+    results_df = pd.DataFrame(data)
+
+    print("Class metrics:")
+    for metric, value in class_metrics.items():
+        print(f"{metric}: {value:.4f}")
+    print("\nTarget metrics:")
+    for metric, value in target_metrics.items():
+        print(f"{metric}: {value:.4f}")
+
+    # Save DataFrame to CSV if a result path is provided
+    if result_path:
+        result_path.mkdir(parents=True, exist_ok=True)
+        csv_path = result_path / f"results_threshold_{threshold}.csv"
+        results_df.to_csv(csv_path, index=False)
+
+        # Save metrics to a separate file
+        metrics_path = result_path / f"metrics_threshold_{threshold}.txt"
+        with open(metrics_path, "w") as f:
+            f.write("Class-based metrics:\n")
+            for key, value in class_metrics.items():
+                f.write(f"{key}: {value}\n")
+            f.write("\nTarget-based metrics:\n")
+            for key, value in target_metrics.items():
+                f.write(f"{key}: {value}\n")
+
+    # Calculate ROC curve
+    precision, recall, _ = precision_recall_curve(y_true, y_pred, pos_label=1, drop_intermediate=False)
+
+    # Combine all metrics
+    all_metrics = {**class_metrics, **target_metrics}
+
+    return class_metrics["roc_auc"], precision, recall, results_df, all_metrics
 
 
-def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder):
+def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder, batch_size):
     """
     Process both datasets and compute pairwise distances
     Args:
@@ -240,8 +258,8 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         args.data_dir / phish_folder,
         args.reshape_size,
         model,
-        save_path=args.emb_dir if args.save_intermediate else None,
-        batch_size=32,
+        save_path=args.save_folder / phish_folder if args.save_intermediate else None,
+        batch_size=batch_size,
     )
     logger.info(f"Processed {phish_count} phishing images")
 
@@ -250,26 +268,19 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         args.data_dir / benign_folder,
         args.reshape_size,
         model,
-        save_path=args.emb_dir if args.save_intermediate else None,
-        batch_size=32,
+        save_path=args.save_folder / benign_folder if args.save_intermediate else None,
+        batch_size=batch_size,
     )
     logger.info(f"Processed {benign_count} benign images")
-
+    args.save_folder.mkdir(parents=True, exist_ok=True)
     # Combine embeddings
     data_emb = np.concatenate([benign_emb, phish_emb], axis=0)
-    np.save(args.emb_dir / "all_embeddings.npy", data_emb)
+    np.save(args.save_folder / "all_embeddings.npy", data_emb)
 
     # Combine labels and filenames if they were saved
     if args.save_intermediate:
         y = np.concatenate([benign_labels, phish_labels], axis=0)
         file_names = np.concatenate([benign_files, phish_files], axis=0)
-
-        # Random shuffle
-        np.random.seed(42)
-        idx = np.random.permutation(len(data_emb))
-        data_emb = data_emb[idx]
-        y = y[idx]
-        file_names = file_names[idx]
     else:
         # For evaluation, create file names that indicate source
         benign_files = np.array([f"benign/file_{i}" for i in range(benign_count)])
@@ -277,9 +288,12 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         file_names = np.concatenate([benign_files, phish_files])
         y = np.array(["benign"] * benign_count + ["phish"] * phish_count)
 
+    np.save(args.save_folder / "all_labels.npy", y)
+    np.save(args.save_folder / "all_file_names.npy", file_names)
+
     # Compute pairwise distances
     pairwise_distance = Evaluate.compute_all_distances_batched(data_emb, targetlist_emb)
-    np.save(args.emb_dir / "pairwise_distances.npy", pairwise_distance)
+    np.save(args.save_folder / "pairwise_distances.npy", pairwise_distance)
 
     return data_emb, pairwise_distance, y, file_names
 
@@ -292,12 +306,14 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
     plt.figure(figsize=(10, 6))
 
     for threshold in thresholds:
-        auc_score, fpr, tpr = evaluate_threshold(
+        auc_score, precision, recall, _, all_metrics = evaluate_threshold(
             pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, args.result_path
         )
-        results.append({"threshold": threshold, "auc_score": auc_score, "fpr": fpr, "tpr": tpr})
-        logger.info(f"Threshold: {threshold}, AUC Score: {auc_score}")
-        plt.step(fpr, tpr, where="post", label=f"Threshold={threshold}")
+        results.append({"threshold": threshold, "auc_score": auc_score})
+        logger.info(
+            f"Threshold: {threshold}, AUC Score: {auc_score}, Target F1 Weighted {all_metrics['target_f1_weighted']}"
+        )
+        plt.step(recall, precision, where="post", label=f"Threshold={threshold}")
         # plt.plot(fpr, tpr, label=f'Threshold={threshold}')
 
     # Plot ROC curves
@@ -323,17 +339,10 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
 
 
 if __name__ == "__main__":
+    np.random.seed(42)
+
     setup_logging()
     logger = logging.getLogger(__name__)
-
-    """
-    file_handler = logging.FileHandler('result.log')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    file_handler.setFormatter(formatter)
-    logger = logging.getLogger()
-    logger.addHandler(file_handler)
-    """
 
     parser = ArgumentParser()
     parser.add_argument("--emb-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
@@ -346,113 +355,45 @@ if __name__ == "__main__":
     parser.add_argument("--save-intermediate", action="store_true", help="Save intermediate results")
     parser.add_argument("--phish-folder", type=str, default="newly_crawled_phishing")
     parser.add_argument("--benign-folder", type=str, default="benign_test")
+    parser.add_argument("--save-folder", type=Path, default=LOGS_DIR / "VisualPhish-Results")
+    parser.add_argument("--batch-size", type=int, default=512)
+    parser.add_argument("--weights-only", action="store_true", help="Load only weights")
+    parser.add_argument("--weights_path", type=Path, help="Used with --weights-only to specify path to a file")
 
     args = parser.parse_args()
     logger.info("Evaluating VisualPhishNet")
 
-    # load targetlist and model
     targetlist_emb, all_labels, all_file_names = load_targetemb(
         args.emb_dir / "whitelist_emb.npy",
         args.emb_dir / "whitelist_labels.npy",
         args.emb_dir / "whitelist_file_names.npy",
     )
     modelHelper = ModelHelper()
-    model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin).layers[3]
+    model = None
+    if args.weights_only:
+        input_shape = [224, 224, 3]
+        new_conv_params = [3, 3, 512]
+        model = modelHelper.define_triplet_network(input_shape, new_conv_params)
+        model.load_weights(args.weights_path)
+    else:
+        model = modelHelper.load_model(args.emb_dir, args.saved_model_name, args.margin)
+    model = model.layers[3]
     logger.info("Loaded targetlist and model, number of protected target screenshots {}".format(len(targetlist_emb)))
 
-    data_emb, pairwise_distance, y, file_names = process_and_evaluate(
-        args, model, targetlist_emb, all_file_names, phish_folder=args.phish_folder, benign_folder=args.benign_folder
+    # data_emb, pairwise_distance, y, file_names = process_and_evaluate(
+    #     args,
+    #     model,
+    #     targetlist_emb,
+    #     all_file_names,
+    #     phish_folder=args.phish_folder,
+    #     benign_folder=args.benign_folder,
+    #     batch_size=args.batch_size,
+    # )
+    data_emb = np.load(args.save_folder / "all_embeddings.npy")
+    pairwise_distance = np.load(args.save_folder / "pairwise_distances.npy")
+    y = np.load(args.save_folder / "all_labels.npy")
+    file_names = np.load(args.save_folder / "all_file_names.npy")
+
+    evaluate_threshold(
+        pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path
     )
-
-    calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args)
-
-    # # read data
-    # X_phish, y_phish, file_names_phish = read_data(args.data_dir / "phish_sample_30k", args.reshape_size)
-    # logger.info("Finish reading data, number of data {}".format(len(X_phish)))
-    #
-    # np.save("X_phish", X_phish)
-    # np.save("y_phish", y_phish)
-    # np.save("file_names_phish", file_names_phish)
-    # gc.collect()
-    #
-    # X_benign, y_benign, file_names_benign = read_data(args.data_dir / "benign_sample_30k", args.reshape_size)
-    # logger.info("Finish reading data, number of data {}".format(len(X_benign)))
-    # np.save("X_benign", X_benign)
-    # np.save("y_benign", y_benign)
-    # np.save("file_names_benign", file_names_benign)
-    # gc.collect()
-    #
-    # X_phish = np.load("X_phish.npy")
-    # y_phish = np.load("y_phish.npy")
-    # file_names_phish = np.load("file_names_phish.npy")
-    # X_benign = np.load("X_benign.npy")
-    # y_benign = np.load("y_benign.npy")
-    # file_names_benign = np.load("file_names_benign.npy")
-    #
-    # X = np.concatenate((X_benign, X_phish), axis=0)
-    # y = np.concatenate((y_benign, y_phish), axis=0)
-    # file_names = np.concatenate((file_names_benign, file_names_phish), axis=0)
-    # # random shuffle all data as tuples (X, y, file_names)
-    # # assert len(X) == len(y) == len(file_names)
-    # np.random.seed(42)
-    # idx = np.random.permutation(len(X))
-    # X = X[idx]
-    # y = y[idx]
-    # file_names = file_names[idx]
-    # np.savez_compressed("val_data", X=X, y=y, file_names=file_names)
-    # gc.collect()
-    #
-    # val_data = np.load("val_data.npz")
-    # X = val_data["X"]
-    # y = val_data["y"]
-    # file_names = val_data["file_names"]
-    # logger.info("Finish reading data, number of data {}".format(len(X)))
-
-    # TODO: save X, y, file_names as test_set
-
-    # get embeddings from data
-    # data_emb = model.predict(X, batch_size=32)
-    # np.save("data_emb", data_emb)
-    # data_emb = np.load("data_emb.npy")
-    # # pairwise_distance = Evaluate.compute_all_distances(data_emb, targetlist_emb, np.zeros([1,512]))
-    #
-    # pairwise_distance_batched = compute_all_distances_batched(data_emb, targetlist_emb)
-    # # pairwise_distance = compute_all_distances(data_emb, targetlist_emb)
-    # # assert np.array_equal(pairwise_distance, pairwise_distance_batched)
-    #
-    # np.save("pairwise_distance", pairwise_distance_batched)
-    # pairwise_distance = np.load("pairwise_distance.npy")
-    # logger.info("Finish getting embedding")
-
-    # y_true = np.zeros([len(X), 1])
-    # y_score = np.zeros([len(X), 1])
-    #
-    # n = 1  # Top-1 match
-    # print("Start ")
-    # args.result_path.mkdir(parents=True, exist_ok=True)
-    # if not args.result_path.exists():
-    #     args.result_path.touch()
-    #
-    # # from 4 to 70 co dwa
-    # for i in tqdm(range(data_emb.shape[0])):
-    #     distances_to_target = pairwise_distance[i, :]
-    #     idx, values = Evaluate.find_min_distances(np.ravel(distances_to_target), n)
-    #     names_min_distance, only_names, min_distances = find_names_min_distances(idx, values, all_file_names)
-    #     # distance lower than threshold ==> report as phishing
-    #     if float(min_distances) <= args.threshold:
-    #         phish = 1
-    #         y_score[i] = 1
-    #     # else it is benign
-    #     else:
-    #         phish = 0
-    #
-    #     with open(args.result_path, "a+", encoding="utf-8", errors="ignore") as f:
-    #         f.write(f"{file_names[i]}\t{y_score[i]}\t{str(min_distances)}\t{str(only_names[0])}\n")
-    #
-    # # TODO: closest target => target
-    # print(roc_auc_score(y_true, y_score))
-    # fpr, tpr, thresholds = roc_curve(y_true, y_score, pos_label=0)
-    #
-    # # Print ROC curve
-    # plt.plot(fpr, tpr)
-    # plt.show()
