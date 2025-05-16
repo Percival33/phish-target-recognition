@@ -51,7 +51,7 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
 
         is_phishing = True
         if "is_phishing" in df.columns:
-            is_phishing = False if row["is_phishing"] == False else True
+            is_phishing = False if not row["is_phishing"] else True
 
         if is_phishing:
             phishing_targets.add(target)

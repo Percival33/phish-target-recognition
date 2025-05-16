@@ -228,7 +228,7 @@ def plot_error_analysis(df, output_path=None):
         plt.show()
 
         # Print some statistics about misclassified examples
-        print(f"\nMisclassification Analysis:")
+        print("\nMisclassification Analysis:")
         print(f"Total examples: {len(df)}")
         print(
             f"Misclassified examples: {misclassified.sum()} ({misclassified.sum() / len(df):.2%})"

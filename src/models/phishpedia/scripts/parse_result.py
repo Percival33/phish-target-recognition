@@ -25,15 +25,19 @@ def parse_phishpedia_csv(file_path, is_phish=False):
     df_raw = None
 
     def create_processed_df(raw_df):
-        return pd.DataFrame({
-            "file": raw_df["folder"],
-            "pp_class": raw_df["phish_category"],
-            "pp_target": raw_df["pred_target"],
-            "url": raw_df["url"],
-            "true_class": true_class_value,  # Set based on is_phish argument
-            "true_target": raw_df["folder"].str.split("+").str[0] if is_phish else "benign",
-            "pp_conf": raw_df["siamese_conf"],
-        })
+        return pd.DataFrame(
+            {
+                "file": raw_df["folder"],
+                "pp_class": raw_df["phish_category"],
+                "pp_target": raw_df["pred_target"],
+                "url": raw_df["url"],
+                "true_class": true_class_value,  # Set based on is_phish argument
+                "true_target": raw_df["folder"].str.split("+").str[0]
+                if is_phish
+                else "benign",
+                "pp_conf": raw_df["siamese_conf"],
+            }
+        )
 
     column_names = [
         "folder",
@@ -54,7 +58,7 @@ def parse_phishpedia_csv(file_path, is_phish=False):
                 sep="\t",
                 names=column_names,
                 encoding=encoding,
-                on_bad_lines="skip"
+                on_bad_lines="skip",
             )
 
             # Handle any Unicode conversion for string columns

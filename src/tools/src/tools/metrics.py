@@ -8,7 +8,6 @@ from sklearn.metrics import (
 )
 from sklearn.preprocessing import LabelEncoder
 import json
-import os
 from pathlib import Path
 
 # Import PROJ_ROOT from the config module
@@ -16,14 +15,17 @@ from .config import PROJ_ROOT
 
 TARGET_MAPPINGS_PATH = PROJ_ROOT / "target_mappings.json"
 
+
 def load_and_prepare_mappings(file_path: Path) -> dict[str, str]:
     """Loads target mappings from JSON and prepares a lookup dictionary."""
     if not file_path.exists():
-        print(f"Warning: Mapping file not found at {file_path}. Proceeding without normalization.")
+        print(
+            f"Warning: Mapping file not found at {file_path}. Proceeding without normalization."
+        )
         return {}
 
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             raw_mappings = json.load(f)
     except json.JSONDecodeError:
         print(f"Error: Could not decode JSON from {file_path}.")
@@ -56,11 +58,15 @@ def calculate_metrics(cls_true, cls_pred, targets_true, targets_pred):
     mapping = None
     if TARGET_MAPPINGS_PATH.exists():
         mapping = load_and_prepare_mappings(TARGET_MAPPINGS_PATH)
-    
+
     if mapping:
         # Only normalize if mapping was loaded successfully
-        normalized_targets_true = [mapping.get(str(t).lower(), str(t)) for t in targets_true]
-        normalized_targets_pred = [mapping.get(str(t).lower(), str(t)) for t in targets_pred]
+        normalized_targets_true = [
+            mapping.get(str(t).lower(), str(t)) for t in targets_true
+        ]
+        normalized_targets_pred = [
+            mapping.get(str(t).lower(), str(t)) for t in targets_pred
+        ]
 
     all_targets = list(normalized_targets_true) + list(normalized_targets_pred)
     le = LabelEncoder()
@@ -73,7 +79,11 @@ def calculate_metrics(cls_true, cls_pred, targets_true, targets_pred):
     Repp_TP = np.sum((cls_true == 1) & (cls_pred == 1))
 
     # Idp: Number of correctly reported phishing webpages with brand reported correctly
-    Idp = np.sum((cls_true == 1) & (cls_pred == 1) & (targets_true_encoded == targets_pred_encoded))
+    Idp = np.sum(
+        (cls_true == 1)
+        & (cls_pred == 1)
+        & (targets_true_encoded == targets_pred_encoded)
+    )
 
     target_metrics = {
         "target_f1_micro": f1_score(
