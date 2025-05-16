@@ -111,14 +111,14 @@ class ModelHelper:
         """
         correct_matches = sum(
             targetHelper.check_if_target_in_top(
-                str(test_file.name), 
+                str(test_file.name),
                 evaluate.find_names_min_distances(
                     *evaluate.find_min_distances(
-                        np.ravel(evaluate.pairwise_distance[i, :]), 
+                        np.ravel(evaluate.pairwise_distance[i, :]),
                         1
                     )
                 )[1]
-            )[0] 
+            )[0]
             for i, test_file in enumerate(phish_test_files)
         )
        """
@@ -222,7 +222,7 @@ class ModelHelper:
                 internal_model_mem_count += ModelHelper.get_model_memory_usage(batch_size, layer)
             single_layer_mem = 1
             out_shape = layer.output_shape
-            if type(out_shape) is list:
+            if isinstance(out_shape, list):
                 out_shape = out_shape[0]
             for s in out_shape:
                 if s is None:

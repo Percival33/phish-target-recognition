@@ -5,11 +5,13 @@ import re
 from pathlib import Path
 import sys
 from urllib.parse import urlparse
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Optional, Dict, Any
+
 
 def calculate_hash(file_path: Path) -> str:
     # TODO: Implement perceptual hash calculation for image file
     return None
+
 
 def extract_fqdn(url: str) -> Optional[str]:
     """Extracts the FQDN from a URL."""
@@ -17,6 +19,7 @@ def extract_fqdn(url: str) -> Optional[str]:
         return urlparse(url).netloc
     except Exception:
         return None
+
 
 def find_image_files(image_folder: Path) -> List[Path]:
     """Finds and sorts image files in a folder."""
@@ -30,13 +33,14 @@ def find_image_files(image_folder: Path) -> List[Path]:
         # Extracts numbers from filename for robust sorting
         # e.g. "001.png" -> 1, "img_002.jpg" -> 2
         name_stem = path.stem
-        numbers = re.findall(r'\d+', name_stem)
+        numbers = re.findall(r"\d+", name_stem)
         if numbers:
-            return int(numbers[-1]) # Use the last number found
-        return -1 # Should not happen if filenames are numbered
+            return int(numbers[-1])  # Use the last number found
+        return -1  # Should not happen if filenames are numbered
 
     images.sort(key=sort_key)
     return images
+
 
 def prepare_csv_data(
     image_folder_path: Path,
@@ -64,8 +68,10 @@ def prepare_csv_data(
     if not image_files:
         print(f"Warning: No image files found in {image_folder_path}")
         if not target_names:
-            print("Warning: No target names found in labels file either. Output CSV will be empty.")
-        
+            print(
+                "Warning: No target names found in labels file either. Output CSV will be empty."
+            )
+
     if len(target_names) != len(image_files):
         print(
             f"Error: Mismatch between number of target names ({len(target_names)}) and "
@@ -74,7 +80,7 @@ def prepare_csv_data(
         sys.exit(1)
 
     min_count = min(len(target_names), len(image_files))
-    
+
     csv_data: List[Dict[str, Any]] = []
 
     for i in range(min_count):
@@ -82,26 +88,32 @@ def prepare_csv_data(
         image_file = image_files[i]
 
         url = None  # URL is no longer sourced from labels.txt
-        fqdn = None # FQDN is derived from URL, so also None
-        
-        screenshot_object = image_file.name # just the filename
+        fqdn = None  # FQDN is derived from URL, so also None
+
+        screenshot_object = image_file.name  # just the filename
 
         screenshot_hash = calculate_hash(image_file)
         affected_entity = target_name
-        
+
         csv_data.append(
             {
                 "url": url if url is not None else "",
                 "fqdn": fqdn if fqdn is not None else "",
                 "screenshot_object": screenshot_object,
-                "screenshot_hash": screenshot_hash if screenshot_hash is not None else "",
-                "affected_entity": affected_entity if affected_entity is not None else "",
+                "screenshot_hash": screenshot_hash
+                if screenshot_hash is not None
+                else "",
+                "affected_entity": affected_entity
+                if affected_entity is not None
+                else "",
                 "is_phishing": default_is_phishing,
             }
         )
-        
+
     if not csv_data and (target_names or image_files):
-        print("Warning: No matching pairs of target names and images to process. Output CSV will only contain headers.")
+        print(
+            "Warning: No matching pairs of target names and images to process. Output CSV will only contain headers."
+        )
 
     fieldnames = [
         "url",
@@ -119,15 +131,19 @@ def prepare_csv_data(
         if csv_data:
             writer.writerows(csv_data)
 
-    print(f"Successfully generated CSV: {output_csv_path} with {len(csv_data)} entries.")
+    print(
+        f"Successfully generated CSV: {output_csv_path} with {len(csv_data)} entries."
+    )
     if len(csv_data) < len(target_names) or len(csv_data) < len(image_files):
-        print(f"Note: {len(target_names) - len(csv_data)} target names and/or {len(image_files) - len(csv_data)} images were not processed due to mismatches.")
+        print(
+            f"Note: {len(target_names) - len(csv_data)} target names and/or {len(image_files) - len(csv_data)} images were not processed due to mismatches."
+        )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Prepare a CSV file from an image folder and a labels file (target names) "
-                    "for use with organize_by_sample.py."
+        "for use with organize_by_sample.py."
     )
     parser.add_argument(
         "--image-folder",
@@ -168,5 +184,6 @@ def main() -> None:
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
+
 if __name__ == "__main__":
-    main() 
+    main()
