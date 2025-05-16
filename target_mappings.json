@@ -1,7 +1,11 @@
 {
-  "AT&T": [
-    "AT&T",
-    "att"
+  "absa": [
+    "Absa Group",
+    "absa"
+  ],
+  "adidas": [
+    "Adidas",
+    "adidas"
   ],
   "Adobe": [
     "Adobe",
@@ -23,110 +27,6 @@
     "American Express",
     "american_express"
   ],
-  "BNP Paribas": [
-    "BNP Paribas",
-    "bnp paribas",
-    "bnp_paribas"
-  ],
-  "Bankia": [
-    "Bankia",
-    "bankia"
-  ],
-  "ExampleBank": [
-    "EB",
-    "ExampleBank",
-    "example bank"
-  ],
-  "Facebook": [
-    "Facebook",
-    "facebook",
-    "meta"
-  ],
-  "Google": [
-    "Google",
-    "gmail",
-    "google"
-  ],
-  "HSBC": [
-    "HSBC",
-    "HSBC Bank",
-    "hsbc"
-  ],
-  "IRS": [
-    "IRS",
-    "irs"
-  ],
-  "Instagram": [
-    "Instagram",
-    "instagram"
-  ],
-  "La Banque postale": [
-    "La Banque postale",
-    "la_banque_postale"
-  ],
-  "La Poste": [
-    "La Poste",
-    "la_poste"
-  ],
-  "LinkedIn Corporation": [
-    "LinkedIn Corporation",
-    "linkedin"
-  ],
-  "Microsoft": [
-    "Microsoft",
-    "microsoft",
-    "microsoft outlook",
-    "ms_bing",
-    "ms_office",
-    "ms_onedrive",
-    "ms_outlook",
-    "ms_skype"
-  ],
-  "Netflix": [
-    "Netflix",
-    "netflix"
-  ],
-  "Orange": [
-    "Orange",
-    "orange"
-  ],
-  "PayPal": [
-    "PayPal",
-    "paypal"
-  ],
-  "RuneScape": [
-    "RuneScape",
-    "runescape"
-  ],
-  "Steam": [
-    "Steam",
-    "steam"
-  ],
-  "Strato": [
-    "Strato",
-    "Strato AG",
-    "strato"
-  ],
-  "Twitter, Inc.": [
-    "Twitter, Inc.",
-    "twitter"
-  ],
-  "Wells Fargo & Company": [
-    "Wells Fargo & Company",
-    "wells_fargo"
-  ],
-  "Yahoo!": [
-    "Yahoo!",
-    "yahoo"
-  ],
-  "absa": [
-    "Absa Group",
-    "absa"
-  ],
-  "adidas": [
-    "Adidas",
-    "adidas"
-  ],
   "apple": [
     "Apple",
     "apple"
@@ -136,9 +36,17 @@
     "Aruba S.p.A.",
     "aruba"
   ],
+  "AT&T": [
+    "AT&T",
+    "att"
+  ],
   "bahia": [
     "Bahia",
     "bahia"
+  ],
+  "Bankia": [
+    "Bankia",
+    "bankia"
   ],
   "barclaycard": [
     "Barclaycard",
@@ -151,6 +59,11 @@
   "bcp": [
     "BCP",
     "bcp"
+  ],
+  "BNP Paribas": [
+    "BNP Paribas",
+    "bnp paribas",
+    "bnp_paribas"
   ],
   "boa": [
     "Bank of America",
@@ -196,6 +109,21 @@
     "eBay",
     "ebay"
   ],
+  "ExampleBank": [
+    "EB",
+    "ExampleBank",
+    "example bank"
+  ],
+  "Facebook": [
+    "Facebook",
+    "facebook",
+    "meta"
+  ],
+  "Google": [
+    "Google",
+    "gmail",
+    "google"
+  ],
   "google_drive": [
     "Google Drive",
     "google_drive"
@@ -209,13 +137,38 @@
     "Grupo Bancolombia",
     "grupo_bancolombia"
   ],
+  "HSBC": [
+    "HSBC",
+    "HSBC Bank",
+    "hsbc"
+  ],
   "impots_gov": [
     "DGI French Tax Authority",
     "impots_gov"
   ],
+  "Instagram": [
+    "Instagram",
+    "instagram"
+  ],
+  "IRS": [
+    "IRS",
+    "irs"
+  ],
   "itau": [
     "Itau Unibanco S.A",
     "itau"
+  ],
+  "La Banque postale": [
+    "La Banque postale",
+    "la_banque_postale"
+  ],
+  "La Poste": [
+    "La Poste",
+    "la_poste"
+  ],
+  "LinkedIn Corporation": [
+    "LinkedIn Corporation",
+    "linkedin"
   ],
   "lloyds_bank": [
     "Lloyds TSB Group",
@@ -223,6 +176,16 @@
   ],
   "mdpd": [
     "mdpd"
+  ],
+  "Microsoft": [
+    "Microsoft",
+    "microsoft",
+    "microsoft outlook",
+    "ms_bing",
+    "ms_office",
+    "ms_onedrive",
+    "ms_outlook",
+    "ms_skype"
   ],
   "nab": [
     "National Australia Bank Limited",
@@ -232,17 +195,46 @@
     "NedBank Limited",
     "nedbank"
   ],
+  "Netflix": [
+    "Netflix",
+    "netflix"
+  ],
+  "Orange": [
+    "Orange",
+    "orange"
+  ],
   "ourtime": [
     "OurTime Dating",
     "ourtime"
+  ],
+  "PayPal": [
+    "PayPal",
+    "paypal"
+  ],
+  "RuneScape": [
+    "RuneScape",
+    "runescape"
   ],
   "sparkasse": [
     "Sparkasse Bank",
     "sparkasse"
   ],
+  "Steam": [
+    "Steam",
+    "steam"
+  ],
+  "Strato": [
+    "Strato",
+    "Strato AG",
+    "strato"
+  ],
   "suntrust": [
     "SunTrust Bank",
     "suntrust"
+  ],
+  "Twitter, Inc.": [
+    "Twitter, Inc.",
+    "twitter"
   ],
   "typeform": [
     "Typeform",
@@ -255,5 +247,13 @@
   "walmart": [
     "Walmart",
     "walmart"
+  ],
+  "Wells Fargo & Company": [
+    "Wells Fargo & Company",
+    "wells_fargo"
+  ],
+  "Yahoo!": [
+    "Yahoo!",
+    "yahoo"
   ]
-} 
+}
