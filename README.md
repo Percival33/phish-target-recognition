@@ -4,7 +4,7 @@
 
 Before starting work on the project, make sure you have the following tools installed:
 
-- **Just**: A task management system. Installation instructions can be found [here](https://github.com/casey/just?tab=readme-ov-file#packages).
+- **Just**: A command runner. Installation instructions can be found [here](https://github.com/casey/just?tab=readme-ov-file#packages).
 - **uv**: An advanced Python package and environment manager. Install using the following commands:
   ```bash
   curl -LsSf https://astral.sh/uv/0.5.18/install.sh | sh
@@ -176,7 +176,6 @@ Instructions for running and preparing data for the VisualPhish model.
     ```
 2.  **Download VisualPhish Data:** In the main project folder, execute (by default, data will be downloaded to `PROJECT_ROOT_DIR/data/interim`):
     ```bash
-    # Make sure you have gdown installed: uv pip install gdown
     uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar zxvf - -C "$PROJECT_ROOT_DIR/data/interim"
     ```
     If you want to download data to a different folder, change `"$PROJECT_ROOT_DIR/data/interim"` to your chosen path.
@@ -250,7 +249,7 @@ This command should be executed after the general `uv sync --frozen` if TensorFl
 The following command runs the evaluation script using target list embeddings from a specified directory. Replace `EMB_FOLDER` with the actual path to the directory containing the target list embedding files (e.g., `whitelist_emb.npy`, `whitelist_labels.npy`, `whitelist_file_names.npy`). The script also assumes that test embeddings and other necessary files (like `all_labels.npy`, `all_file_names.npy`, `pairwise_distances.npy`) are located in the directory specified by `--save-folder` (defaults to `logs/VisualPhish-Results/` if not overridden in the script or command line) or are generated if the script is modified to re-process data.
 
 ```bash
-python src/models/visualphishnet/eval_new.py --emb-dir EMB_FOLDER --threshold 8.0
+uv run src/models/visualphishnet/eval_new.py --emb-dir EMB_FOLDER --threshold 8.0
 ```
 
 This will output metrics to the console and save detailed results to CSV and text files in the directory specified by `--result-path` (defaults to `logs/VisualPhish/`).
@@ -282,14 +281,14 @@ This project includes a Streamlit-based web interface, defined in `src/website.p
 
 ### Running the Backend Services and Website
 
-1.  **Start Backend Services**: 
+1.  **Start Backend Services**:
     Navigate to the root directory of the project in your terminal and run the Docker Compose services in detached mode:
     ```bash
     docker-compose up -d
     ```
     This command will build (if not already built) and start the `api`, `visualphish`, and `phishpedia` services defined in `docker-compose.yml`. The API service will then be accessible at `http://localhost:8000` (as configured in `docker-compose.yml` and `src/website.py`).
 
-2.  **Run the Streamlit Website**: 
+2.  **Run the Streamlit Website**:
     Once the backend services are running (verify their status with `docker-compose ps`), start the Streamlit web application. In the project root directory, execute:
     ```bash
     uv run streamlit run src/website.py
@@ -297,8 +296,6 @@ This project includes a Streamlit-based web interface, defined in `src/website.p
     The website should then be accessible in your web browser, typically at `http://localhost:8501`. It will connect to the API service running via Docker Compose.
 
 ## Other Useful Commands
-
-https://stackoverflow.com/questions/77250743/mac-xcode-g-cannot-compile-even-a-basic-c-program-issues-with-standard-libr
 
 -   Synchronization with Overleaf repository (example):
     ```bash
