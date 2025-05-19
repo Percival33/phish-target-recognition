@@ -67,3 +67,13 @@ def validate_threshold(threshold: Optional[float]) -> None:
     if threshold is not None and not (0 <= threshold <= 100):
         logger.error(f"Threshold must be between 0 and 100, got {threshold}")
         sys.exit(1)
+
+
+def validate_top_k(top_k: int) -> None:
+    """Validate top-k parameter value."""
+    if not isinstance(top_k, int):
+        logger.error(f"Top-k must be an integer, got {type(top_k)}")
+        sys.exit(1)
+    if top_k <= 0:
+        logger.error(f"Top-k must be positive, got {top_k}")
+        sys.exit(1)

@@ -185,7 +185,7 @@ class BaselineEmbedder:
         output_path: Optional[Path] = None,
         batch_size: int = 32,
         true_targets: Optional[List[str]] = None,
-        true_classes: Optional[List[bool]] = None,
+        true_classes: Optional[List[int]] = None,
     ) -> pd.DataFrame:
         """Search for similar images in the index and optionally save results to CSV.
 
@@ -199,128 +199,81 @@ class BaselineEmbedder:
             true_classes: Optional list of true class labels for query images. Must be same length as query_paths.
 
         Returns:
-            DataFrame with columns:
-            - file: query image filename
-            - baseline_class: binary classification (if threshold provided)
-            - baseline_distance: distance to closest match
-            - baseline_target: target from closest match
-            - true_class: from query metadata if available
-            - true_target: from query metadata if available
+            DataFrame with results in the format:
+            file,baseline_class,baseline_distance,baseline_target,true_class,true_target
         """
-        if self.index is None or self.index.ntotal == 0:
-            logger.warning(
-                "FAISS index is not initialized or is empty. Cannot perform search."
-            )
+        if self.index is None:
+            logger.error("No index loaded")
             return pd.DataFrame()
 
         if true_targets is not None and len(true_targets) != len(query_paths):
-            logger.error(
-                f"Length mismatch: true_targets ({len(true_targets)}) != query_paths ({len(query_paths)})"
-            )
+            logger.error("Number of true_targets must match number of query paths")
             return pd.DataFrame()
 
         if true_classes is not None and len(true_classes) != len(query_paths):
-            logger.error(
-                f"Length mismatch: true_classes ({len(true_classes)}) != query_paths ({len(query_paths)})"
-            )
+            logger.error("Number of true_classes must match number of query paths")
             return pd.DataFrame()
 
         results = []
 
-        # Process in batches to control memory usage
-        for batch_start in range(0, len(query_paths), batch_size):
+        # Process queries in batches
+        for batch_start in tqdm(
+            range(0, len(query_paths), batch_size), desc="Processing queries"
+        ):
             batch_end = min(batch_start + batch_size, len(query_paths))
             batch_paths = query_paths[batch_start:batch_end]
+            batch_embeddings = []
 
-            # Pre-compute embeddings for current batch
-            query_embeddings = []
-            query_names = []
-            batch_true_targets = []
-            batch_true_classes = []
-
-            logger.info(
-                f"Computing embeddings for batch {batch_start // batch_size + 1}/{(len(query_paths) - 1) // batch_size + 1}..."
-            )
-            for i, query_path in enumerate(
-                tqdm(batch_paths, desc="Computing embeddings")
-            ):
+            # Compute embeddings for the batch
+            for query_path in batch_paths:
                 try:
                     query_hash = self.hasher.compute(str(query_path))
                     query_array = np.array(query_hash, dtype=np.float32).reshape(1, -1)
-                    query_embeddings.append(query_array)
-                    query_names.append(query_path.name)
-                    batch_true_targets.append(
-                        true_targets[batch_start + i] if true_targets else None
-                    )
-                    batch_true_classes.append(
-                        true_classes[batch_start + i] if true_classes else None
-                    )
+                    batch_embeddings.append(query_array)
                 except Exception as e:
-                    logger.error(
-                        f"Failed to process query image {query_path}: {str(e)}"
-                    )
+                    logger.error(f"Failed to process query {query_path}: {str(e)}")
                     continue
 
-            if not query_embeddings:
-                logger.warning(
-                    f"No query embeddings could be computed for batch {batch_start // batch_size + 1}"
-                )
+            if not batch_embeddings:
                 continue
 
-            # Stack embeddings for current batch
-            query_matrix = np.vstack(query_embeddings)
-
-            # Perform batch search
-            logger.info(
-                f"Performing batch similarity search for batch {batch_start // batch_size + 1}..."
-            )
-            distances, indices = self.index.search(query_matrix, k)
+            # Stack batch embeddings and perform batch search
+            batch_embeddings_array = np.vstack(batch_embeddings)
+            distances, indices = self.index.search(batch_embeddings_array, k)
 
             # Process batch results
-            for query_name, true_target, true_class, distance_row, index_row in zip(
-                query_names, batch_true_targets, batch_true_classes, distances, indices
+            for i, (query_path, distances, indices) in enumerate(
+                zip(batch_paths, distances, indices)
             ):
-                closest_match = self.image_metadata[index_row[0]]
-                closest_distance = float(distance_row[0])
+                try:
+                    closest_distance = float(distances[0])
+                    closest_idx = int(indices[0])
+                    closest_metadata = self.image_metadata[closest_idx]
 
-                result = {
-                    "file": query_name,
-                    "baseline_distance": closest_distance,
-                    "baseline_target": closest_match["true_target"],
-                    "true_class": true_class,
-                    "true_target": true_target,
-                }
+                    result = {
+                        "file": query_path.name,
+                        "baseline_class": closest_metadata["true_class"],
+                        "baseline_distance": closest_distance,
+                        "baseline_target": closest_metadata["true_target"],
+                        "true_class": true_classes[batch_start + i]
+                        if true_classes is not None
+                        else None,
+                        "true_target": true_targets[batch_start + i]
+                        if true_targets is not None
+                        else None,
+                    }
+                    results.append(result)
+                except Exception as e:
+                    logger.error(f"Failed to process result for {query_path}: {str(e)}")
+                    continue
 
-                if threshold is not None:
-                    result["baseline_class"] = 1 if closest_distance < threshold else 0
-
-                results.append(result)
-
-        if not results:
-            logger.warning("No results could be generated for any batch")
-            return pd.DataFrame()
-
-        # Create DataFrame with specified column order
+        # Create DataFrame with results
         df = pd.DataFrame(results)
-        columns = [
-            "file",
-            "baseline_class",
-            "baseline_distance",
-            "baseline_target",
-            "true_class",
-            "true_target",
-        ]
-        df = df.reindex(columns=columns)
 
         # Save to CSV if output path provided
         if output_path is not None:
-            if output_path.exists():
-                logger.warning(
-                    f"Output file {output_path} already exists. Use --overwrite flag to replace."
-                )
-            else:
-                df.to_csv(output_path, index=False)
-                logger.info(f"Results saved to {output_path}")
+            df.to_csv(output_path, index=False)
+            logger.info(f"Saved results to {output_path}")
 
         return df
 
