@@ -10,6 +10,7 @@ from .validators import (
     validate_index_path,
     validate_output_path,
     validate_threshold,
+    validate_metadata_path,
 )
 from .common import get_image_paths
 from tools.config import setup_logging
@@ -39,6 +40,7 @@ def validate_inputs(
     """
     validate_images_dir(images_dir)
     validate_index_path(index_path, must_exist=True)
+    validate_metadata_path(index_path.with_suffix(".csv"), must_exist=True)
     validate_output_path(output_path, overwrite)
     validate_threshold(threshold)
     return get_image_paths(images_dir)
@@ -78,6 +80,7 @@ def main():
     # Convert paths
     images_dir = Path(args.images)
     index_path = Path(args.index)
+    metadata_path = index_path.with_suffix(".csv")
     output_path = Path(args.output)
 
     # Validate inputs and get image paths
@@ -86,7 +89,7 @@ def main():
     )
 
     # Initialize embedder with existing index
-    embedder = BaselineEmbedder(index_path=index_path)
+    embedder = BaselineEmbedder(index_path=index_path, metadata_path=metadata_path)
 
     try:
         # Process queries and get results

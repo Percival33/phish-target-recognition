@@ -21,6 +21,7 @@ class BaselineEmbedder:
         target_mapping: Optional[Dict[str, str]] = None,
         hasher: Optional[hashers.PerceptualHash] = None,
         index_path: Optional[Path] = None,
+        metadata_path: Optional[Path] = None,
     ):
         self.hasher = hasher if hasher is not None else hashers.PHash()
         self.index = None
@@ -34,12 +35,72 @@ class BaselineEmbedder:
                 logger.info(
                     f"Loaded FAISS index from {index_path} with {self.index.ntotal} vectors"
                 )
+                # Try to load metadata if path is provided
+                if metadata_path is not None and metadata_path.exists():
+                    self.load_metadata_csv(metadata_path)
             except Exception as e:
                 logger.error(f"Failed to load FAISS index from {index_path}: {e}")
 
-    def save_index(self, index_path: Path) -> bool:
+    def load_metadata_csv(self, metadata_path: Path) -> bool:
+        """Load metadata from CSV file.
+
+        Args:
+            metadata_path: Path to metadata CSV file
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            df = pd.read_csv(metadata_path)
+            if len(df) != self.index.ntotal:
+                logger.error(
+                    f"Metadata count ({len(df)}) does not match index count ({self.index.ntotal})"
+                )
+                return False
+
+            self.image_metadata = df.to_dict("records")
+            logger.info(f"Loaded metadata for {len(self.image_metadata)} images")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to load metadata from {metadata_path}: {e}")
+            return False
+
+    def save_metadata_csv(self, metadata_path: Path, overwrite: bool = False) -> bool:
+        """Save metadata to CSV file.
+
+        Args:
+            metadata_path: Path to save metadata CSV
+            overwrite: Whether to overwrite existing file
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        if metadata_path.exists() and not overwrite:
+            logger.warning(
+                f"Metadata file {metadata_path} already exists. Use overwrite=True to replace."
+            )
+            return False
+
+        try:
+            df = pd.DataFrame(self.image_metadata)
+            df.to_csv(metadata_path, index=False)
+            logger.info(
+                f"Saved metadata for {len(self.image_metadata)} images to {metadata_path}"
+            )
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save metadata to {metadata_path}: {e}")
+            return False
+
+    def save_index(self, index_path: Path, overwrite: bool = False) -> bool:
         if self.index is None:
             logger.warning("No index to save")
+            return False
+
+        if index_path.exists() and not overwrite:
+            logger.warning(
+                f"Index file {index_path} already exists. Use overwrite=True to replace."
+            )
             return False
 
         try:
@@ -262,3 +323,56 @@ class BaselineEmbedder:
                 logger.info(f"Results saved to {output_path}")
 
         return df
+
+    def search_by_image(
+        self, image: np.ndarray, k: int = 1, threshold: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """Search for similar images in the index using a raw image array.
+
+        Args:
+            image: OpenCV image array (numpy.ndarray)
+            k: Number of similar images to return (default: 1)
+            threshold: Optional distance threshold for binary classification
+
+        Returns:
+            Dictionary containing:
+            - distances: List of distance scores for top k matches
+            - matches: List of dictionaries containing metadata for each match
+            - baseline_class: Binary classification if threshold provided
+        """
+        if self.index is None or self.index.ntotal == 0:
+            logger.warning(
+                "FAISS index is not initialized or is empty. Cannot perform search."
+            )
+            return {"error": "Index not initialized or empty"}
+
+        if not isinstance(image, np.ndarray):
+            logger.error("Input must be a numpy array (OpenCV image)")
+            return {"error": "Invalid input type"}
+
+        try:
+            # Compute perceptual hash for input image
+            query_hash = self.hasher.compute_array(image)
+            query_array = np.array(query_hash, dtype=np.float32).reshape(1, -1)
+
+            # Perform similarity search
+            distances, indices = self.index.search(query_array, k)
+
+            # Process results
+            matches = []
+            for idx, distance in zip(indices[0], distances[0]):
+                match_metadata = self.image_metadata[idx].copy()
+                match_metadata["distance"] = float(distance)
+                matches.append(match_metadata)
+
+            result = {"distances": distances[0].tolist(), "matches": matches}
+
+            # Add binary classification if threshold provided
+            if threshold is not None:
+                result["baseline_class"] = 1 if distances[0][0] < threshold else 0
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to process image: {str(e)}")
+            return {"error": str(e)}

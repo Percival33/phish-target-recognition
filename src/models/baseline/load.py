@@ -51,6 +51,7 @@ def main():
     # Convert paths
     images_dir = Path(args.images)
     index_path = Path(args.index)
+    metadata_path = index_path.with_suffix(".csv")
     labels_path = Path(args.labels) if args.labels else None
 
     # Validate inputs and get image paths
@@ -64,7 +65,10 @@ def main():
         )
         sys.exit(1)
 
-    embedder = BaselineEmbedder(index_path=index_path if not args.overwrite else None)
+    embedder = BaselineEmbedder(
+        index_path=index_path if not args.overwrite else None,
+        metadata_path=metadata_path if not args.overwrite else None,
+    )
 
     try:
         # Compute embeddings
@@ -75,13 +79,16 @@ def main():
             image_paths=image_paths, is_phish=args.is_phish, batch_size=args.batch_size
         )
 
-        # Save index
-        if not embedder.save_index(index_path):
+        if not embedder.save_index(index_path, overwrite=args.overwrite):
             logger.error("Failed to save index")
             sys.exit(1)
 
+        if not embedder.save_metadata_csv(metadata_path, overwrite=args.overwrite):
+            logger.error("Failed to save metadata")
+            sys.exit(1)
+
         logger.info(
-            f"Successfully processed {len(metadata)} images and saved index to {index_path}"
+            f"Successfully processed {len(metadata)} images and saved index to {index_path} and metadata to {metadata_path}"
         )
 
     except Exception as e:

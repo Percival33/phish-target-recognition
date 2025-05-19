@@ -69,6 +69,7 @@ services:
       - DISTANCE_THRESHOLD=${DISTANCE_THRESHOLD:1}
     volumes:
       - ./data/processed/baseline/faiss_index.idx:/code/index/faiss_index.idx
+      - ./data/processed/baseline/faiss_index.csv:/code/index/faiss_index.csv
 
 networks:
   net:

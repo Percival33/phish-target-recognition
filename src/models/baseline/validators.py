@@ -31,6 +31,21 @@ def validate_index_path(
         sys.exit(1)
 
 
+def validate_metadata_path(
+    metadata_path: Path, must_exist: bool = False, overwrite: bool = False
+) -> None:
+    """Validate metadata CSV path based on requirements."""
+    if must_exist:
+        if not metadata_path.exists():
+            logger.error(f"Metadata file {metadata_path} does not exist")
+            sys.exit(1)
+    elif metadata_path.exists() and not overwrite:
+        logger.error(
+            f"Metadata file {metadata_path} already exists. Use --overwrite to replace"
+        )
+        sys.exit(1)
+
+
 def validate_output_path(output_path: Path, overwrite: bool = False) -> None:
     """Validate output path."""
     if output_path.exists() and not overwrite:
