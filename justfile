@@ -14,11 +14,15 @@ copy-pp: build-common
     mkdir -p src/models/phishpedia/common
     cp src/tools/dist/*.whl src/models/phishpedia/common
 
-tools: copy-vp copy-pp
+copy-baseline: build-common
+    mkdir -p src/models/baseline/common
+    cp src/tools/dist/*.whl src/models/baseline/common
+
+tools: copy-vp copy-pp copy-baseline
     echo "Tools package was built"
 
 run-pp recipe-name:
-    just -f src/models/phishpedia/justfile {{recipe-name}}
+    just -f src/models/phishpedia/justfile {{ recipe-name }}
 
 docker: tools
     just run-pp setup-models
