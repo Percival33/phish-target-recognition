@@ -6,8 +6,8 @@ from typing import Optional, List, Tuple
 
 import wandb
 
-from .BaselineEmbedder import BaselineEmbedder
-from .validators import (
+from BaselineEmbedder import BaselineEmbedder
+from validators import (
     validate_images_dir,
     validate_index_path,
     validate_output_path,
@@ -16,7 +16,7 @@ from .validators import (
     validate_labels_path,
     validate_top_k,
 )
-from .common import get_image_paths, load_labels
+from common import get_image_paths, load_labels
 from tools.config import setup_logging
 
 setup_logging()

@@ -19,7 +19,7 @@ class BaselineEmbedder:
     def __init__(
         self,
         target_mapping: Optional[Dict[str, str]] = None,
-        hasher: Optional[hashers.PerceptualHash] = None,
+        hasher: Optional[hashers.PHash] = None,
         index_path: Optional[Path] = None,
         metadata_path: Optional[Path] = None,
     ):

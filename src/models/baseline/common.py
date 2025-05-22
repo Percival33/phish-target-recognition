@@ -9,6 +9,12 @@ logger = logging.getLogger(__name__)
 def get_image_paths(images_dir: Path) -> List[Path]:
     """Get list of image paths from directory."""
     image_paths: List[Path] = []
+    for subdir in images_dir.iterdir():
+        if subdir.is_dir():
+            image_paths.extend(subdir.glob("*.jpg"))
+            image_paths.extend(subdir.glob("*.jpeg"))
+            image_paths.extend(subdir.glob("*.png"))
+
     for ext in ("*.jpg", "*.jpeg", "*.png"):
         image_paths.extend(images_dir.glob(ext))
 

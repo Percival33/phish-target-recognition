@@ -6,9 +6,9 @@ from typing import Optional, List
 
 import wandb
 
-from .BaselineEmbedder import BaselineEmbedder
-from .validators import validate_images_dir, validate_index_path, validate_labels_path
-from .common import get_image_paths, load_labels
+from BaselineEmbedder import BaselineEmbedder
+from validators import validate_images_dir, validate_index_path, validate_labels_path
+from common import get_image_paths
 from tools.config import setup_logging
 
 setup_logging()
@@ -22,7 +22,6 @@ def validate_inputs(
     validate_images_dir(images_dir)
     validate_index_path(index_path, must_exist=False, overwrite=overwrite)
     validate_labels_path(labels_path)
-    return get_image_paths(images_dir)
 
 
 def main():
@@ -57,22 +56,20 @@ def main():
             config=args,
         )
 
-    # Convert paths
     images_dir = Path(args.images)
     index_path = Path(args.index)
     metadata_path = index_path.with_suffix(".csv")
     labels_path = Path(args.labels) if args.labels else None
 
-    # Validate inputs and get image paths
-    image_paths = validate_inputs(images_dir, index_path, labels_path, args.overwrite)
+    validate_inputs(images_dir, index_path, labels_path, args.overwrite)
+    image_paths = get_image_paths(images_dir)
 
-    # Load target labels if provided
-    target_labels = load_labels(labels_path)
-    if target_labels and len(target_labels) != len(image_paths):
-        logger.error(
-            f"Number of labels ({len(target_labels)}) does not match number of images ({len(image_paths)})"
-        )
-        sys.exit(1)
+    # target_labels = load_labels(labels_path)
+    # if target_labels and len(target_labels) != len(image_paths):
+    #     logger.error(
+    #         f"Number of labels ({len(target_labels)}) does not match number of images ({len(image_paths)})"
+    #     )
+    #     sys.exit(1)
 
     embedder = BaselineEmbedder(
         index_path=index_path if not args.overwrite else None,
