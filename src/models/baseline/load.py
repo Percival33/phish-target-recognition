@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from typing import Optional, List
 
+import wandb
+
 from .BaselineEmbedder import BaselineEmbedder
 from .validators import validate_images_dir, validate_index_path, validate_labels_path
 from .common import get_image_paths, load_labels
@@ -45,8 +47,15 @@ def main():
     parser.add_argument(
         "--overwrite", action="store_true", help="Overwrite existing index"
     )
+    parser.add_argument("--log", action="store_true", help="Enable wandb logging")
 
     args = parser.parse_args()
+    if args.log:
+        run = wandb.init(
+            project="baseline-load",
+            group="baseline",
+            config=args,
+        )
 
     # Convert paths
     images_dir = Path(args.images)
@@ -87,9 +96,25 @@ def main():
             logger.error("Failed to save metadata")
             sys.exit(1)
 
+        # Log artifacts as wandb artifacts if logging enabled
+        if args.log:
+            try:
+                logger.info(f"Load results for {len(metadata)} images")
+                run.save(str(index_path))
+                run.save(str(metadata_path))
+            except Exception as e:
+                logger.warning(f"Failed to log wandb artifacts: {e}")
+
         logger.info(
             f"Successfully processed {len(metadata)} images and saved index to {index_path} and metadata to {metadata_path}"
         )
+
+        # Finish wandb run if logging enabled
+        if args.log:
+            try:
+                wandb.finish()
+            except Exception as e:
+                logger.warning(f"Failed to finish wandb run: {e}")
 
     except Exception as e:
         logger.error(f"Error during processing: {e}")
