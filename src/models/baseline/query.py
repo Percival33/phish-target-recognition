@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from typing import Optional, List, Tuple
 
+import wandb
+
 from .BaselineEmbedder import BaselineEmbedder
 from .validators import (
     validate_images_dir,
@@ -101,8 +103,15 @@ def main():
     parser.add_argument(
         "--overwrite", action="store_true", help="Overwrite existing output"
     )
+    parser.add_argument("--log", action="store_true", help="Enable wandb logging")
 
     args = parser.parse_args()
+    if args.log:
+        run = wandb.init(
+            project="baseline-query",
+            group="baseline",
+            config=args,
+        )
 
     # Convert paths
     images_dir = Path(args.images)
@@ -140,9 +149,24 @@ def main():
         if args.overwrite:
             results.to_csv(output_path, index=False)
 
+        # Log CSV as wandb artifact if logging enabled
+        if args.log:
+            try:
+                logger.info(f"Query results for {len(image_paths)} images")
+                run.save(str(output_path))
+            except Exception as e:
+                logger.warning(f"Failed to log wandb artifact: {e}")
+
         logger.info(
             f"Successfully processed {len(image_paths)} queries and saved results to {output_path}"
         )
+
+        # Finish wandb run if logging enabled
+        if args.log:
+            try:
+                wandb.finish()
+            except Exception as e:
+                logger.warning(f"Failed to finish wandb run: {e}")
 
     except Exception as e:
         logger.error(f"Error during processing: {e}")
