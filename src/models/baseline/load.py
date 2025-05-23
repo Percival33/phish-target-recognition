@@ -7,7 +7,7 @@ from typing import Optional, List
 import wandb
 
 from BaselineEmbedder import BaselineEmbedder
-from validators import validate_images_dir, validate_index_path, validate_labels_path
+from checkers import validate_images_dir, validate_index_path, validate_labels_path
 from common import get_image_paths
 from tools.config import setup_logging
 

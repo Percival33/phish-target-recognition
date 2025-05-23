@@ -82,6 +82,8 @@ class BaselineEmbedder:
             return False
 
         try:
+            metadata_path.parent.mkdir(parents=True, exist_ok=True)
+
             df = pd.DataFrame(self.image_metadata)
             df.to_csv(metadata_path, index=False)
             logger.info(
@@ -104,6 +106,8 @@ class BaselineEmbedder:
             return False
 
         try:
+            index_path.parent.mkdir(parents=True, exist_ok=True)
+
             faiss.write_index(self.index, str(index_path))
             logger.info(
                 f"Saved FAISS index to {index_path} with {self.index.ntotal} vectors"
@@ -144,7 +148,10 @@ class BaselineEmbedder:
             for img_path in batch_paths:
                 try:
                     phash = self.hasher.compute(str(img_path))
-                    phash_array = np.array(phash, dtype=np.float32).reshape(1, -1)
+                    phash_vector = self.hasher.string_to_vector(phash)
+                    phash_array = np.array(phash_vector, dtype=np.float32).reshape(
+                        1, -1
+                    )
 
                     true_target = str(img_path.parent.name).split("+")[0]
 
@@ -216,7 +223,6 @@ class BaselineEmbedder:
 
         results = []
 
-        # Process queries in batches
         for batch_start in tqdm(
             range(0, len(query_paths), batch_size), desc="Processing queries"
         ):
@@ -224,11 +230,13 @@ class BaselineEmbedder:
             batch_paths = query_paths[batch_start:batch_end]
             batch_embeddings = []
 
-            # Compute embeddings for the batch
             for query_path in batch_paths:
                 try:
                     query_hash = self.hasher.compute(str(query_path))
-                    query_array = np.array(query_hash, dtype=np.float32).reshape(1, -1)
+                    query_vector = self.hasher.string_to_vector(query_hash)
+                    query_array = np.array(query_vector, dtype=np.float32).reshape(
+                        1, -1
+                    )
                     batch_embeddings.append(query_array)
                 except Exception as e:
                     logger.error(f"Failed to process query {query_path}: {str(e)}")
@@ -237,11 +245,9 @@ class BaselineEmbedder:
             if not batch_embeddings:
                 continue
 
-            # Stack batch embeddings and perform batch search
             batch_embeddings_array = np.vstack(batch_embeddings)
             distances, indices = self.index.search(batch_embeddings_array, k)
 
-            # Process batch results
             for i, (query_path, distances, indices) in enumerate(
                 zip(batch_paths, distances, indices)
             ):
@@ -267,10 +273,8 @@ class BaselineEmbedder:
                     logger.error(f"Failed to process result for {query_path}: {str(e)}")
                     continue
 
-        # Create DataFrame with results
         df = pd.DataFrame(results)
 
-        # Save to CSV if output path provided
         if output_path is not None:
             df.to_csv(output_path, index=False)
             logger.info(f"Saved results to {output_path}")
@@ -304,9 +308,9 @@ class BaselineEmbedder:
             return {"error": "Invalid input type"}
 
         try:
-            # Compute perceptual hash for input image
             query_hash = self.hasher.compute_array(image)
-            query_array = np.array(query_hash, dtype=np.float32).reshape(1, -1)
+            query_vector = self.hasher.string_to_vector(query_hash)
+            query_array = np.array(query_vector, dtype=np.float32).reshape(1, -1)
 
             # Perform similarity search
             distances, indices = self.index.search(query_array, k)
