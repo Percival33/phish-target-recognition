@@ -7,7 +7,7 @@ from typing import Optional, List, Tuple
 import wandb
 
 from BaselineEmbedder import BaselineEmbedder
-from validators import (
+from checkers import (
     validate_images_dir,
     validate_index_path,
     validate_output_path,
@@ -31,8 +31,9 @@ def validate_inputs(
     threshold: Optional[float] = None,
     overwrite: bool = False,
     top_k: int = 1,
+    is_phish_cli_arg: bool = False,
 ) -> Tuple[List[Path], Optional[List[str]], List[int]]:
-    """Validate input parameters and return list of valid image paths and labels.
+    """Validate input parameters and return list of valid image paths, labels, and true classes.
 
     Args:
         images_dir: Directory containing query images
@@ -42,9 +43,10 @@ def validate_inputs(
         threshold: Optional distance threshold for classification
         overwrite: Whether to overwrite existing output file
         top_k: Number of similar images to return
+        is_phish_cli_arg: Boolean flag indicating if all query images should be marked as phishing
 
     Returns:
-        Tuple of (list of valid image paths, optional list of labels, list of true_classes)
+        Tuple of (list of valid image paths, optional list of target labels, list of true classes)
     """
     validate_images_dir(images_dir)
     validate_index_path(index_path, must_exist=True)
@@ -54,22 +56,29 @@ def validate_inputs(
     validate_top_k(top_k)
 
     image_paths = get_image_paths(images_dir)
+    num_images = len(image_paths)
 
-    # Handle labels if provided
-    labels = None
+    # Create true_classes_list based on is_phish_cli_arg
+    true_classes_list = [1] * num_images if is_phish_cli_arg else [0] * num_images
+
+    # Handle true_targets_list (labels)
+    true_targets_list = [None] * num_images
+
     if labels_path:
         validate_labels_path(labels_path)
-        labels = load_labels(labels_path)
-        if len(labels) != len(image_paths):
-            logger.error(
-                f"Number of labels ({len(labels)}) does not match number of images ({len(image_paths)})"
+        loaded_labels = load_labels(labels_path)
+        if len(loaded_labels) == num_images:
+            true_targets_list = loaded_labels
+        else:
+            logger.warning(
+                f"Found {len(loaded_labels)} labels but {num_images} images. True targets will not be fully populated for all query images."
             )
-            sys.exit(1)
+            true_targets_list = [p.parent.name.split("+")[0] for p in image_paths]
+    else:
+        # Default: derive from directory structure
+        true_targets_list = [p.parent.name.split("+")[0] for p in image_paths]
 
-    # Initialize true_classes with placeholder value 7
-    true_classes = [7] * len(image_paths)
-
-    return image_paths, labels, true_classes
+    return image_paths, true_targets_list, true_classes_list
 
 
 def main():
@@ -103,6 +112,11 @@ def main():
     parser.add_argument(
         "--overwrite", action="store_true", help="Overwrite existing output"
     )
+    parser.add_argument(
+        "--is-phish",
+        action="store_true",
+        help="Mark all query images as phishing (true_class = 1)",
+    )
     parser.add_argument("--log", action="store_true", help="Enable wandb logging")
 
     args = parser.parse_args()
@@ -129,6 +143,7 @@ def main():
         args.threshold,
         args.overwrite,
         args.top_k,
+        args.is_phish,
     )
 
     # Initialize embedder with existing index

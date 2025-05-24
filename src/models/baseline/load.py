@@ -64,6 +64,10 @@ def main():
     validate_inputs(images_dir, index_path, labels_path, args.overwrite)
     image_paths = get_image_paths(images_dir)
 
+    # Prepare true_classes_list based on args.is_phish
+    num_images = len(image_paths)
+    true_classes_list = [1] * num_images if args.is_phish else [0] * num_images
+
     # target_labels = load_labels(labels_path)
     # if target_labels and len(target_labels) != len(image_paths):
     #     logger.error(
@@ -79,10 +83,13 @@ def main():
     try:
         # Compute embeddings
         logger.info(
+            # 9363
             f"Processing {len(image_paths)} images with batch size {args.batch_size}"
         )
         _, metadata = embedder.compute_embeddings(
-            image_paths=image_paths, is_phish=args.is_phish, batch_size=args.batch_size
+            image_paths=image_paths,
+            true_classes=true_classes_list,
+            batch_size=args.batch_size,
         )
 
         if not embedder.save_index(index_path, overwrite=args.overwrite):

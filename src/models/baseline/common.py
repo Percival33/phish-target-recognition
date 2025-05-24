@@ -14,6 +14,9 @@ def get_image_paths(images_dir: Path) -> List[Path]:
             image_paths.extend(subdir.glob("*.jpg"))
             image_paths.extend(subdir.glob("*.jpeg"))
             image_paths.extend(subdir.glob("*.png"))
+            image_paths.extend(subdir.glob("*.pnp"))
+            image_paths.extend(subdir.glob("*.PNG"))
+            image_paths.extend(subdir.glob("*.pnp"))
 
     for ext in ("*.jpg", "*.jpeg", "*.png"):
         image_paths.extend(images_dir.glob(ext))

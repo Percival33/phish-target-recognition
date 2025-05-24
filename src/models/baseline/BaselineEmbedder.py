@@ -118,12 +118,13 @@ class BaselineEmbedder:
             return False
 
     def compute_embeddings(
-        self, image_paths: List[Path], is_phish: bool = False, batch_size: int = 32
+        self, image_paths: List[Path], true_classes: List[int], batch_size: int = 32
     ) -> Tuple[faiss.Index, List[Dict[str, Any]]]:
         """Compute perceptual hashes for a list of images and store their metadata.
 
         Args:
             image_paths: List of paths to images to process
+            true_classes: List of integer class labels for each image (0 for benign, 1 for phishing)
             batch_size: Number of images to process in each batch
 
         Returns:
@@ -135,9 +136,16 @@ class BaselineEmbedder:
             logger.error("No image paths provided")
             return self.index, []
 
+        if len(true_classes) != len(image_paths):
+            logger.error(
+                f"Number of true_classes ({len(true_classes)}) must match number of image_paths ({len(image_paths)})"
+            )
+            return self.index, []
+
         # Reset metadata for fresh computation
         self.image_metadata = []
         batch_embeddings = []
+        current_image_index = 0
 
         # Process images in batches
         for batch_start in tqdm(
@@ -158,15 +166,17 @@ class BaselineEmbedder:
                     metadata = {
                         "file": img_path.name,
                         "phash": phash,
-                        "true_class": is_phish,
+                        "true_class": true_classes[current_image_index],
                         "true_target": true_target,
                     }
 
                     self.image_metadata.append(metadata)
                     batch_embeddings.append(phash_array)
+                    current_image_index += 1
 
                 except Exception as e:
                     logger.error(f"Failed to process image {img_path}: {str(e)}")
+                    current_image_index += 1
                     continue
 
             # Create or update FAISS index with batch
@@ -213,9 +223,9 @@ class BaselineEmbedder:
             logger.error("No index loaded")
             return pd.DataFrame()
 
-        if true_targets is not None and len(true_targets) != len(query_paths):
-            logger.error("Number of true_targets must match number of query paths")
-            return pd.DataFrame()
+        # if true_targets is not None and len(true_targets) != len(query_paths):
+        #     logger.error("Number of true_targets must match number of query paths")
+        #     return pd.DataFrame()
 
         if true_classes is not None and len(true_classes) != len(query_paths):
             logger.error("Number of true_classes must match number of query paths")
@@ -258,7 +268,7 @@ class BaselineEmbedder:
 
                     result = {
                         "file": query_path.name,
-                        "baseline_class": closest_metadata["true_class"],
+                        "baseline_class": 1 if closest_distance < threshold else 0,
                         "baseline_distance": closest_distance,
                         "baseline_target": closest_metadata["true_target"],
                         "true_class": true_classes[batch_start + i]
