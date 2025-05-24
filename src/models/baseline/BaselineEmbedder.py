@@ -23,19 +23,17 @@ class BaselineEmbedder:
         index_path: Optional[Path] = None,
         metadata_path: Optional[Path] = None,
     ):
-        self.hasher = hasher if hasher is not None else hashers.PHash()
+        self.hasher = hasher if hasher is not None else hashers.PHash(hash_size=16)
         self.index = None
         self.image_metadata: List[Dict[str, Any]] = []
         self.target_mapping = target_mapping
 
-        # Try to load index if path is provided and file exists
         if index_path is not None and index_path.exists():
             try:
                 self.index = faiss.read_index(str(index_path))
                 logger.info(
                     f"Loaded FAISS index from {index_path} with {self.index.ntotal} vectors"
                 )
-                # Try to load metadata if path is provided
                 if metadata_path is not None and metadata_path.exists():
                     self.load_metadata_csv(metadata_path)
             except Exception as e:
@@ -130,7 +128,7 @@ class BaselineEmbedder:
         Returns:
             Tuple containing:
             - FAISS index with stored embeddings
-            - List of metadata dictionaries for each processed image
+            - List of metadata dictionaries for newly processed images only
         """
         if not image_paths:
             logger.error("No image paths provided")
@@ -142,21 +140,49 @@ class BaselineEmbedder:
             )
             return self.index, []
 
-        # Reset metadata for fresh computation
-        self.image_metadata = []
-        batch_embeddings = []
-        current_image_index = 0
+        # Initialize metadata list if index is None (creating new index)
+        if self.index is None:
+            self.image_metadata = []
 
-        # Process images in batches
+        # Track newly processed metadata separately
+        new_metadata = []
+        batch_embeddings = []
+
         for batch_start in tqdm(
             range(0, len(image_paths), batch_size), desc="Processing images"
         ):
             batch_paths = image_paths[batch_start : batch_start + batch_size]
+            batch_filepaths_str = [str(p) for p in batch_paths]
 
-            for img_path in batch_paths:
+            try:
+                batch_computed_phashes = self.hasher.compute_parallel(
+                    batch_filepaths_str, max_workers=5
+                )
+            except Exception as e:
+                logger.error(f"Failed to compute parallel hashes for batch: {str(e)}")
+                continue
+
+            for i, img_path in enumerate(batch_paths):
                 try:
-                    phash = self.hasher.compute(str(img_path))
-                    phash_vector = self.hasher.string_to_vector(phash)
+                    phash_result = batch_computed_phashes[i]
+
+                    if phash_result is None or phash_result.get("error") is not None:
+                        error_msg = (
+                            phash_result.get("error")
+                            if phash_result
+                            else "Unknown error"
+                        )
+                        logger.error(
+                            f"Failed to compute hash for image {img_path}: {error_msg}"
+                        )
+                        continue
+
+                    phash_str = phash_result.get("hash")
+                    if phash_str is None:
+                        logger.error(f"No hash returned for image {img_path}")
+                        continue
+
+                    phash_vector = self.hasher.string_to_vector(phash_str)
                     phash_array = np.array(phash_vector, dtype=np.float32).reshape(
                         1, -1
                     )
@@ -165,21 +191,20 @@ class BaselineEmbedder:
 
                     metadata = {
                         "file": img_path.name,
-                        "phash": phash,
-                        "true_class": true_classes[current_image_index],
+                        "phash": phash_str,
+                        "true_class": true_classes[batch_start + i],
                         "true_target": true_target,
                     }
 
+                    # Add to both lists: internal metadata and new metadata
                     self.image_metadata.append(metadata)
+                    new_metadata.append(metadata)
                     batch_embeddings.append(phash_array)
-                    current_image_index += 1
 
                 except Exception as e:
                     logger.error(f"Failed to process image {img_path}: {str(e)}")
-                    current_image_index += 1
                     continue
 
-            # Create or update FAISS index with batch
             if batch_embeddings:
                 if self.index is None:
                     embedding_dim = batch_embeddings[0].shape[1]
@@ -187,12 +212,13 @@ class BaselineEmbedder:
 
                 embeddings_array = np.vstack(batch_embeddings)
                 self.index.add(embeddings_array)
-                batch_embeddings = []  # Clear batch after adding to index
+                batch_embeddings = []
 
-        if not self.image_metadata:
+        if not new_metadata:
             logger.warning("No images were successfully processed")
 
-        return self.index, self.image_metadata
+        # Return only newly processed metadata
+        return self.index, new_metadata
 
     def search_similar(
         self,
@@ -240,9 +266,37 @@ class BaselineEmbedder:
             batch_paths = query_paths[batch_start:batch_end]
             batch_embeddings = []
 
-            for query_path in batch_paths:
+            batch_filepaths_str = [str(p) for p in batch_paths]
+            try:
+                batch_computed_phashes = self.hasher.compute_parallel(
+                    batch_filepaths_str, max_workers=5
+                )
+            except Exception as e:
+                logger.error(
+                    f"Failed to compute parallel hashes for query batch: {str(e)}"
+                )
+                continue
+
+            for i, query_path in enumerate(batch_paths):
                 try:
-                    query_hash = self.hasher.compute(str(query_path))
+                    query_result = batch_computed_phashes[i]
+
+                    if query_result is None or query_result.get("error") is not None:
+                        error_msg = (
+                            query_result.get("error")
+                            if query_result
+                            else "Unknown error"
+                        )
+                        logger.error(
+                            f"Failed to compute hash for query {query_path}: {error_msg}"
+                        )
+                        continue
+
+                    query_hash = query_result.get("hash")
+                    if query_hash is None:
+                        logger.error(f"No hash returned for query {query_path}")
+                        continue
+
                     query_vector = self.hasher.string_to_vector(query_hash)
                     query_array = np.array(query_vector, dtype=np.float32).reshape(
                         1, -1
@@ -268,7 +322,7 @@ class BaselineEmbedder:
 
                     result = {
                         "file": query_path.name,
-                        "baseline_class": 1 if closest_distance < threshold else 0,
+                        "baseline_class": closest_metadata["true_class"],
                         "baseline_distance": closest_distance,
                         "baseline_target": closest_metadata["true_target"],
                         "true_class": true_classes[batch_start + i]
