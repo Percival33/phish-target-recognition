@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 from tools.config import setup_logging
-from .config_loader import Config
+from config_loader import Config
 
 setup_logging()
 logger = logging.getLogger(__name__)

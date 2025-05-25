@@ -9,7 +9,7 @@ import importlib
 from pathlib import Path
 from typing import Tuple
 
-from .config_loader import Config
+from config_loader import Config
 
 logger = logging.getLogger(__name__)
 

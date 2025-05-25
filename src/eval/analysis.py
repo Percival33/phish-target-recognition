@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import friedmanchisquare
 from typing import Tuple
 
-from .config_loader import Config
+from config_loader import Config
 
 
 def create_performance_dataframe(

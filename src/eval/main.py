@@ -7,23 +7,22 @@ import logging
 import sys
 from pathlib import Path
 import pandas as pd
-
 from tools.config import setup_logging
-from .config_loader import load_config, ConfigError, Config
-from .data_processor import process_all_data, DataProcessingError
-from .analysis import (
+from config_loader import load_config, ConfigError, Config
+from data_processor import process_all_data, DataProcessingError
+from analysis import (
     create_performance_dataframe,
     calculate_rankings,
     perform_friedman_test,
     create_summary_statistics,
 )
-from .reporting import (
+from reporting import (
     create_formatted_results_table,
     save_table_as_csv,
     save_table_as_image,
     create_output_directory,
 )
-from .plot_generator import create_and_save_cd_diagram
+from plot_generator import create_and_save_cd_diagram
 
 
 def _process_data(config: Config) -> tuple:
