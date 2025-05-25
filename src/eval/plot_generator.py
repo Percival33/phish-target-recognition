@@ -17,11 +17,10 @@ def create_and_save_cd_diagram(
 
     algorithm_names = config.algorithm_names
     metric_config = config.metric_config
-    current_plot_config = config.plot_config or {}
 
     lower_better = not metric_config.higher_scores_are_better
-    test = current_plot_config.get("cd_test", "nemenyi")
-    correction = current_plot_config.get("cd_correction", "holm")
+    test = config.plot_config.get("cd_test", "nemenyi")
+    correction = config.plot_config.get("cd_correction", "holm")
 
     logger.info(
         f"Creating CD diagram with test={test}, correction={correction}, lower_better={lower_better}"
