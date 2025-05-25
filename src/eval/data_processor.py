@@ -60,7 +60,7 @@ def process_all_data(config: Config) -> np.ndarray:
                 scores_matrix[dataset_idx, algorithm_idx] = score
             except Exception as e:
                 raise DataProcessingError(
-                    f"Processing failed for {algorithm_name} on {dataset_name}: {e}"
+                    f"Processing failed for alg: '{algorithm_name}' on dataset: '{dataset_name}' - {e}"
                 )
 
     return scores_matrix
