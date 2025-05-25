@@ -147,7 +147,7 @@ def create_csv(root_folder, csv_output_file):
 if __name__ == "__main__":
     print(os.getcwd())
     dataset_path = PROJ_ROOT / "data" / "raw" / "VisualPhish"
-    input_dir = dataset_path / "browsers" "chrome"
+    input_dir = dataset_path / "browserschrome"
     output_dir = PROJ_ROOT / "data" / "processed" / "miniDataset"
     urls_file = dataset_path / "browsers" / "urls.txt"
     csv_output_file = f"{output_dir}/output.csv"
