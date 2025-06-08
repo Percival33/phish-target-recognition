@@ -30,4 +30,4 @@ dev = [
 ]
 
 [tool.uv.sources]
-tools = { path = "common/tools-0.1.8-py3-none-any.whl" }
+tools = { path = "libs/tools-0.1.8-py3-none-any.whl" }
