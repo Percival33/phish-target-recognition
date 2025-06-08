@@ -1,0 +1,17 @@
+[project]
+name = "eval"
+version = "0.1.0"
+description = "Package for evaluating model performance and generating critical difference diagrams."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.20",
+    "matplotlib>=3.5",
+    "scipy>=1.8",
+    "aeon>=0.8",
+    "tools"
+]
+
+[tool.uv.sources]
+tools = { path = "libs/tools-0.1.8-py3-none-any.whl" }
