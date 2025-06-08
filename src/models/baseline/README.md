@@ -11,6 +11,57 @@ A baseline phishing detection service that uses perceptual hashing (via the perc
 - FastAPI-based REST API interface
 - Command-line tools for index creation and querying
 
+## Prerequisites and Setup
+
+### 1. Install Required Tools
+Ensure you have the following installed:
+- **Just**: Command runner for project tasks
+- **uv**: Python package and environment manager
+
+### 2. Environment Configuration
+```bash
+# Set PROJECT_ROOT_DIR environment variable
+export PROJECT_ROOT_DIR=$(pwd)
+
+# Add to shell config for persistence
+echo "export PROJECT_ROOT_DIR=$(pwd)" >> ~/.zshrc
+source ~/.zshrc
+```
+
+### 3. Install Development Tools and Dependencies
+```bash
+# Install development tools
+just tools
+
+# Synchronize Python dependencies
+uv sync --frozen
+```
+
+### 4. Dataset Preparation (VisualPhish)
+```bash
+# Download VisualPhish dataset
+uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar zxvf - -C "$PROJECT_ROOT_DIR/data/interim"
+```
+
+Expected data structure at `$PROJECT_ROOT_DIR/data/interim/VisualPhish`:
+```
+VisualPhish/
+├── phishing/
+│   ├── Target_A/
+│   │   ├── T0_0.png
+│   │   └── T0_1.png
+│   ├── Target_B/
+│   │   └── T1_0.png
+│   └── targets2.txt  # Phishing target names
+└── trusted_list/
+    ├── Target_A/
+    │   ├── image1.png
+    │   └── image2.png
+    ├── Target_B/
+    │   └── image3.png
+    └── targets.txt  # Benign target names
+```
+
 ## Scripts
 
 ### `load.py` - Index Creation Script
@@ -20,7 +71,7 @@ The `load.py` script processes images and creates a FAISS index with perceptual 
 #### Usage
 
 ```bash
-python load.py --images <images_dir> --index <index_path> [OPTIONS]
+uv run src/models/baseline/load.py --images <images_dir> --index <index_path> [OPTIONS]
 ```
 
 #### Command-line Arguments
@@ -42,18 +93,40 @@ This flag determines the `true_class` value stored in the metadata for **all pro
 
 This class information is stored alongside each image's embedding in the metadata and is used during querying for evaluation purposes.
 
-#### Examples
+#### Complete Examples
 
+**Create benign images index from VisualPhish trusted_list:**
 ```bash
-# Index benign images
-python load.py --images /path/to/benign_images --index benign_index.faiss
+# Create output directory
+mkdir -p "$PROJECT_ROOT_DIR/data/processed/baseline/"
 
-# Index phishing images
-python load.py --images /path/to/phishing_images --index phishing_index.faiss --is-phish
-
-# Index with custom batch size and overwrite existing
-python load.py --images /path/to/images --index my_index.faiss --batch-size 128 --overwrite
+# Index all benign images from trusted_list
+uv run src/models/baseline/load.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/trusted_index.faiss" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list/targets.txt" \
+    --batch-size 256 \
+    --log \
+    --overwrite
 ```
+
+**Create phishing images index from VisualPhish phishing directory:**
+```bash
+# Index all phishing images from phishing directory
+uv run src/models/baseline/load.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_index.faiss" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing/targets2.txt" \
+    --is-phish \
+    --batch-size 256 \
+    --log \
+    --overwrite
+```
+
+#### Expected Output Files
+After successful execution, verify these files exist:
+- `*.faiss` - FAISS index file containing perceptual hash embeddings
+- `*.csv` - Metadata file with image paths, target labels, and embedding information
 
 ### `query.py` - Image Query Script
 
@@ -62,7 +135,7 @@ The `query.py` script searches for similar images in an existing FAISS index and
 #### Usage
 
 ```bash
-python query.py --images <query_images_dir> --index <index_path> --output <results.csv> [OPTIONS]
+uv run src/models/baseline/query.py --images <query_images_dir> --index <index_path> --output <results.csv> [OPTIONS]
 ```
 
 #### Command-line Arguments
@@ -87,6 +160,56 @@ This flag sets the **ground truth class** for **all query images** used in evalu
 
 This `true_class` for the query image is included in the output CSV, allowing for evaluation by comparing it against the `baseline_class` (the `true_class` of the matched image from the index).
 
+#### Complete Examples and Use Cases
+
+**1. Phishing Detection Evaluation (Query benign images against phishing index):**
+```bash
+# Test if benign images are incorrectly flagged as phishing
+uv run src/models/baseline/query.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_index.faiss" \
+    --output "$PROJECT_ROOT_DIR/data/processed/baseline/benign_vs_phishing_results.csv" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list/targets.txt" \
+    --threshold 0.5 \
+    --top-k 1 \
+    --batch-size 256 \
+    --overwrite
+```
+
+**2. Phishing Classification (Query unknown images against phishing index):**
+```bash
+# Classify unknown images as phishing/benign based on distance threshold
+uv run src/models/baseline/query.py \
+    --images "/path/to/unknown/images" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_index.faiss" \
+    --output "$PROJECT_ROOT_DIR/data/processed/baseline/classification_results.csv" \
+    --threshold 0.5 \
+    --top-k 1 \
+    --batch-size 256 \
+    --overwrite
+```
+
+**3. Similarity Search (Find similar phishing samples):**
+```bash
+# Query phishing images against phishing index for similarity analysis
+uv run src/models/baseline/query.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_index.faiss" \
+    --output "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_similarity_results.csv" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing/targets2.txt" \
+    --is-phish \
+    --top-k 5 \
+    --batch-size 256 \
+    --overwrite
+```
+
+#### Distance Interpretation and Threshold Guidance
+
+- **Lower distances = Higher similarity**
+- **Classification Logic**: Images with distance below threshold are classified as phishing
+- **Threshold Tuning**: Test different threshold values (e.g., 0.3, 0.5, 1.0) for optimal classification performance
+- **Typical Range**: Distance values usually range from 0.0 (identical) to 4.0+ (very different)
+
 #### Output Format
 
 The query script outputs a CSV file with the following columns:
@@ -97,19 +220,6 @@ The query script outputs a CSV file with the following columns:
 - `baseline_target`: The target/brand of the matched image
 - `true_class`: The ground truth class of the query image (0 or 1, based on `--is-phish`)
 - `true_target`: The target/brand of the query image (from labels or directory structure)
-
-#### Examples
-
-```bash
-# Query benign images against an index
-python query.py --images /path/to/benign_queries --index my_index.faiss --output results.csv
-
-# Query phishing images for evaluation
-python query.py --images /path/to/phishing_queries --index my_index.faiss --output results.csv --is-phish
-
-# Query with custom parameters
-python query.py --images /path/to/queries --index my_index.faiss --output results.csv --top-k 5 --threshold 2.0
-```
 
 ### `scripts/evaluate_baseline.py` - Evaluation Script
 
@@ -152,6 +262,56 @@ uv run python scripts/evaluate_baseline.py output/query_results.csv
 
 # Evaluate with ROC curve visualization
 uv run python scripts/evaluate_baseline.py output/query_results.csv --plot
+```
+
+## Complete Workflow Examples
+
+### Workflow 1: Build Benign Index and Evaluate Against Phishing
+
+```bash
+# 1. Create benign images index
+uv run src/models/baseline/load.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/trusted_index.faiss" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list/targets.txt" \
+    --overwrite
+
+# 2. Query phishing images against benign index
+uv run src/models/baseline/query.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/trusted_index.faiss" \
+    --output "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_vs_benign_results.csv" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing/targets2.txt" \
+    --is-phish \
+    --threshold 1.0 \
+    --overwrite
+
+# 3. Evaluate results
+uv run python scripts/evaluate_baseline.py "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_vs_benign_results.csv" --plot
+```
+
+### Workflow 2: Build Phishing Index for Classification
+
+```bash
+# 1. Create phishing images index
+uv run src/models/baseline/load.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_index.faiss" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/phishing/targets2.txt" \
+    --is-phish \
+    --overwrite
+
+# 2. Test classification with benign images
+uv run src/models/baseline/query.py \
+    --images "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list" \
+    --index "$PROJECT_ROOT_DIR/data/processed/baseline/phishing_index.faiss" \
+    --output "$PROJECT_ROOT_DIR/data/processed/baseline/classification_results.csv" \
+    --labels "$PROJECT_ROOT_DIR/data/interim/VisualPhish/trusted_list/targets.txt" \
+    --threshold 0.5 \
+    --overwrite
+
+# 3. Evaluate classification performance
+uv run python scripts/evaluate_baseline.py "$PROJECT_ROOT_DIR/data/processed/baseline/classification_results.csv" --plot
 ```
 
 ## True Class Values
