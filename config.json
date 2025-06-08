@@ -1,5 +1,5 @@
 {
-  "dataset_names": ["Phishpedia", "VisualPhish", "PhishIRIS"],
+  "dataset_names": ["VisualPhish"],
   "algorithm_names": ["Phishpedia", "VisualPhish", "Baseline"],
   "metric_config": {
     "display_name": "Identification Rate (%)",
@@ -13,14 +13,14 @@
   "data_input_config": {
     "paths_to_csv_files": {
       "Phishpedia": {
-        "Phishpedia": "data/results/phishpedia_on_phishpedia_data.csv",
+        "Phishpedia": "logs/phishpedia/ccc.txt",
         "VisualPhish": "data/results/visualphish_on_phishpedia_data.csv",
         "Baseline": "data/results/baseline_on_phishpedia_data.csv"
       },
       "VisualPhish": {
-        "Phishpedia": "data/results/phishpedia_on_visualphish_data.csv",
-        "VisualPhish": "data/results/visualphish_on_visualphish_data.csv",
-        "Baseline": "data/results/baseline_on_visualphish_data.csv"
+        "Phishpedia": "logs/Phishpedia-VisualPhish-dataset-newly-crawled-phishing/20250511_results.csv-2",
+        "VisualPhish": "logs/VisualPhish/results_threshold_8.csv",
+        "Baseline": "data/processed/baseline/new_phishing.csv-2"
       },
       "PhishIRIS": {
         "Phishpedia": "data/results/phishpedia_on_phishiris_data.csv",
@@ -38,6 +38,31 @@
       "true_class": "true_class",
       "pred_target": "_target",
       "pred_class": "_class"
+    }
+  },
+  "cross_validation_config": {
+    "enabled": true,
+    "n_splits": 3,
+    "shuffle": true,
+    "random_state": 42,
+    "output_splits_directory": "data_splits",
+    "dataset_image_paths": {
+      "VisualPhish": {
+        "path": "data/raw/VisualPhish",
+        "label_strategy": "folder_name",
+        "target_mapping": {
+          "phishing": "newly_crawled_phishing",
+          "benign": "benign_test"
+        }
+      },
+      "Phishpedia": {
+        "path": "data/raw/phishpedia",
+        "label_strategy": "folder_name",
+        "target_mapping": {
+          "phishing": "phish_sample_30k",
+          "benign": "benign_sample_30k"
+        }
+      }
     }
   },
   "output_config": {
