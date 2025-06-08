@@ -49,7 +49,7 @@
     "dataset_image_paths": {
       "VisualPhish": {
         "path": "data/raw/VisualPhish",
-        "label_strategy": "folder_name",
+        "label_strategy": "labels_file",
         "target_mapping": {
           "phishing": "newly_crawled_phishing",
           "benign": "benign_test"
@@ -57,7 +57,7 @@
       },
       "Phishpedia": {
         "path": "data/raw/phishpedia",
-        "label_strategy": "folder_name",
+        "label_strategy": "subfolders",
         "target_mapping": {
           "phishing": "phish_sample_30k",
           "benign": "benign_sample_30k"

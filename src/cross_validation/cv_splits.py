@@ -95,7 +95,7 @@ class LabelExtractor:
 
 
 class SimpleDataProcessor:
-    """Simple data processor following Single Responsibility Principle"""
+    """Data processor implementing multiple label strategies"""
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -109,18 +109,29 @@ class SimpleDataProcessor:
 
         for target_type, subdirectory in dataset_config.target_mapping.items():
             target_path = base_path / subdirectory
+            class_value = 1 if target_type == "phishing" else 0
 
-            if target_type == "phishing":
+            if dataset_config.label_strategy == "directory":
                 samples.extend(
-                    self._process_phishing_directory(
-                        target_path, dataset_config, base_path
+                    self._process_directory_strategy(
+                        target_path, target_type, class_value
                     )
                 )
-            else:  # benign
+            elif dataset_config.label_strategy == "labels_file":
                 samples.extend(
-                    self._process_benign_directory(
-                        target_path, base_path, dataset_config
+                    self._process_labels_file_strategy(
+                        target_path, target_type, class_value
                     )
+                )
+            elif dataset_config.label_strategy == "subfolders":
+                samples.extend(
+                    self._process_subfolders_strategy(
+                        target_path, target_type, class_value
+                    )
+                )
+            else:
+                self.logger.warning(
+                    f"Unknown label strategy: {dataset_config.label_strategy}"
                 )
 
         df = pd.DataFrame(samples)
@@ -129,76 +140,102 @@ class SimpleDataProcessor:
         )
         return df
 
-    def _process_phishing_directory(
-        self, target_path: Path, dataset_config: DatasetConfig, base_path: Path
+    def _process_directory_strategy(
+        self, target_path: Path, target_type: str, class_value: int
     ) -> List[Dict[str, Any]]:
-        """Process phishing directory based on dataset structure"""
+        """Process using directory strategy: images organized in class subdirectories"""
         samples = []
 
-        if dataset_config.name == "Phishpedia":
-            # Phishpedia structure: subdirs with shot.png
-            for subdir in target_path.iterdir():
-                if subdir.is_dir():
-                    shot_file = subdir / "shot.png"
-                    if shot_file.exists():
-                        target = self._get_target_for_phishpedia(subdir, target_path)
-                        samples.append(
-                            {
-                                "file": str(shot_file),
-                                "true_target": target,
-                                "true_class": 1,
-                            }
-                        )
-        else:
-            # Other datasets: direct image files
-            image_files = self.file_discoverer.get_image_files(target_path)
-            labels = self.label_extractor.extract_labels(
-                target_path / CVConstants.LABELS_TXT
+        if not target_path.exists():
+            self.logger.warning(f"Target path does not exist: {target_path}")
+            return samples
+
+        # For directory strategy, expect subdirectories named by target/brand
+        for subdir in target_path.iterdir():
+            if subdir.is_dir():
+                brand_name = subdir.name
+                image_files = self.file_discoverer.get_image_files(subdir)
+
+                for img_file in image_files:
+                    samples.append(
+                        {
+                            "file": str(img_file),
+                            "true_target": brand_name,
+                            "true_class": class_value,
+                        }
+                    )
+
+        return samples
+
+    def _process_labels_file_strategy(
+        self, target_path: Path, target_type: str, class_value: int
+    ) -> List[Dict[str, Any]]:
+        """Process using labels_file strategy: flat structure with labels.txt"""
+        samples = []
+
+        if not target_path.exists():
+            self.logger.warning(f"Target path does not exist: {target_path}")
+            return samples
+
+        # Get all image files in the directory
+        image_files = sorted(self.file_discoverer.get_image_files(target_path))
+
+        # Read labels from labels.txt
+        labels_file = target_path / CVConstants.LABELS_TXT
+        labels = self.label_extractor.extract_labels(labels_file)
+
+        # Match images with labels
+        for i, img_file in enumerate(image_files):
+            if target_type == "benign":
+                # For benign, use generic benign label
+                target_label = "benign"
+            else:
+                # For phishing, use label from labels.txt or default
+                target_label = labels[i] if i < len(labels) else "phishing"
+
+            samples.append(
+                {
+                    "file": str(img_file),
+                    "true_target": target_label,
+                    "true_class": class_value,
+                }
             )
 
-            for i, img_file in enumerate(image_files):
-                target = labels[i] if i < len(labels) else "phishing"
-                samples.append(
-                    {"file": str(img_file), "true_target": target, "true_class": 1}
-                )
-
         return samples
 
-    def _process_benign_directory(
-        self, target_path: Path, base_path: Path, dataset_config: DatasetConfig = None
+    def _process_subfolders_strategy(
+        self, target_path: Path, target_type: str, class_value: int
     ) -> List[Dict[str, Any]]:
-        """Process benign directory"""
+        """Process using subfolders strategy: nested subdirs with individual labels.txt files"""
         samples = []
 
-        # Special handling for Phishpedia benign structure (subdirs with shot.png)
-        if dataset_config and dataset_config.name == "Phishpedia":
-            for subdir in target_path.iterdir():
-                if subdir.is_dir():
-                    shot_file = subdir / "shot.png"
-                    if shot_file.exists():
-                        samples.append(
-                            {
-                                "file": str(shot_file),
-                                "true_target": "benign",
-                                "true_class": 0,
-                            }
-                        )
-        else:
-            # Other datasets: direct image files
-            image_files = self.file_discoverer.get_image_files(target_path)
-            for img_file in image_files:
-                samples.append(
-                    {"file": str(img_file), "true_target": "benign", "true_class": 0}
-                )
+        if not target_path.exists():
+            self.logger.warning(f"Target path does not exist: {target_path}")
+            return samples
+
+        # For subfolders strategy: iterate through subdirectories, each containing shot.png
+        for subdir in target_path.iterdir():
+            if subdir.is_dir():
+                shot_file = subdir / "shot.png"
+
+                if shot_file.exists():
+                    if target_type == "benign":
+                        target_label = "benign"
+                    else:
+                        # Try to get label from individual labels.txt in subdir
+                        labels_file = subdir / CVConstants.LABELS_TXT
+                        labels = self.label_extractor.extract_labels(labels_file)
+                        target_label = labels[0] if labels else subdir.name
+
+                    samples.append(
+                        {
+                            "file": str(shot_file),
+                            "true_target": target_label,
+                            "true_class": class_value,
+                        }
+                    )
 
         return samples
-
-    def _get_target_for_phishpedia(self, subdir: Path, target_path: Path) -> str:
-        """Get target label for Phishpedia subdirectory"""
-        labels = self.label_extractor.extract_labels(
-            target_path / CVConstants.LABELS_TXT
-        )
-        return labels[0] if labels else subdir.name
 
 
 class StratifiedSplitGenerator:
@@ -217,8 +254,9 @@ class StratifiedSplitGenerator:
 class CSVFileWriter:
     """Writes CSV files for training and evaluation"""
 
-    def __init__(self):
+    def __init__(self, csv_column_prefixes: Dict[str, str]):
         self.logger = logging.getLogger(__name__)
+        self.csv_column_prefixes = csv_column_prefixes
 
     def write_split_files(
         self,
@@ -249,10 +287,10 @@ class CSVFileWriter:
         """Create evaluation DataFrame with empty prediction columns"""
         eval_df = data[CVConstants.TRAIN_COLUMNS].copy()
 
-        # Add empty prediction columns for each algorithm
-        for alg in ["pp", "vp", "baseline"]:
-            eval_df[f"{alg}_target"] = ""
-            eval_df[f"{alg}_class"] = ""
+        # Add empty prediction columns for each algorithm using configurable prefixes
+        for algorithm, prefix in self.csv_column_prefixes.items():
+            eval_df[f"{prefix}_target"] = ""
+            eval_df[f"{prefix}_class"] = ""
 
         return eval_df
 
@@ -407,11 +445,14 @@ def main():
     args = parser.parse_args()
     setup_logging()
 
-    # Dependency injection - assemble components
+    # Load config first to get CSV column prefixes
     config_loader = ConfigLoader()
+    config = config_loader.load_config(args.config)
+
+    # Dependency injection - assemble components
     data_processor = SimpleDataProcessor()
     split_generator = StratifiedSplitGenerator()
-    file_writer = CSVFileWriter()
+    file_writer = CSVFileWriter(config.csv_column_prefixes)
     symlink_manager = PerSampleSymlinkManager() if args.create_symlinks else None
 
     # Create main splitter

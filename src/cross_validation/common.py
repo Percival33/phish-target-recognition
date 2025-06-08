@@ -29,17 +29,6 @@ class CVConstants:
 
     # CSV columns
     TRAIN_COLUMNS = ["file", "true_target", "true_class"]
-    VAL_COLUMNS = [
-        "file",
-        "true_target",
-        "true_class",
-        "pp_target",
-        "pp_class",
-        "vp_target",
-        "vp_class",
-        "baseline_target",
-        "baseline_class",
-    ]
 
     # Image extensions
     IMAGE_EXTENSIONS = [
@@ -51,6 +40,14 @@ class CVConstants:
         "*.tiff",
         "*.webp",
     ]
+
+    @staticmethod
+    def get_val_columns(csv_column_prefixes: Dict[str, str]) -> List[str]:
+        """Generate validation CSV columns based on algorithm prefixes"""
+        columns = CVConstants.TRAIN_COLUMNS.copy()
+        for algorithm, prefix in csv_column_prefixes.items():
+            columns.extend([f"{prefix}_target", f"{prefix}_class"])
+        return columns
 
 
 @dataclass
@@ -73,6 +70,7 @@ class CrossValidationConfig:
     random_state: int
     output_splits_directory: str
     dataset_configs: Dict[str, DatasetConfig]
+    csv_column_prefixes: Dict[str, str]
 
 
 @dataclass
@@ -124,6 +122,12 @@ class ConfigLoader:
             if not Path(output_dir).is_absolute():
                 output_dir = str(Path(PROJ_ROOT) / output_dir)
 
+            # Load CSV column prefixes from data_input_config
+            csv_column_prefixes = config.get("data_input_config", {}).get(
+                "csv_column_prefixes",
+                {"Phishpedia": "pp", "VisualPhish": "vp", "Baseline": "baseline"},
+            )
+
             return CrossValidationConfig(
                 enabled=cv_config["enabled"],
                 n_splits=cv_config.get("n_splits", 3),
@@ -131,6 +135,7 @@ class ConfigLoader:
                 random_state=cv_config.get("random_state", 42),
                 output_splits_directory=output_dir,
                 dataset_configs=dataset_configs,
+                csv_column_prefixes=csv_column_prefixes,
             )
 
         except Exception as e:

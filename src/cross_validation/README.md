@@ -1,10 +1,8 @@
 # Cross-Validation Data Splits
 
-This package provides robust scripts for creating and validating cross-validation data splits.
+Robust scripts for creating and validating cross-validation data splits.
 
 ## Architecture
-
-The system is built with clean architecture patterns:
 
 - **Protocol-based design**: Uses Python protocols for dependency inversion
 - **Single Responsibility**: Each class has one clear purpose
@@ -37,13 +35,8 @@ The system is built with clean architecture patterns:
 ## Scripts
 
 ### `cv_splits.py` - Create Data Splits
-Creates stratified train/val splits with optional symlink creation.
-
 ```bash
-# Using UV (recommended)
 uv run python cv_splits.py [options]
-
-# Using just commands
 just splits              # Basic splits
 just splits-links        # With symlinks
 just splits-config file  # Custom config
@@ -54,20 +47,9 @@ just splits-config file  # Custom config
 - `--splits-dir`: Output directory (overrides config)
 - `--create-symlinks`: Create symlinks to original images
 
-**Features:**
-- Supports multiple dataset structures (direct images, Phishpedia subdirs)
-- Extracts labels from `labels.txt` files
-- Creates train.csv (simple format) and val.csv (with prediction columns)
-- Optional symlink creation for organized image access
-
 ### `cv_validator.py` - Validate Splits
-Comprehensive validation of generated splits.
-
 ```bash
-# Using UV (recommended)
 uv run python cv_validator.py [options]
-
-# Using just commands
 just validate                # Basic validation
 just validate-config file    # Custom config
 ```
@@ -75,13 +57,6 @@ just validate-config file    # Custom config
 **Options:**
 - `--config`: Config file path (default: `config.json`)
 - `--splits-dir`: Splits directory (overrides config)
-
-**Validations:**
-- Directory structure completeness
-- CSV file format and required columns
-- Class balance across splits
-- Symlink integrity (if present)
-- File existence verification
 
 ## Project Setup
 
@@ -94,26 +69,16 @@ just validate-config file    # Custom config
 
 ### Installation
 ```bash
-# Setup environment and dependencies
-just setup-cv
-
-# Or manually with UV
-uv sync
+just setup-cv    # Setup environment and dependencies
+uv sync          # Or manually with UV
 ```
 
 ### Development Commands
 ```bash
-# Setup and run basic test
-just test
-
-# Full test with symlinks
-just test-full
-
-# Clean generated splits
-just clean
-
-# Clean entire environment
-just clean-cv
+just test        # Setup and run basic test
+just test-full   # Full test with symlinks
+just clean       # Clean generated splits
+just clean-cv    # Clean entire environment
 ```
 
 ## Output Structure
@@ -123,7 +88,7 @@ data_splits/
 ├── split_0/
 │   ├── VisualPhish/
 │   │   ├── train.csv        # file, true_target, true_class
-│   │   ├── val.csv          # + prediction columns (pp_, vp_, baseline_)
+│   │   ├── val.csv          # + prediction columns (configurable prefixes)
 │   │   └── images/          # symlinks (optional)
 │   │       ├── train/       # training images
 │   │       └── val/         # validation images
@@ -135,12 +100,21 @@ data_splits/
 └── split_2/
 ```
 
-## Configuration Format
+## Adding Dataset Folders
 
-The system expects a JSON configuration with:
+To add new datasets to the cross-validation process, update the configuration:
+
+### Configuration Format
 
 ```json
 {
+  "data_input_config": {
+    "csv_column_prefixes": {
+      "Phishpedia": "pp",
+      "VisualPhish": "vp",
+      "Baseline": "baseline"
+    }
+  },
   "cross_validation_config": {
     "enabled": true,
     "n_splits": 3,
@@ -150,7 +124,7 @@ The system expects a JSON configuration with:
     "dataset_image_paths": {
       "DatasetName": {
         "path": "/path/to/dataset",
-        "label_strategy": "directory",
+        "label_strategy": "directory|labels_file|subfolders",
         "target_mapping": {
           "phishing": "phishing_dir",
           "benign": "benign_dir"
@@ -161,53 +135,48 @@ The system expects a JSON configuration with:
 }
 ```
 
-## SOLID Principles Applied
+**Note**: The `csv_column_prefixes` in `data_input_config` determine the algorithm column prefixes used in validation CSV files (e.g., `pp_target`, `vp_class`).
 
-### Single Responsibility Principle
-- Each validator handles one type of validation
-- Data processor focuses only on data loading
-- File writer handles only CSV generation
+### Label Strategies
 
-### Open/Closed Principle
-- New validators can be added without modifying existing code
-- Protocol-based interfaces allow easy extensions
-
-### Liskov Substitution Principle
-- All validators implement the same `Validator` protocol
-- Components can be swapped without breaking functionality
-
-### Interface Segregation Principle
-- Small, focused protocols (DataProcessor, SplitGenerator, etc.)
-- Clients depend only on methods they use
-
-### Dependency Inversion Principle
-- High-level modules depend on abstractions (protocols)
-- Concrete implementations are injected at runtime
-
-## Integration
-
-**Training Scripts**:
-```python
-# Read training data
-train_df = pd.read_csv("data_splits/split_0/dataset/train.csv")
-# Columns: file, true_target, true_class
+**`directory`**: Images organized in brand/target subdirectories
+```
+dataset/phishing/brand1/image1.jpg
+dataset/phishing/brand2/image2.jpg
+dataset/benign/benign_site/image3.jpg
 ```
 
-**Evaluation Scripts**:
-```python
-# Read evaluation data
-val_df = pd.read_csv("data_splits/split_0/dataset/val.csv")
-# Add predictions to pp_target, vp_target, baseline_target columns
+**`labels_file`**: Flat structure with `labels.txt`
+```
+dataset/phishing/image1.jpg
+dataset/phishing/labels.txt  # one label per line matching sorted image order
+dataset/benign/image2.jpg
 ```
 
-## Architecture Benefits
+**`subfolders`**: Nested subdirs each containing `shot.png`
+```
+dataset/phishing/brand1+timestamp/shot.png
+dataset/phishing/brand2+timestamp/shot.png
+dataset/benign/benign_folder/shot.png
+```
 
-- **Maintainable**: Clear separation of concerns
-- **Testable**: Each component can be tested in isolation
-- **Extensible**: Easy to add new validators or processors
-- **Robust**: Comprehensive validation and error handling
-- **Flexible**: Protocol-based design allows easy substitution
+### Example: Adding New Dataset
 
-**Total LOC:** ~760 lines across 3 main files
-**Test Coverage**: Comprehensive validation suite
-**Extensibility**: High - new features can be added without breaking changes
+```json
+{
+  "NewDataset": {
+    "path": "/data/my_dataset",
+    "label_strategy": "directory",
+    "target_mapping": {
+      "phishing": "malicious",
+      "benign": "legitimate"
+    }
+  }
+}
+```
+
+The system will automatically:
+- Discover images using the specified strategy
+- Apply target mapping for consistent labeling
+- Include the dataset in cross-validation splits
+- Generate corresponding CSV files and symlinks

@@ -102,7 +102,7 @@ class CSVFilesValidator:
             if not val_csv.exists():
                 missing_files.append(str(val_csv))
             else:
-                val_validation = self._validate_val_csv(val_csv)
+                val_validation = self._validate_val_csv(val_csv, config)
                 if not val_validation.passed:
                     invalid_files.append(f"{val_csv}: {val_validation.message}")
 
@@ -130,11 +130,13 @@ class CSVFilesValidator:
         except Exception as e:
             return ValidationResult(False, f"Error reading CSV: {e}")
 
-    def _validate_val_csv(self, csv_path: Path) -> ValidationResult:
+    def _validate_val_csv(
+        self, csv_path: Path, config: CrossValidationConfig
+    ) -> ValidationResult:
         """Validate validation CSV structure"""
         try:
             df = pd.read_csv(csv_path)
-            required_columns = CVConstants.VAL_COLUMNS
+            required_columns = CVConstants.get_val_columns(config.csv_column_prefixes)
 
             missing_columns = set(required_columns) - set(df.columns)
             if missing_columns:
