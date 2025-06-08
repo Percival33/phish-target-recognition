@@ -1,85 +1,117 @@
-# Cross-Validation Package justfile
-# Uses UV for dependency management
+# Cross-Validation Package
+# Manages dataset splitting, validation, and environment setup
+# Uses UV for Python dependency management
+# =============================================================================
 # Configuration
+# =============================================================================
 
 config := "config.json"
 
-# Default target - show available recipes
+# =============================================================================
+# Help & Information
+# =============================================================================
+
+# Show available recipes
 default:
     just --list
 
-# Setup cross-validation environment with tools
+# =============================================================================
+# Environment Management
+# =============================================================================
+
+# Set up development environment with all dependencies
 setup-cv:
     #!/usr/bin/env bash
     echo "Setting up cross-validation environment..."
     cd ../.. && just copy-tools-to-cv
-    uv sync --quiet
+    cd src/cross_validation && uv sync --quiet
     echo "Cross-validation environment setup complete."
 
-# Create basic cross-validation splits
-splits:
-    #!/usr/bin/env bash
-    echo "Creating cross-validation splits..."
-    uv run python cv_splits.py --config {{ config }}
-
-# Create cross-validation splits with symlinks
-splits-links:
-    #!/usr/bin/env bash
-    echo "Creating cross-validation splits with symlinks..."
-    uv run python cv_splits.py --config {{ config }} --create-symlinks
-
-# Validate generated splits
-validate:
-    #!/usr/bin/env bash
-    echo "Validating cross-validation splits..."
-    uv run python cv_validator.py --config {{ config }}
-
-# Remove generated splits
-clean:
-    #!/usr/bin/env bash
-    echo "Cleaning generated splits..."
-    # Navigate to project root to find data_splits directory
-    if [ -d "../../data_splits" ]; then
-        echo "Top-level folders to be removed:"
-        ls -1 ../../data_splits/ 2>/dev/null || echo "  (no folders found)"
-        rm -rf ../../data_splits
-        echo "Removed data_splits directory from project root"
-    else
-        echo "No data_splits directory found in project root"
-    fi
-
-# Clean cross-validation environment
-clean-cv:
+# Clean environment artifacts (libs, venv)
+clean-env:
     #!/usr/bin/env bash
     echo "Cleaning cross-validation environment..."
-    rm -rf libs
-    rm -rf .venv
+    rm -rf libs .venv
     echo "Cross-validation environment cleaned."
 
-# Basic test - setup, clean, create splits, and validate
-test: setup-cv clean splits validate
-    #!/usr/bin/env bash
-    echo "✓ Basic test completed successfully"
+# =============================================================================
+# Data Management
+# =============================================================================
 
-# Full test with symlinks - setup, clean, create splits with symlinks, and validate
-test-full: setup-cv clean splits-links validate
-    #!/usr/bin/env bash
-    echo "✓ Full test with symlinks completed successfully"
+# Create cross-validation splits using default config
+splits:
+    @just _run-splits {{ config }} ""
 
-# Run splits with custom config file
+# Create cross-validation splits with symlinks using default config
+splits-links:
+    @just _run-splits {{ config }} "--create-symlinks"
+
+# Create splits with custom config file
 splits-config config_file:
-    #!/usr/bin/env bash
-    echo "Creating cross-validation splits with config: {{ config_file }}"
-    uv run python cv_splits.py --config {{ config_file }}
+    @just _run-splits {{ config_file }} ""
 
-# Run splits with symlinks and custom config file
+# Create splits with symlinks using custom config file
 splits-links-config config_file:
-    #!/usr/bin/env bash
-    echo "Creating cross-validation splits with symlinks using config: {{ config_file }}"
-    uv run python cv_splits.py --config {{ config_file }} --create-symlinks
+    @just _run-splits {{ config_file }} "--create-symlinks"
 
-# Validate with custom config file
-validate-config config_file:
+# Remove all generated split data
+clean-data:
     #!/usr/bin/env bash
-    echo "Validating cross-validation splits with config: {{ config_file }}"
+    echo "Cleaning generated splits..."
+    if [ -d "../../data_splits" ]; then
+        echo "Removing data_splits directory contents:"
+        ls -1 ../../data_splits/ 2>/dev/null || echo "  (no folders found)"
+        rm -rf ../../data_splits
+        echo "✓ Removed data_splits directory from project root"
+    else
+        echo "✓ No data_splits directory found (already clean)"
+    fi
+
+# =============================================================================
+# Validation
+# =============================================================================
+
+# Validate splits using default config
+validate:
+    @just _run-validation {{ config }}
+
+# Validate splits with custom config file
+validate-config config_file:
+    @just _run-validation {{ config_file }}
+
+# =============================================================================
+# Testing & Quality Assurance
+# =============================================================================
+
+# Run complete test pipeline (setup → clean → splits → validate)
+test: setup-cv clean-data splits validate
+    @echo "✓ Basic cross-validation test completed successfully"
+
+# Run complete test pipeline with symlinks
+test-links: setup-cv clean-data splits-links validate
+    @echo "✓ Cross-validation test with symlinks completed successfully"
+
+# =============================================================================
+# Maintenance
+# =============================================================================
+
+# Full cleanup - remove all generated data and environment artifacts
+clean: clean-data clean-env
+    @echo "✓ Complete cleanup finished"
+
+# Internal helpers
+
+_run-splits config_file options:
+    #!/usr/bin/env bash
+    action="Creating cross-validation splits"
+    [[ "{{ options }}" == *"symlinks"* ]] && action+=" with symlinks"
+    [[ "{{ config_file }}" != "{{ config }}" ]] && action+=" using config: {{ config_file }}"
+    echo "${action}..."
+    uv run python cv_splits.py --config {{ config_file }} {{ options }}
+
+_run-validation config_file:
+    #!/usr/bin/env bash
+    action="Validating cross-validation splits"
+    [[ "{{ config_file }}" != "{{ config }}" ]] && action+=" with config: {{ config_file }}"
+    echo "${action}..."
     uv run python cv_validator.py --config {{ config_file }}

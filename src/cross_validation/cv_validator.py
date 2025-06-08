@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-"""
-Cross-Validation Splits Validator - SOLID Principles Implementation
-
-A simple validator that follows SOLID principles to validate generated CV splits.
-"""
-
 import logging
 from pathlib import Path
 from typing import List

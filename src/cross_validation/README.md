@@ -76,9 +76,10 @@ uv sync          # Or manually with UV
 ### Development Commands
 ```bash
 just test        # Setup and run basic test
-just test-full   # Full test with symlinks
-just clean       # Clean generated splits
-just clean-cv    # Clean entire environment
+just test-links  # Full test with symlinks
+just clean       # Clean generated splits and environment
+just clean-data  # Clean only generated splits
+just clean-env   # Clean only environment artifacts
 ```
 
 ## Output Structure
@@ -137,7 +138,23 @@ To add new datasets to the cross-validation process, update the configuration:
 
 **Note**: The `csv_column_prefixes` in `data_input_config` determine the algorithm column prefixes used in validation CSV files (e.g., `pp_target`, `vp_class`).
 
-### Label Strategies
+### Target Mapping
+
+`target_mapping` provides a canonical class abstraction layer that maps standardized class names (`"phishing"`, `"benign"`) to dataset-specific directory structures. This decouples the cross-validation logic from heterogeneous dataset naming conventions.
+
+**Purpose**: Enables uniform binary classification across datasets with different organizational schemas without dataset-specific code branches.
+
+**Example mappings**:
+```json
+"VisualPhish": {
+  "target_mapping": {
+    "phishing": "newly_crawled_phishing",  // maps to actual dir name
+    "benign": "benign_test"               // maps to actual dir name
+  }
+}
+```
+
+### Label Discovery Strategies
 
 **`directory`**: Images organized in brand/target subdirectories
 ```
