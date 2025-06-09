@@ -135,6 +135,10 @@ class SimpleDataProcessor:
                 )
 
         df = pd.DataFrame(samples)
+
+        # Validate no duplicate targets across classes
+        # self._validate_no_duplicate_targets(df, dataset_config.name)
+
         self.logger.info(
             f"{dataset_config.name}: {len(df)} samples, classes: {Counter(df['true_class'])}"
         )
@@ -187,8 +191,8 @@ class SimpleDataProcessor:
         # Match images with labels
         for i, img_file in enumerate(image_files):
             if target_type == "benign":
-                # For benign, use generic benign label
-                target_label = "benign"
+                # For benign, use label from labels.txt if available, otherwise "benign"
+                target_label = labels[i] if i < len(labels) and labels[i] else "benign"
             else:
                 # For phishing, use label from labels.txt or default
                 target_label = labels[i] if i < len(labels) else "phishing"
@@ -220,7 +224,10 @@ class SimpleDataProcessor:
 
                 if shot_file.exists():
                     if target_type == "benign":
-                        target_label = "benign"
+                        if subdir.name and subdir.name != "benign":
+                            target_label = subdir.name
+                        else:
+                            target_label = "benign"
                     else:
                         # Try to get label from individual labels.txt in subdir
                         labels_file = subdir / CVConstants.LABELS_TXT
@@ -236,6 +243,22 @@ class SimpleDataProcessor:
                     )
 
         return samples
+
+    def _validate_no_duplicate_targets(self, df: pd.DataFrame, dataset_name: str):
+        """Validate that no target appears in both phishing and benign classes"""
+        if df.empty:
+            return
+
+        phishing_targets = set(df[df["true_class"] == 1]["true_target"].unique())
+        benign_targets = set(df[df["true_class"] == 0]["true_target"].unique())
+
+        duplicate_targets = phishing_targets.intersection(benign_targets)
+
+        if duplicate_targets:
+            duplicate_list = sorted(list(duplicate_targets))
+            raise ValueError(
+                f"Duplicate target found in dataset {dataset_name}: {duplicate_list}"
+            )
 
 
 class StratifiedSplitGenerator:
@@ -315,7 +338,12 @@ class PerSampleSymlinkManager:
 
         # Create symlinks for training data
         train_data = data.iloc[train_idx]
-        self._create_sample_symlinks(train_data, images_dir, "train", dataset_config)
+        self._create_sample_symlinks(
+            train_data,
+            images_dir,
+            "train",
+            dataset_config,
+        )
 
         # Create symlinks for validation data
         val_data = data.iloc[val_idx]
@@ -341,7 +369,14 @@ class PerSampleSymlinkManager:
 
             if original_file.exists():
                 # Create meaningful symlink name
-                target_dir = split_images_dir / row["true_target"]
+                if split_type == "train":
+                    target_dir = (
+                        split_images_dir
+                        / ("phish" if row["true_class"] == 1 else "benign")
+                        / row["true_target"]
+                    )
+                else:
+                    target_dir = split_images_dir / row["true_target"]
                 target_dir.mkdir(parents=True, exist_ok=True)
 
                 symlink_path = target_dir / original_file.name
@@ -355,8 +390,6 @@ class PerSampleSymlinkManager:
 
 
 class CrossValidationSplitter:
-    """Main orchestrator following Dependency Inversion Principle"""
-
     def __init__(
         self,
         config_loader: ConfigLoader,

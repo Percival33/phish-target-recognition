@@ -20,7 +20,7 @@ default:
 # =============================================================================
 
 # Set up development environment with all dependencies
-setup-cv:
+setup:
     #!/usr/bin/env bash
     echo "Setting up cross-validation environment..."
     cd ../.. && just copy-tools-to-cv
@@ -54,8 +54,7 @@ splits-config config_file:
 splits-links-config config_file:
     @just _run-splits {{ config_file }} "--create-symlinks"
 
-# Remove all generated split data
-clean-data:
+clean:
     #!/usr/bin/env bash
     echo "Cleaning generated splits..."
     if [ -d "../../data_splits" ]; then
@@ -84,11 +83,11 @@ validate-config config_file:
 # =============================================================================
 
 # Run complete test pipeline (setup → clean → splits → validate)
-test: setup-cv clean-data splits validate
+test: setup clean splits validate
     @echo "✓ Basic cross-validation test completed successfully"
 
 # Run complete test pipeline with symlinks
-test-links: setup-cv clean-data splits-links validate
+test-links: setup clean splits-links validate
     @echo "✓ Cross-validation test with symlinks completed successfully"
 
 # =============================================================================
@@ -96,7 +95,7 @@ test-links: setup-cv clean-data splits-links validate
 # =============================================================================
 
 # Full cleanup - remove all generated data and environment artifacts
-clean: clean-data clean-env
+clean-all: clean clean-env
     @echo "✓ Complete cleanup finished"
 
 # Internal helpers

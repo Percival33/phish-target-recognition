@@ -30,7 +30,12 @@ class BaselineEmbedder:
 
         if index_path is not None and index_path.exists():
             try:
-                self.index = faiss.read_index(str(index_path))
+                # Try loading as binary index first, then as regular index
+                try:
+                    self.index = faiss.read_index_binary(str(index_path))
+                except:  # noqa: E722
+                    self.index = faiss.read_index(str(index_path))
+
                 logger.info(
                     f"Loaded FAISS index from {index_path} with {self.index.ntotal} vectors"
                 )
@@ -106,7 +111,12 @@ class BaselineEmbedder:
         try:
             index_path.parent.mkdir(parents=True, exist_ok=True)
 
-            faiss.write_index(self.index, str(index_path))
+            # Use appropriate save method based on index type
+            if isinstance(self.index, faiss.IndexBinaryFlat):
+                faiss.write_index_binary(self.index, str(index_path))
+            else:
+                faiss.write_index(self.index, str(index_path))
+
             logger.info(
                 f"Saved FAISS index to {index_path} with {self.index.ntotal} vectors"
             )
@@ -183,10 +193,18 @@ class BaselineEmbedder:
                         continue
 
                     phash_vector = self.hasher.string_to_vector(phash_str)
-                    phash_array = np.array(phash_vector, dtype=np.float32).reshape(
-                        1, -1
-                    )
 
+                    # Use appropriate data type based on hasher type
+                    if isinstance(self.hasher, hashers.PHashF):
+                        # Floating point hash - use float32 for Euclidean distance
+                        phash_array = np.array(phash_vector, dtype=np.float32).reshape(
+                            1, -1
+                        )
+                    else:
+                        # Binary hash - pack bits for FAISS binary index
+                        phash_array = (
+                            np.packbits(phash_vector).astype(np.uint8).reshape(1, -1)
+                        )
                     true_target = str(img_path.parent.name).split("+")[0]
 
                     metadata = {
@@ -208,7 +226,14 @@ class BaselineEmbedder:
             if batch_embeddings:
                 if self.index is None:
                     embedding_dim = batch_embeddings[0].shape[1]
-                    self.index = faiss.IndexFlatL2(embedding_dim)
+
+                    # Choose index type based on hasher type
+                    if isinstance(self.hasher, hashers.PHashF):
+                        # Floating point hash - use Euclidean distance
+                        self.index = faiss.IndexFlatL2(embedding_dim)
+                    else:
+                        # Binary hash - use Hamming distance (dimension in bits)
+                        self.index = faiss.IndexBinaryFlat(embedding_dim * 8)
 
                 embeddings_array = np.vstack(batch_embeddings)
                 self.index.add(embeddings_array)
@@ -298,9 +323,18 @@ class BaselineEmbedder:
                         continue
 
                     query_vector = self.hasher.string_to_vector(query_hash)
-                    query_array = np.array(query_vector, dtype=np.float32).reshape(
-                        1, -1
-                    )
+
+                    # Use appropriate data type based on hasher type
+                    if isinstance(self.hasher, hashers.PHashF):
+                        # Floating point hash - use float32 for Euclidean distance
+                        query_array = np.array(query_vector, dtype=np.float32).reshape(
+                            1, -1
+                        )
+                    else:
+                        # Binary hash - pack bits for FAISS binary index
+                        query_array = (
+                            np.packbits(query_vector).astype(np.uint8).reshape(1, -1)
+                        )
                     batch_embeddings.append(query_array)
                 except Exception as e:
                     logger.error(f"Failed to process query {query_path}: {str(e)}")
@@ -374,7 +408,14 @@ class BaselineEmbedder:
         try:
             query_hash = self.hasher.compute_array(image)
             query_vector = self.hasher.string_to_vector(query_hash)
-            query_array = np.array(query_vector, dtype=np.float32).reshape(1, -1)
+
+            # Use appropriate data type based on hasher type
+            if isinstance(self.hasher, hashers.PHashF):
+                # Floating point hash - use float32 for Euclidean distance
+                query_array = np.array(query_vector, dtype=np.float32).reshape(1, -1)
+            else:
+                # Binary hash - pack bits for FAISS binary index
+                query_array = np.packbits(query_vector).astype(np.uint8).reshape(1, -1)
 
             # Perform similarity search
             distances, indices = self.index.search(query_array, k)
