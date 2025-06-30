@@ -214,6 +214,7 @@ class SymlinkValidator:
     ) -> ValidationResult:
         """Validate symlinks"""
         broken_symlinks = []
+        missing_symlinks = []
 
         for (
             split_idx,
@@ -225,28 +226,101 @@ class SymlinkValidator:
             images_dir = PathUtils.get_images_dir_path(dataset_dir)
 
             if images_dir.exists():
-                broken = self._check_symlinks_in_dir(images_dir)
-                if broken:
+                validation_result = self._check_symlinks_in_dir(images_dir, dataset_dir)
+                if validation_result["broken"]:
                     broken_symlinks.extend(
-                        [f"{split_idx}/{dataset_name}: {link}" for link in broken]
+                        [
+                            f"{split_idx}/{dataset_name}: {link}"
+                            for link in validation_result["broken"]
+                        ]
+                    )
+                if validation_result["missing"]:
+                    missing_symlinks.extend(
+                        [
+                            f"{split_idx}/{dataset_name}: {link}"
+                            for link in validation_result["missing"]
+                        ]
                     )
 
+        issues = []
         if broken_symlinks:
+            issues.append(f"Broken symlinks: {broken_symlinks}")
+        if missing_symlinks:
+            issues.append(f"Missing symlinks: {missing_symlinks}")
+
+        if issues:
             return ValidationResult(
-                False, "Broken symlinks found", {"broken_symlinks": broken_symlinks}
+                False,
+                "Symlink validation failed",
+                {
+                    "broken_symlinks": broken_symlinks,
+                    "missing_symlinks": missing_symlinks,
+                },
             )
 
         return ValidationResult(True, "All symlinks are valid")
 
-    def _check_symlinks_in_dir(self, images_dir: Path) -> List[str]:
-        """Check symlinks in a directory"""
+    def _check_symlinks_in_dir(self, images_dir: Path, dataset_dir: Path) -> dict:
+        """Check symlinks in a directory and validate completeness"""
         broken = []
+        missing = []
 
+        # Check for broken symlinks
         for item in images_dir.rglob("*"):
             if item.is_symlink() and not item.exists():
                 broken.append(str(item.relative_to(images_dir)))
 
-        return broken
+        # Check for missing info.txt symlinks where they should exist
+        self._check_missing_info_symlinks(images_dir, dataset_dir, missing)
+
+        return {"broken": broken, "missing": missing}
+
+    def _check_missing_info_symlinks(
+        self, images_dir: Path, dataset_dir: Path, missing: List[str]
+    ):
+        """Check for missing info.txt symlinks where original info.txt files exist"""
+        # Read the CSV files to get the original file paths
+        val_csv = PathUtils.get_val_csv_path(dataset_dir)
+        train_csv = PathUtils.get_train_csv_path(dataset_dir)
+
+        original_files = []
+
+        # Collect original file paths from both train and val CSVs
+        for csv_file in [train_csv, val_csv]:
+            if csv_file.exists():
+                try:
+                    df = pd.read_csv(csv_file)
+                    if "file" in df.columns:
+                        original_files.extend(df["file"].tolist())
+                except Exception as e:
+                    self.logger.warning(f"Error reading {csv_file}: {e}")
+
+        # For each original file, check if info.txt exists and has corresponding symlink
+        for file_path in original_files:
+            original_file = Path(file_path)
+            info_file = original_file.parent / "info.txt"
+
+            if info_file.exists():
+                # Find corresponding symlink directories in images_dir
+                # Look for shot.png symlinks to determine where info.txt should be
+                for shot_symlink in images_dir.rglob("shot.png"):
+                    if shot_symlink.is_symlink():
+                        # Check if this symlink points to our original file
+                        try:
+                            if shot_symlink.resolve() == original_file.resolve():
+                                # Found the shot.png symlink, check for info.txt in same dir
+                                expected_info_symlink = shot_symlink.parent / "info.txt"
+                                if not expected_info_symlink.exists():
+                                    missing.append(
+                                        str(
+                                            expected_info_symlink.relative_to(
+                                                images_dir
+                                            )
+                                        )
+                                    )
+                        except (OSError, FileNotFoundError):
+                            # Skip if we can't resolve symlink
+                            continue
 
 
 class CrossValidationValidator:
