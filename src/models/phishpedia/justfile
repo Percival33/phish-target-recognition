@@ -5,6 +5,7 @@ default:
 # Install depencies based on the operating system
 install:
     #!/usr/bin/env bash
+    set -euo pipefail
     OS=$(uname -s)
     if [[ "$OS" == "Darwin" ]]; then
         just install-macos
@@ -42,10 +43,10 @@ install-cuda:
     uv sync --frozen
 
     # Install PyTorch stack with CUDA support
-    uv pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 --index https://download.pytorch.org/whl/torch_stable.html
+    uv pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
     # Install Detectron2 with CUDA support
-    uv pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html --no-build-isolation
+    uv pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu111/torch1.9/index.html --no-build-isolation --prerelease=allow
 
     echo "CUDA installation complete!"
 
@@ -147,11 +148,12 @@ prepare-mappings:
 
 prepare: prepare-mappings
     #!/usr/bin/env bash
+    set -euo pipefail
     echo "Preparing datasets..."
 
     # Process datasets
-    python convert_encodings.py datasets/phish_sample_30k
-    python find_missing_files.py datasets/benign_sample_30k > find_missing_files.log
-    python fix-script.py datasets/benign_sample_30k find_missing_files.log
+    uv run scripts/convert_encodings.py $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k
+    uv run scripts/find_missing_files.py $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k > find_missing_files.log
+    uv run scripts/fix_script.py $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k find_missing_files.log
 
     echo "Preparation complete!"

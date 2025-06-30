@@ -27,8 +27,8 @@ class Evaluate:
 
         Args:
         test_matrix (numpy.ndarray): Matrix of test samples
-        train_legit (numpy.ndarray, optional): Legitimate training samples
-        train_phish (numpy.ndarray, optional): Phishing training samples
+        train_legit (numpy.ndarray): Legitimate training samples
+        train_phish (numpy.ndarray): Phishing training samples
 
         Returns:
         numpy.ndarray: Pairwise distances between test matrix and training data
