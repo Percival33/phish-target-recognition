@@ -21,7 +21,10 @@ copy-tools-to-baseline: build-common
 copy-tools-for-eval: build-common
     mkdir -p src/eval/libs
     cp src/tools/dist/*.whl src/eval/libs/
-    echo "Copied tools wheel to src/eval/libs/"
+
+copy-tools-to-cv: build-common
+    mkdir -p src/cross_validation/libs
+    cp src/tools/dist/*.whl src/cross_validation/libs/
 
 setup-eval: copy-tools-for-eval
     cd src/eval && \
@@ -44,7 +47,7 @@ clean-eval:
     rm -rf src/eval/critical_difference_analysis_results
     echo "Cleaned 'eval' libs, virtual environment, and results."
 
-tools: copy-tools-to-visualphishnet copy-tools-to-phishpedia copy-tools-to-baseline
+tools: copy-tools-to-visualphishnet copy-tools-to-phishpedia copy-tools-to-baseline copy-tools-to-cv
     echo "Tools package was built"
 
 run-pp recipe-name:

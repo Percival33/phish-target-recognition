@@ -5,6 +5,8 @@ description = "Simplified implementation of 'Phishpedia: A Hybrid Deep Learning 
 readme = "README.md"
 requires-python = ">=3.9,<3.10"
 dependencies = [
+    "black==21.4b2",
+    "chardet>=5.2.0",
     "fvcore>=0.1.5.post20221221",
     "gdown>=5.2.0",
     "lxml>=5.3.1",
