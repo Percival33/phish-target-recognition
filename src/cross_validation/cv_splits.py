@@ -103,7 +103,6 @@ class SimpleDataProcessor:
         self.label_extractor = LabelExtractor()
 
     def process_dataset(self, dataset_config: DatasetConfig) -> pd.DataFrame:
-        """Process dataset and return DataFrame with all samples"""
         base_path = Path(dataset_config.path)
         samples = []
 
@@ -210,7 +209,7 @@ class SimpleDataProcessor:
     def _process_subfolders_strategy(
         self, target_path: Path, target_type: str, class_value: int
     ) -> List[Dict[str, Any]]:
-        """Process using subfolders strategy: nested subdirs with individual labels.txt files"""
+        """Process using subfolders strategy: nested subdirs each containing shot.png and info.txt"""
         samples = []
 
         if not target_path.exists():
@@ -229,10 +228,7 @@ class SimpleDataProcessor:
                         else:
                             target_label = "benign"
                     else:
-                        # Try to get label from individual labels.txt in subdir
-                        labels_file = subdir / CVConstants.LABELS_TXT
-                        labels = self.label_extractor.extract_labels(labels_file)
-                        target_label = labels[0] if labels else subdir.name
+                        target_label = subdir.name.split("+")[0]
 
                     samples.append(
                         {
@@ -366,27 +362,50 @@ class PerSampleSymlinkManager:
 
         for _, row in data.iterrows():
             original_file = base_path / row["file"]
+            normalized_parent = original_file.parent.split("+")[
+                0
+            ]  # Normalize parent for symlink
 
-            if original_file.exists():
-                # Create meaningful symlink name
-                if split_type == "train":
-                    target_dir = (
-                        split_images_dir
-                        / ("phish" if row["true_class"] == 1 else "benign")
-                        / row["true_target"]
-                    )
-                else:
-                    target_dir = split_images_dir / row["true_target"]
-                target_dir.mkdir(parents=True, exist_ok=True)
+            # if original_file.exists():
+            #     Check if info.txt exists in the same directory first
+            # TODO: VERIFY!!!
 
-                symlink_path = target_dir / original_file.name
+            # Create meaningful symlink name
+            if split_type == "train":
+                target_dir = (
+                    split_images_dir
+                    / ("phish" if row["true_class"] == 1 else "benign")
+                    / row["true_target"]
+                )
+            else:
+                target_dir = split_images_dir / row["true_target"]
+            target_dir.mkdir(parents=True, exist_ok=True)
 
+            # Create symlink for the main file (shot.png)
+            symlink_path = target_dir / original_file.name
+            try:
+                if not symlink_path.exists():
+                    symlink_path.symlink_to(original_file)
+            except OSError as e:
+                self.logger.warning(f"Failed to create symlink {symlink_path}: {e}")
+                continue
+
+            info_file = original_file.parent / "info.txt"
+            info_symlink_path = target_dir / "info.txt"
+            if info_file.exists():
                 try:
-                    # Create symlink
-                    if not symlink_path.exists():
-                        symlink_path.symlink_to(original_file)
+                    if not info_symlink_path.exists():
+                        info_symlink_path.symlink_to(info_file)
                 except OSError as e:
-                    self.logger.warning(f"Failed to create symlink {symlink_path}: {e}")
+                    self.logger.warning(
+                        f"Failed to create info.txt symlink {info_symlink_path}: {e}"
+                    )
+            else:
+                self.logger.warning(
+                    f"info.txt not found for {original_file}, creating symlink {info_symlink_path}"
+                )
+                with info_symlink_path.open("w", encoding="utf-8") as f:
+                    f.write(normalized_parent)
 
 
 class CrossValidationSplitter:
@@ -408,14 +427,11 @@ class CrossValidationSplitter:
     def create_splits(
         self, config_path: str = CVConstants.CONFIG_JSON, create_symlinks: bool = False
     ) -> bool:
-        """Create cross-validation splits"""
         try:
-            # Load configuration
             config = self.config_loader.load_config(config_path)
             output_dir = Path(config.output_splits_directory)
             PathUtils.ensure_directory(output_dir)
 
-            # Process each dataset
             for dataset_config in config.dataset_configs.values():
                 self._process_single_dataset(
                     dataset_config, config, output_dir, create_symlinks
@@ -435,7 +451,6 @@ class CrossValidationSplitter:
         output_dir: Path,
         create_symlinks: bool,
     ):
-        """Process a single dataset"""
         self.logger.info(f"Processing {dataset_config.name}")
 
         # Load dataset
@@ -467,10 +482,7 @@ class CrossValidationSplitter:
 
 
 def main():
-    """Main entry point"""
-    parser = CVArgumentParser.create_base_parser(
-        "Cross-validation data splits with SOLID principles"
-    )
+    parser = CVArgumentParser.create_base_parser("Cross-validation data splits")
     parser.add_argument(
         "--create-symlinks", action="store_true", help="Create symlinks for each sample"
     )
@@ -479,27 +491,17 @@ def main():
     setup_logging()
 
     # Load config first to get CSV column prefixes
-    config_loader = ConfigLoader()
-    config = config_loader.load_config(args.config)
+    config = ConfigLoader().load_config(args.config)
 
-    # Dependency injection - assemble components
-    data_processor = SimpleDataProcessor()
-    split_generator = StratifiedSplitGenerator()
-    file_writer = CSVFileWriter(config.csv_column_prefixes)
-    symlink_manager = PerSampleSymlinkManager() if args.create_symlinks else None
-
-    # Create main splitter
     splitter = CrossValidationSplitter(
-        config_loader=config_loader,
-        data_processor=data_processor,
-        split_generator=split_generator,
-        file_writer=file_writer,
-        symlink_manager=symlink_manager,
+        config_loader=(ConfigLoader()),
+        data_processor=(SimpleDataProcessor()),
+        split_generator=(StratifiedSplitGenerator()),
+        file_writer=(CSVFileWriter(config.csv_column_prefixes)),
+        symlink_manager=(PerSampleSymlinkManager() if args.create_symlinks else None),
     )
 
-    # Execute
-    success = splitter.create_splits(args.config, args.create_symlinks)
-    return 0 if success else 1
+    return int(splitter.create_splits(args.config, args.create_symlinks))
 
 
 if __name__ == "__main__":

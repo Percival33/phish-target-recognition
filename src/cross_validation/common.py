@@ -13,7 +13,6 @@ import argparse
 from tools.config import PROJ_ROOT
 
 
-# Constants
 class CVConstants:
     """Cross-validation constants"""
 
@@ -191,8 +190,6 @@ class CVArgumentParser:
 
 
 class PathUtils:
-    """Common path utilities"""
-
     @staticmethod
     def ensure_directory(path: Path) -> Path:
         """Ensure directory exists, create if needed"""
@@ -215,7 +212,6 @@ class PathUtils:
         return dataset_dir / CVConstants.IMAGES_DIR
 
 
-# Protocol for shared interfaces
 class Validator(Protocol):
     """Interface for validation checks"""
 
