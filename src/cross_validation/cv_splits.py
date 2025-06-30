@@ -507,7 +507,8 @@ def main():
         symlink_manager=(PerSampleSymlinkManager() if args.create_symlinks else None),
     )
 
-    return int(splitter.create_splits(args.config, args.create_symlinks))
+    success = splitter.create_splits(args.config, args.create_symlinks)
+    return 0 if success else 1
 
 
 if __name__ == "__main__":
