@@ -228,7 +228,8 @@ class SimpleDataProcessor:
                         else:
                             target_label = "benign"
                     else:
-                        target_label = subdir.name.split("+")[0]
+                        self.logger.debug("split on + in process subfolders strategy")
+                        target_label = str(subdir.name).split("+")[0]
 
                     samples.append(
                         {
@@ -362,7 +363,8 @@ class PerSampleSymlinkManager:
 
         for _, row in data.iterrows():
             original_file = base_path / row["file"]
-            normalized_parent = original_file.parent.split("+")[
+            self.logger.debug("split on + in create_sample_symlinks")
+            normalized_parent = str(original_file.parent).split("+")[
                 0
             ]  # Normalize parent for symlink
 
