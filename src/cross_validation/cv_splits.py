@@ -228,7 +228,13 @@ class SimpleDataProcessor:
                         else:
                             target_label = "benign"
                     else:
-                        target_label = str(subdir.name).split("+")[0]
+                        # We can not remove timestamp (split on "+") as we lose all samples but one from the same target
+                        # Example:
+                        # 1&1 Ionos+2020-08-13-19`10`20/shot.png
+                        # 1&1 Ionos+2020-08-16-16`00`55/shot.png
+                        # Only one of them will be kept. Due to duplication of target name `1&1 Ionos`
+                        # in PerSampleSymlinkManager._create_sample_symlinks() method
+                        target_label = subdir.name
 
                     samples.append(
                         {
