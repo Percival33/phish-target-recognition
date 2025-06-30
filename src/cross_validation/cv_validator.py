@@ -278,8 +278,6 @@ class SymlinkValidator:
     def _check_missing_info_symlinks(
         self, images_dir: Path, dataset_dir: Path, missing: List[str]
     ):
-        """Check for missing info.txt symlinks where original info.txt files exist"""
-        # Read the CSV files to get the original file paths
         val_csv = PathUtils.get_val_csv_path(dataset_dir)
         train_csv = PathUtils.get_train_csv_path(dataset_dir)
 
@@ -324,8 +322,6 @@ class SymlinkValidator:
 
 
 class CrossValidationValidator:
-    """Main validator orchestrator"""
-
     def __init__(self, validators: List[Validator]):
         self.validators = validators
         self.logger = logging.getLogger(__name__)
@@ -333,7 +329,6 @@ class CrossValidationValidator:
     def validate_splits(
         self, config_path: str = CVConstants.CONFIG_JSON, splits_dir: str = None
     ) -> bool:
-        """Validate all splits"""
         try:
             # Load config
             config_loader = ConfigLoader()
@@ -374,14 +369,12 @@ class CrossValidationValidator:
 
 
 def main():
-    """Main entry point"""
     parser = CVArgumentParser.create_base_parser(
         "Validate cross-validation data splits"
     )
     args = parser.parse_args()
     setup_logging()
 
-    # Assemble validators
     validators = [
         DirectoryStructureValidator(),
         CSVFilesValidator(),
@@ -389,10 +382,8 @@ def main():
         SymlinkValidator(),
     ]
 
-    # Create main validator
     validator = CrossValidationValidator(validators)
 
-    # Execute validation
     success = validator.validate_splits(args.config, args.splits_dir)
     return 0 if success else 1
 
