@@ -48,7 +48,7 @@
     "output_splits_directory": "data_splits",
     "dataset_image_paths": {
       "VisualPhish": {
-        "path": "data/raw/VisualPhish",
+        "path": "data/raw/visualphish",
         "label_strategy": "labels_file",
         "target_mapping": {
           "phishing": "newly_crawled_phishing",
