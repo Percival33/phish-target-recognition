@@ -152,8 +152,8 @@ prepare: prepare-mappings
     echo "Preparing datasets..."
 
     # Process datasets
-    uv run scripts/convert_encodings.py data/raw/phishpedia/phish_sample_30k
-    uv run scripts/find_missing_files.py data/raw/phishpedia/benign_sample_30k > find_missing_files.log
+    uv run scripts/convert_encodings.py $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k
+    uv run scripts/find_missing_files.py $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k > find_missing_files.log
     uv run scripts/fix_script.py $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k find_missing_files.log
 
     echo "Preparation complete!"
