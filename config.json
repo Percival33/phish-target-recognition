@@ -47,7 +47,7 @@
     "random_state": 42,
     "output_splits_directory": "data_splits",
     "dataset_image_paths": {
-      "VisualPhish": {
+      "visualPhish": {
         "path": "data/raw/visualphish",
         "label_strategy": "labels_file",
         "target_mapping": {
@@ -55,7 +55,7 @@
           "benign": "benign_test"
         }
       },
-      "Phishpedia": {
+      "phishpedia": {
         "path": "data/raw/phishpedia",
         "label_strategy": "subfolders",
         "target_mapping": {

@@ -372,11 +372,6 @@ class PerSampleSymlinkManager:
                 0
             ]  # Normalize parent for symlink
 
-            # if original_file.exists():
-            #     Check if info.txt exists in the same directory first
-            # TODO: VERIFY!!!
-
-            # Create meaningful symlink name
             if split_type == "train":
                 target_dir = (
                     split_images_dir
