@@ -1,4 +1,16 @@
 # External datasets
+
+<!-- TOC -->
+* [External datasets](#external-datasets)
+  * [How to prepare dataset to use Phishpedia model?](#how-to-prepare-dataset-to-use-phishpedia-model)
+    * [Evaluation for Phishpedia](#evaluation-for-phishpedia)
+      * [Preparing Evaluation Data with `organize.py`](#preparing-evaluation-data-with-organizepy)
+    * [Data Preparation for Phishpedia (`organize_by_sample.py`):](#data-preparation-for-phishpedia-organize_by_samplepy)
+      * [Preparing CSV Data for `organize_by_sample.py` with `prepare_data_for_organizer.py`](#preparing-csv-data-for-organize_by_samplepy-with-prepare_data_for_organizerpy)
+  * [How to prepare data for VisualPhish model?](#how-to-prepare-data-for-visualphish-model)
+    * [Data Preparation for VisualPhish (`organize_by_target.py`):](#data-preparation-for-visualphish-organize_by_targetpy)
+<!-- TOC -->
+
 ## How to prepare dataset to use Phishpedia model?
 TODO: check methods
 ### Evaluation for Phishpedia
@@ -108,4 +120,46 @@ PATH_TO_DATA/
     │   ├── info.txt
     │   └── shot.png
     └── targets.txt     # List of targets for the trusted dataset
+```
+
+## How to prepare data for VisualPhish model?
+### Data Preparation for VisualPhish (`organize_by_target.py`):
+
+To prepare data in the required format, use the `organize_by_target.py` script. **Note:** This script should be run from the main project directory.
+
+```bash
+uv run src/organize_by_target.py --csv PATH_TO_CSV_FILE --screenshots PATH_TO_SCREENSHOTS_FOLDER --output PATH_TO_OUTPUT_DIRECTORY
+```
+
+-   `--csv`: Path to the CSV file. The CSV file must contain the columns: `url`, `fqdn`, `screenshot_object`, `screenshot_hash`, `affected_entity`.
+-   `--screenshots`: Path to the parent folder containing screenshots. Screenshot file names are taken from the `screenshot_object` column.
+-   `--output`: Path to the directory where the processed data will be saved.
+
+**Additional Information about the `organize_by_target.py` Script:**
+
+-   The `is_phishing` column in the CSV file is optional. If it exists, a value of `False` means benign samples. If the column does not exist, all samples are treated as phishing.
+-   Target directory names are created based on the `affected_entity` column:
+    -   The value is converted to lowercase.
+    -   If the value is empty (NaN), the name 'unknown' is used.
+-   Targets are sorted alphabetically.
+-   The script creates `targets2.txt` (in the `phishing` folder) and `targets.txt` (in the `trusted_list` folder) files, containing sorted target names.
+
+**Data Structure for VisualPhish:**
+
+The dataset is organized by targets.
+
+```
+PATH_TO_OUTPUT_DIRECTORY/
+├── phishing/
+│   ├── Target_A/
+│   │   ├── Sample1.png
+│   │   └── Sample2.png
+│   ├── Target_B/
+│   │   └── Sample3.png
+│   └── targets2.txt      # List of targets for the phishing dataset
+└── trusted_list/         # (Analogous structure if trusted data is present)
+    ├── Target_X/
+    │   ├── Sample4.png
+    │   └── Sample5.png
+    └── targets.txt       # List of targets for the trusted dataset
 ```

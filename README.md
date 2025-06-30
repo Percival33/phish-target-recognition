@@ -1,5 +1,23 @@
 # Phishing Target Recognition
 
+<!-- TOC -->
+* [Phishing Target Recognition](#phishing-target-recognition)
+  * [Prerequisites](#prerequisites)
+  * [Project Configuration](#project-configuration)
+  * [Phishpedia](#phishpedia)
+    * [Execution Steps:](#execution-steps)
+    * [External datasets](#external-datasets)
+  * [VisualPhish](#visualphish)
+    * [Execution Steps:](#execution-steps-1)
+    * [Evaluation for VisualPhish](#evaluation-for-visualphish)
+  * [Cross validation](#cross-validation)
+  * [Datasets](#datasets)
+  * [Website](#website)
+    * [Prerequisites](#prerequisites-1)
+    * [Running the Backend Services and Website](#running-the-backend-services-and-website)
+  * [Other Useful Commands](#other-useful-commands)
+<!-- TOC -->
+
 ## Prerequisites
 
 Before starting work on the project, make sure you have the following tools installed:
@@ -74,17 +92,18 @@ Instructions for running and preparing data for the VisualPhish model.
     ```bash
     uv sync --frozen
     ```
-2.  **Download VisualPhish Data:** In the main project folder, execute (by default, data will be downloaded to `PROJECT_ROOT_DIR/data/interim`):
-    ```bash
-    uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar zxvf - -C "$PROJECT_ROOT_DIR/data/interim"
-    ```
-    If you want to download data to a different folder, change `"$PROJECT_ROOT_DIR/data/interim"` to your chosen path.
-3.  **Login to Wandb:** In the main project folder, execute:
+    >![Note]
+    > **Note for macOS users:** If you encounter issues with TensorFlow, you might need to install it specifically for macOS. You can do this by running:
+    > ```bash
+    > uv sync --extra macos
+    > ```
+    > This command should be executed after the general `uv sync --frozen` if TensorFlow issues persist.
+2.  **Login to Wandb:** In the main project folder, execute:
     ```bash
     uv run wandb login YOUR_API_KEY
     ```
     Replace `YOUR_API_KEY` with your Weights & Biases API key.
-4.  **Run VisualPhish Training:** In the main project folder, execute:
+3.  **Run VisualPhish Training:** In the main project folder, execute:
     ```bash
     uv run trainer.py --dataset-path PATH_TO_DATASET --logdir LOG_DIRECTORY --output-dir OUTPUT_DIRECTORY
     ```
@@ -93,63 +112,16 @@ Instructions for running and preparing data for the VisualPhish model.
     -   `--logdir`: `$PROJECT_ROOT_DIR/logdir`
     -   `--output-dir`: `$PROJECT_ROOT_DIR/data/processed/VisualPhish`
 
-### Data Preparation for VisualPhish (`organize_by_target.py`):
-
-To prepare data in the required format, use the `organize_by_target.py` script. **Note:** This script should be run from the main project directory.
-
-```bash
-uv run src/organize_by_target.py --csv PATH_TO_CSV_FILE --screenshots PATH_TO_SCREENSHOTS_FOLDER --output PATH_TO_OUTPUT_DIRECTORY
-```
-
--   `--csv`: Path to the CSV file. The CSV file must contain the columns: `url`, `fqdn`, `screenshot_object`, `screenshot_hash`, `affected_entity`.
--   `--screenshots`: Path to the parent folder containing screenshots. Screenshot file names are taken from the `screenshot_object` column.
--   `--output`: Path to the directory where the processed data will be saved.
-
-**Additional Information about the `organize_by_target.py` Script:**
-
--   The `is_phishing` column in the CSV file is optional. If it exists, a value of `False` means benign samples. If the column does not exist, all samples are treated as phishing.
--   Target directory names are created based on the `affected_entity` column:
-    -   The value is converted to lowercase.
-    -   If the value is empty (NaN), the name 'unknown' is used.
--   Targets are sorted alphabetically.
--   The script creates `targets2.txt` (in the `phishing` folder) and `targets.txt` (in the `trusted_list` folder) files, containing sorted target names.
-
-**Data Structure for VisualPhish:**
-
-The dataset is organized by targets.
-
-```
-PATH_TO_OUTPUT_DIRECTORY/
-├── phishing/
-│   ├── Target_A/
-│   │   ├── Sample1.png
-│   │   └── Sample2.png
-│   ├── Target_B/
-│   │   └── Sample3.png
-│   └── targets2.txt      # List of targets for the phishing dataset
-└── trusted_list/         # (Analogous structure if trusted data is present)
-    ├── Target_X/
-    │   ├── Sample4.png
-    │   └── Sample5.png
-    └── targets.txt       # List of targets for the trusted dataset
-```
-
 ### Evaluation for VisualPhish
 
 To evaluate the VisualPhish model using pre-computed embeddings and a specific threshold, you can run the `eval_new.py` script. This script will load the target list embeddings from a specified directory and the test data embeddings from a default or specified save folder.
-
-**Note for macOS users:** If you encounter issues with TensorFlow, you might need to install it specifically for macOS. You can do this by running:
-```bash
-uv sync --extra macos
-```
-This command should be executed after the general `uv sync --frozen` if TensorFlow issues persist.
 
 **Example Evaluation Command:**
 
 The following command runs the evaluation script using target list embeddings from a specified directory. Replace `EMB_FOLDER` with the actual path to the directory containing the target list embedding files (e.g., `whitelist_emb.npy`, `whitelist_labels.npy`, `whitelist_file_names.npy`). The script also assumes that test embeddings and other necessary files (like `all_labels.npy`, `all_file_names.npy`, `pairwise_distances.npy`) are located in the directory specified by `--save-folder` (defaults to `logs/VisualPhish-Results/` if not overridden in the script or command line) or are generated if the script is modified to re-process data.
 
 ```bash
-uv run src/models/visualphishnet/eval_new.py --emb-dir EMB_FOLDER --threshold 8.0
+uv run src/models/visualphishnet/eval_new.py --emb-dir EMB_FOLDER --threshold 8.0 # default value from original paper
 ```
 
 This will output metrics to the console and save detailed results to CSV and text files in the directory specified by `--result-path` (defaults to `logs/VisualPhish/`).
@@ -169,6 +141,11 @@ uv run --with gdown gdown 1yORUeSrF5vGcgxYrsCoqXcpOUHt-iHq_ -O download_benign.z
 uv run --with gdown gdown 1l-aQk54F0tAZ-RPfOyGo1jtz-Dsxo1Ao -O download_vp.zip && mkdir -p $PROJECT_ROOT_DIR/data/raw/visualphish && unzip -q download_vp.zip -d $PROJECT_ROOT_DIR/data/raw/visualphish && rm download_vp.zip
 ```
 
+
+File available below is preprocessed dataset of already cropped images.
+```bash
+uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar zxvf - -C "$PROJECT_ROOT_DIR/data/interim"
+```
 
 ## Website
 
