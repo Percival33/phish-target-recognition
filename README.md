@@ -10,7 +10,9 @@
   * [VisualPhish](#visualphish)
     * [Execution Steps:](#execution-steps-1)
     * [Evaluation for VisualPhish](#evaluation-for-visualphish)
+  * [Baseline](#baseline)
   * [Cross validation](#cross-validation)
+  * [Evaluation](#evaluation)
   * [Datasets](#datasets)
   * [Website](#website)
     * [Prerequisites](#prerequisites-1)
@@ -92,7 +94,7 @@ Instructions for running and preparing data for the VisualPhish model.
     ```bash
     uv sync --frozen
     ```
-    >![Note]
+    > [!NOTE]
     > **Note for macOS users:** If you encounter issues with TensorFlow, you might need to install it specifically for macOS. You can do this by running:
     > ```bash
     > uv sync --extra macos
@@ -126,8 +128,30 @@ uv run src/models/visualphishnet/eval_new.py --emb-dir EMB_FOLDER --threshold 8.
 
 This will output metrics to the console and save detailed results to CSV and text files in the directory specified by `--result-path` (defaults to `logs/VisualPhish/`).
 
+## Baseline
+see [baseline readme](./src/models/baseline/README.md)
+TODO: better description
+
 ## Cross validation
 
+1. Go to the cross-validation module
+   ```bash
+   cd $PROJECT_ROOT_DIR/src/cross_validation
+   ```
+
+2. Create the split generator
+   ```bash
+   just splits-links
+   ```
+
+By default the command creates a new directory named `data_splits` in the project root. You can override the destination via the `cross_validation_config.output_splits_directory` key in [config.json](./config.json).
+
+Each fold directory contains `train.csv`, `val.csv` and actual images to run models on them.
+
+Once the splits are ready, run your models on them and evaluate the outputs with the routines located in `src/eval/`.
+
+## Evaluation
+TODO
 
 ## Datasets
 This project uses two main datasets for phishing target recognition:
@@ -136,11 +160,11 @@ This project uses two main datasets for phishing target recognition:
 uv run --with gdown gdown 12ypEMPRQ43zGRqHGut0Esq2z5en0DH4g -O download_phish.zip && mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k && unzip -q download_phish.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k && rm download_phish.zip
 uv run --with gdown gdown 1yORUeSrF5vGcgxYrsCoqXcpOUHt-iHq_ -O download_benign.zip && mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k && unzip -q download_benign.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k && rm download_benign.zip
 ```
+
 - **VisualPhish**: A dataset of phishing images with associated metadata, including a whitelist of legitimate brands.
 ```shell
 uv run --with gdown gdown 1l-aQk54F0tAZ-RPfOyGo1jtz-Dsxo1Ao -O download_vp.zip && mkdir -p $PROJECT_ROOT_DIR/data/raw/visualphish && unzip -q download_vp.zip -d $PROJECT_ROOT_DIR/data/raw/visualphish && rm download_vp.zip
 ```
-
 
 File available below is preprocessed dataset of already cropped images.
 ```bash
