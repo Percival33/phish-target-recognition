@@ -32,6 +32,15 @@ In the main project folder, execute the following commands:
     source ~/.zshrc # or source ~/.bashrc
     ```
 
+## Datasets
+This project uses two main datasets for phishing target recognition:
+- **Phishpedia**: A dataset of phishing websites with associated screenshots and metadata.
+```shell
+uv run --with gdown gdown 12ypEMPRQ43zGRqHGut0Esq2z5en0DH4g -O download_phish.zip && mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k && unzip -q download_phish.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k && rm download_phish.zip
+uv run --with gdown gdown   -O download_benign.zip && mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k && unzip -q download_benign.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k && rm download_benign.zip
+```
+- **VisualPhish**: A dataset of phishing images with associated metadata, including a whitelist of legitimate brands.
+
 ## Phishpedia
 
 Instructions for running and preparing data for the Phishpedia model.
@@ -49,6 +58,7 @@ Instructions for running and preparing data for the Phishpedia model.
     ```bash
     just prepare
     ```
+    In case of failure make sure that dataset is in `$PROJECT_ROOT_DIR/data/raw/phishpedia/` folder
 3.  **Login to Wandb:**
     ```bash
     uv run wandb login YOUR_API_KEY
