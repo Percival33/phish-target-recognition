@@ -85,7 +85,10 @@ def main():
     args = parser.parse_args()
 
     if not args.quiet:
-        print(f"Scanning subfolders in '{args.folder_path}' for missing files...")
+        print(
+            f"Scanning subfolders in '{args.folder_path}' for missing files...",
+            file=sys.stderr,
+        )
 
     # Find folders with missing files
     results = find_missing_files(
@@ -101,7 +104,7 @@ def main():
         if not args.quiet:
             print(f"\nTotal: {len(results)} folders with missing files")
     elif not args.quiet:
-        print("All folders contain both info.txt and shot.png files.")
+        print("All folders contain both info.txt and shot.png files.", file=sys.stderr)
 
     return 0
 
@@ -115,6 +118,6 @@ if __name__ == "__main__":
 
     # Only print execution time if not in quiet mode
     if len(sys.argv) > 1 and not ("-q" in sys.argv or "--quiet" in sys.argv):
-        print(f"\nExecution time: {elapsed:.2f} seconds")
+        print(f"\nExecution time: {elapsed:.2f} seconds", file=sys.stderr)
 
     sys.exit(exit_code)
