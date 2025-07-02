@@ -62,6 +62,12 @@ uv run scripts/prepare_data_for_organizer.py \
   --is-phishing
 ```
 
+uv run scripts/prepare_data_for_organizer.py \
+  --image-folder $PROJECT_ROOT_DIR/data/raw/VisualPhish/phishing/ \
+  --labels-file $PROJECT_ROOT_DIR/data/raw/VisualPhish/phishing/targets2.txt \
+  --output-csv $PROJECT_ROOT_DIR/data/interim/prepared_for_organizer.csv \
+  --is-phishing
+
 **Explanation of Arguments:**
 
 -   `scripts/prepare_data_for_organizer.py`: The path to the CSV preparation script.
