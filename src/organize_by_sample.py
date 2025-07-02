@@ -25,7 +25,6 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
         "url",
         "fqdn",
         "screenshot_object",
-        "screenshot_hash",
         "affected_entity",
     ]
     missing_columns = [col for col in required_columns if col not in df.columns]
@@ -35,8 +34,8 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
     output_path = Path(output_path)
     phishing_dir = output_path / "phishing"
     trusted_dir = output_path / "trusted_list"
-    phishing_dir.mkdir(exist_ok=True)
-    trusted_dir.mkdir(exist_ok=True)
+    phishing_dir.mkdir(exist_ok=True, parents=True)
+    trusted_dir.mkdir(exist_ok=True, parents=True)
 
     phishing_targets = set()
     trusted_targets = set()
@@ -49,10 +48,7 @@ def organize_by_sample(csv_path, screenshots_path, output_path):
             else "unknown"
         )
 
-        is_phishing = True
-        if "is_phishing" in df.columns:
-            is_phishing = False if not row["is_phishing"] else True
-
+        is_phishing = int(row.get("is_phishing", 1))
         if is_phishing:
             phishing_targets.add(target)
             parent_dir = phishing_dir
