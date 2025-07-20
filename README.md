@@ -8,10 +8,14 @@
     * [Test Single Model](#test-single-model)
     * [Web Interface Demo](#web-interface-demo)
     * [Use own dataset for evaluation](#use-own-dataset-for-evaluation)
-      * [Organize for Phishpedia](#organize-for-phishpedia)
-      * [Step 3: Update Configuration](#step-3-update-configuration)
-      * [Step 4: Setup cross validation](#step-4-setup-cross-validation)
-      * [Step 5: Run models](#step-5-run-models)
+      * [Update configuration](#update-configuration)
+      * [Organize for `Phishpedia`](#organize-for-phishpedia)
+        * [Step 1: Update target mapping](#step-1-update-target-mapping)
+        * [Step 2: Run models](#step-2-run-models)
+      * [Organize for `VisualPhish`](#organize-for-visualphish)
+      * [Organize for `Baseline`](#organize-for-baseline)
+        * [Step 1: Setup cross validation](#step-1-setup-cross-validation)
+        * [Step 2: Run models](#step-2-run-models-1)
 <!-- TOC -->
 
 ## Prerequisites
@@ -63,23 +67,26 @@ Prepare csv file with such columns:
     "is_phishing" # column with 1 and 0 depending on sample being phishing
 ```
 
-then run `src/organize_by_sample.csv`
-#### Organize for Phishpedia
-```shell
-uv run src/organize_by_sample.py \
-    --csv my_dataset/prepared_data.csv \
-    --screenshots my_dataset/images/ \ # this is folder which with screenshot_object will form a valid path to image
-    --output my_dataset/phishpedia_format
-```
-#### Step 3: Update Configuration
+#### Update configuration
 
-Edit `config.json`:
+Edit `config.json` by adding:
+- column prefixes for each dataset
 ```json
 {
+  "data_input_config": {
+    "csv_column_prefixes": {
+      "Phishpedia": "pp"
+    }
+  },
   "cross_validation_config": {
+    "enabled": true,
+    "n_splits": 3,
+    "shuffle": true,
+    "random_state": 42,
+    "output_splits_directory": "data_splits",
     "dataset_image_paths": {
-      "my_dataset": {
-        "path": "my_dataset/phishpedia_format",
+      "your_dataset_name": {
+        "path": "path_to_your_dataset",
         "label_strategy": "subfolders",
         "target_mapping": {
           "phishing": "phishing",
@@ -90,15 +97,29 @@ Edit `config.json`:
   }
 }
 ```
+path in dataset automatically prefixed with `PROJECT_ROOT_DIR`.
 
-path in dataset automaticaly prefixed with `PROJECT_ROOT_DIR`.
+#### Organize for `Phishpedia`
+Warning: `screenshots` path is folder which with screenshot_object will form a valid path to image.
 
-#### Step 4: Setup cross validation
-To do this step you need to have `PROJECT_ROOT_DIR` set and dataset registered in `config.json`.
+```shell
+uv run src/organize_by_sample.py \
+    --csv path_to_prepared_data.csv \
+    --screenshots my_dataset/images/ \
+    --output my_dataset/phishpedia_format
+```
 
-Go to `src/cross_validation` and run `just setup` and then `just splits-links`.
+##### Step 1: Update target mapping
 
-#### Step 5: Run models
+Run `just prepare-mapping` to update target mapping. This will update `src/models/phishpedia/models/domain_map.pkl` file.
+If you have any other targets to add, you need to:can add them to the `domain_map.pkl` file.
+- add their names to `domain_map.pkl` as new entries (target_name, target_domain) example:
+```python
+domain_map['amazon'] = ['amazon.com']
+```
+- add logos into `src/models/phishpedia/models/expand_targetlist`.
+
+##### Step 2: Run models
 
 Run model on every split.
 For `Phishpedia` see [preparation steps](./docs/docs-to-process.md#phishpedia) which includes preparation of domain mappings.
@@ -106,6 +127,8 @@ If you have specific domains and examples update them before running models.
 
 **Run on each cross-validation split**
 ```bash
+mkdir -p $PROJECT_ROOT_DIR/logs/phishpedia # create logs directory
+
 for split in 0 1 2; do
     echo "=== Running Phishpedia on split_${split} ==="
     uv run phishpedia.py \
@@ -115,8 +138,57 @@ for split in 0 1 2; do
 done
 ```
 
-For `VisualPhish`
-TODO
+#### Organize for `VisualPhish`
+1. scripts/prepare_data_for_organizer.py
+2. TODO: ??
 
-For `Baseline`
-TODO
+#### Organize for `Baseline`
+Warning: `screenshots` path is folder which with screenshot_object will form a valid path to image.
+
+```shell
+uv run src/organize_by_target.py \
+    --csv path_to_prepared_data.csv \
+    --screenshots my_dataset/images/ \
+    --output my_dataset/baseline_format
+```
+
+##### Step 1: Setup cross validation
+To do this step you need to have `PROJECT_ROOT_DIR` set and dataset registered in `config.json`.
+
+Go to `src/cross_validation` and run `just setup` and then `just splits-links`.
+
+##### Step 2: Run models
+First run `load.py` to create FAISS index.
+Phishing and benign samples must be run in separate steps. Below samples are separated in different folders.
+Later query it, using `query.py`.
+
+**Run on each cross-validation split**
+```bash
+mkdir -p $PROJECT_ROOT_DIR/logs/baseline # create logs directory
+
+for split in 0 1 2; do
+    echo "=== Running Baseline on split_${split} ==="
+    uv run src/models/baseline/load.py \
+    --images my_dataset/baseline_format/phishing \
+    --index $PROJECT_ROOT_DIR/data/processed/baseline/index_${split}.faiss \
+    --is-phish \
+    --batch-size 256 \
+    --log
+
+    uv run src/models/baseline/load.py \
+    --images my_dataset/baseline_format/trusted_list \
+    --index $PROJECT_ROOT_DIR/data/processed/baseline/index_${split}.faiss \
+    --batch-size 256 \
+    --log \
+    --append
+
+    uv run src/models/baseline/query.py \
+    --images my_dataset/test_images/ \
+    --index $PROJECT_ROOT_DIR/data/processed/baseline/index_${split}.faiss \
+    --output $PROJECT_ROOT_DIR/logs/baseline/results_${split}.csv \
+    --unknown \
+    --threshold 0.5 \
+    --batch-size 256 \
+    --log
+done
+```

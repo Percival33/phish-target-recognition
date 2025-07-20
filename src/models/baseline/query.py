@@ -32,7 +32,8 @@ def validate_inputs(
     overwrite: bool = False,
     top_k: int = 1,
     is_phish_cli_arg: bool = False,
-) -> Tuple[List[Path], Optional[List[str]], List[int]]:
+    is_unknown_cli_arg: bool = False,
+) -> Tuple[List[Path], Optional[List[str]], Optional[List[int]]]:
     """Validate input parameters and return list of valid image paths, labels, and true classes.
 
     Args:
@@ -44,9 +45,10 @@ def validate_inputs(
         overwrite: Whether to overwrite existing output file
         top_k: Number of similar images to return
         is_phish_cli_arg: Boolean flag indicating if all query images should be marked as phishing
+        is_unknown_cli_arg: Boolean flag indicating if all query images should be marked as unknown
 
     Returns:
-        Tuple of (list of valid image paths, optional list of target labels, list of true classes)
+        Tuple of (list of valid image paths, optional list of target labels, optional list of true classes)
     """
     validate_images_dir(images_dir)
     validate_index_path(index_path, must_exist=True)
@@ -58,8 +60,13 @@ def validate_inputs(
     image_paths = get_image_paths(images_dir)
     num_images = len(image_paths)
 
-    # Create true_classes_list based on is_phish_cli_arg
-    true_classes_list = [1] * num_images if is_phish_cli_arg else [0] * num_images
+    # Create true_classes_list based on flags
+    if is_unknown_cli_arg:
+        true_classes_list = None  # This will make search_similar set true_class=None
+    elif is_phish_cli_arg:
+        true_classes_list = [1] * num_images
+    else:
+        true_classes_list = [0] * num_images
 
     # Handle true_targets_list (labels)
     true_targets_list = [None] * num_images
@@ -117,6 +124,11 @@ def main():
         action="store_true",
         help="Mark all query images as phishing (true_class = 1)",
     )
+    parser.add_argument(
+        "--unknown",
+        action="store_true",
+        help="Mark all query images as unknown class (true_class = None)",
+    )
     parser.add_argument("--log", action="store_true", help="Enable wandb logging")
 
     args = parser.parse_args()
@@ -144,6 +156,7 @@ def main():
         args.overwrite,
         args.top_k,
         args.is_phish,
+        args.unknown,
     )
 
     # Initialize embedder with existing index

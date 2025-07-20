@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "pandas",
+#     "tqdm",
+# ]
+# ///
+
 import pandas as pd
 from pathlib import Path
 import shutil

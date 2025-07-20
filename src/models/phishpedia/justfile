@@ -133,18 +133,7 @@ clean:
     uv pip uninstall torch torchvision torchaudio detectron2
 
 prepare-mappings:
-    #!/usr/bin/env python
-    import pickle
-    with open('./models/domain_map.pkl', 'rb') as handle:
-        domain_map = pickle.load(handle)
-
-    domain_map['Simplii Financial'] = 'simplii.com'
-    domain_map['Bank of The Bahamas Limited'] = 'bankbahamas.com'
-    domain_map['mdpd'] = 'mps.it'
-    domain_map['sicil_shop'] = 'sicilshop.com'
-
-    with open('./models/domain_map.pkl', 'wb') as handle:
-        pickle.dump(domain_map, handle)
+    uv run scripts/prepare_domain_mappings.py
 
 prepare: prepare-mappings
     #!/usr/bin/env bash
@@ -157,3 +146,32 @@ prepare: prepare-mappings
     uv run scripts/fix_script.py $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k find_missing_files.log
 
     echo "Preparation complete!"
+
+# Prepare VisualPhish dataset for running under Phishpedia model
+prepare-visualphish-for-phishpedia dataset_path:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Preparing VisualPhish dataset for Phishpedia model..."
+    echo "Dataset path: {{ dataset_path }}"
+
+    # Step 1: Prepare VisualPhish dataset
+    echo "Step 1: Preparing VisualPhish dataset..."
+    uv run scripts/prepare_vp.py -q {{ dataset_path }} > prepare_vp.log
+    echo "✓ Dataset preparation complete, log saved to prepare_vp.log"
+
+    # Step 2: Find missing files
+    echo "Step 2: Finding missing files..."
+    uv run scripts/find_missing_files.py {{ dataset_path }} -q > find_missing.log
+    echo "✓ Missing files scan complete, log saved to find_missing.log"
+
+    # Step 3: Fix missing files (only if there are any)
+    echo "Step 3: Fixing missing files..."
+    if [ -s find_missing.log ]; then
+        echo "Found missing files, attempting to fix..."
+        uv run scripts/fix_script.py {{ dataset_path }} find_missing.log
+        echo "✓ Missing files fixed"
+    else
+        echo "✓ No missing files found, skipping fix step"
+    fi
+
+    echo "Dataset preparation complete! The dataset at {{ dataset_path }} is now ready for Phishpedia model."
