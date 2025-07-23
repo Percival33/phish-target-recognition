@@ -155,15 +155,15 @@ class PhishpediaWrapper:
         )
         phish_category = 1
         # Visualize, add annotations
-        cv2.putText(
-            plotvis,
-            "Target: {} with confidence {:.4f}".format(pred_target, siamese_conf),
-            (int(matched_coord[0] + 20), int(matched_coord[1] + 20)),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.8,
-            (0, 0, 0),
-            2,
-        )
+        # cv2.putText(
+        #     plotvis,
+        #     "Target: {} with confidence {:.4f}".format(pred_target, siamese_conf),
+        #     (int(matched_coord[0] + 20), int(matched_coord[1] + 20)),
+        #     cv2.FONT_HERSHEY_SIMPLEX,
+        #     0.8,
+        #     (0, 0, 0),
+        #     2,
+        # )
 
         return (
             phish_category,
