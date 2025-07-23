@@ -11,15 +11,44 @@ import shutil
 import glob
 
 
+def generate_url_from_folder_name(folder_name_or_path):
+    """Generate URL from folder name with new format: domain-identifier.com"""
+    # Extract folder name if full path is provided
+    if os.path.sep in folder_name_or_path:
+        folder_name = os.path.basename(folder_name_or_path)
+    else:
+        folder_name = folder_name_or_path
+
+    # Split folder name on "--"
+    parts = folder_name.split("--")
+
+    if len(parts) >= 2:
+        # Extract domain and identifier
+        domain_part = parts[0]  # e.g., "yahoo.com"
+        identifier = parts[1]  # e.g., "790"
+
+        # Remove .com/.org etc. extension from domain if present
+        if "." in domain_part:
+            domain_base = domain_part.rsplit(".", 1)[0]  # e.g., "yahoo"
+            extension = domain_part.rsplit(".", 1)[1]  # e.g., "com"
+            # Create new format: yahoo-790.com
+            new_domain = f"{domain_base}-{identifier}.{extension}"
+        else:
+            # If no extension, just append identifier
+            new_domain = f"{domain_part}-{identifier}.com"
+
+        url = f"https://{new_domain}"
+    else:
+        # If no identifier, use original behavior
+        url = f"https://{folder_name}"
+
+    return url
+
+
 def create_info_txt(folder_path):
     """Create info.txt file with URL deduced from the folder name."""
-    folder_name = os.path.basename(folder_path).split("--")[0]
-
-    # Extract domain name
-    domain = folder_name
-
-    # Create URL (add https:// prefix)
-    url = f"https://{domain}"
+    # Generate URL using new format
+    url = generate_url_from_folder_name(folder_path)
 
     # Create info.txt with the URL
     info_path = os.path.join(folder_path, "info.txt")
@@ -54,7 +83,7 @@ def handle_multiple_png(folder_path):
 
             # Create info.txt in the new folder
             new_info_path = os.path.join(new_folder_path, "info.txt")
-            url = f"https://{folder_name}"
+            url = generate_url_from_folder_name(new_folder_path)
             with open(new_info_path, "w") as f:
                 f.write(url)
 
@@ -100,7 +129,7 @@ def handle_multiple_png(folder_path):
 
                         # Create info.txt in the new folder
                         new_info_path = os.path.join(new_folder_path, "info.txt")
-                        url = f"https://{folder_name}"
+                        url = generate_url_from_folder_name(new_folder_path)
                         with open(new_info_path, "w") as f:
                             f.write(url)
 
