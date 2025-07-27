@@ -13,9 +13,12 @@
         * [Step 1: Update target mapping](#step-1-update-target-mapping)
         * [Step 2: Run models](#step-2-run-models)
       * [Organize for `VisualPhish`](#organize-for-visualphish)
+        * [Step 1: Setup environment](#step-1-setup-environment)
+        * [Step 2: Run models](#step-2-run-models-1)
+        * [Step 3: Run evaluation](#step-3-run-evaluation)
       * [Organize for `Baseline`](#organize-for-baseline)
         * [Step 1: Setup cross validation](#step-1-setup-cross-validation)
-        * [Step 2: Run models](#step-2-run-models-1)
+        * [Step 2: Run models](#step-2-run-models-2)
 <!-- TOC -->
 
 ## Prerequisites
