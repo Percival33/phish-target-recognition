@@ -68,14 +68,14 @@ This is the **recommended approach** for comprehensive model evaluation and comp
 
 ```bash
 # Download Phishpedia dataset (30k samples each)
-uv run --with gdown gdown 12ypEMPRQ43zGRqHGut0Esq2z5en0DH4g -O download_phish.zip
-mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k
-unzip -q download_phish.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k
+uv run --with gdown gdown 12ypEMPRQ43zGRqHGut0Esq2z5en0DH4g -O download_phish.zip && \
+mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k && \
+unzip -q download_phish.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/phish_sample_30k && \
 rm download_phish.zip
 
-uv run --with gdown gdown 1yORUeSrF5vGcgxYrsCoqXcpOUHt-iHq_ -O download_benign.zip
-mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k
-unzip -q download_benign.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k
+uv run --with gdown gdown 1yORUeSrF5vGcgxYrsCoqXcpOUHt-iHq_ -O download_benign.zip && \
+mkdir -p $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k && \
+unzip -q download_benign.zip -d $PROJECT_ROOT_DIR/data/raw/phishpedia/benign_sample_30k && \
 rm download_benign.zip
 
 # Download VisualPhish dataset
@@ -89,7 +89,8 @@ uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar z
 ```
 
 ### Step 2: Create Cross-Validation Splits
-
+TODO: first run `just prepare` then run `just splits-links`
+TODO: fix text to invert order and merge it with main readme
 **This step is crucial** - it creates balanced train/test splits for robust evaluation:
 
 ```bash
@@ -173,6 +174,7 @@ for split in 0 1 2; do
         --images $PROJECT_ROOT_DIR/data_splits/split_${split}/Baseline/images/train \
         --index $PROJECT_ROOT_DIR/data/processed/baseline/split_${split}_index.faiss \
         --batch-size 256 \
+        --log \
         --overwrite
 
     # Query validation data
