@@ -31,8 +31,8 @@ def organize_screenshots_by_target(csv_path, screenshots_dir, output_dir):
     df = pd.read_csv(csv_path)
 
     if "is_phishing" in df.columns:
-        phishing_df = df[df["is_phishing"]]
-        trusted_df = df[not df["is_phishing"]]
+        phishing_df = df.loc[df["is_phishing"] == 1]
+        trusted_df = df.loc[df["is_phishing"] == 0]
     else:
         phishing_df = df
         trusted_df = pd.DataFrame()
