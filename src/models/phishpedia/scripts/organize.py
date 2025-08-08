@@ -110,7 +110,7 @@ def get_special_domain_mapping():
         "lloyds_bank": "lloydsbank.com",
         "made_in_china": "made-in-china.com",
         "mbank": "mbank.pl",
-        "mdpd": "miamidade.gov",
+        "mdpd": "mps.it",
         "mew": "myetherwallet.com",
         "microsoft": "microsoft.com",
         "momentum_office_design": "momentumofficeonline.com",
