@@ -1,0 +1,144 @@
+1&1 Ionos
+Absa Group
+adidas
+Adobe
+Airbnb, Inc
+Alibaba
+Allegro
+Amazon
+ameli_fr
+American Express
+anadolubank
+AOL
+Apple
+arnet_tech
+AT&T
+azul
+bahia
+banco_de_occidente
+banco_inter
+Bank of America
+Bank of Montreal
+Bank of New Zealand
+Bankia
+barclaycard
+barclays
+BB&T Corporation
+bcp
+bestchange
+blizzard
+BNP Paribas
+bradesco
+BT Group plc
+CaixaBank
+Canadian Imperial Bank of Commerce
+capital_one
+Capitec Bank Limited
+cathay_bank
+cetelem
+Chase Personal Banking
+cloudconvert
+cogeco
+Commonwealth Bank of Australia
+Cox Communications
+crate_and_barrel
+cryptobridge
+Daum
+db
+DHL
+dkb
+docmagic
+Dropbox
+eBay
+eharmony
+erste
+Etisalat
+etrade
+Facebook
+file_transfer
+First Investment Bank
+fnac
+fsnb
+Google
+Google
+gov_uk
+Government of Canada
+grupo_bancolombia
+hfe
+HSBC Bank
+htb
+ieee
+infinisource
+Instagram
+International Card Services B.V
+IRS
+Itau Unibanco S.A
+itunes
+knab
+La Poste
+la_banque_postale
+latam
+lcl
+LinkedIn Corporation
+Lloyds TSB Group
+Made-In-China
+mbank
+mdpd
+Microsoft OneDrive
+Microsoft OneDrive
+momentum_office_design
+ms_bing
+ms_skype
+MWeb
+MyEtherWallet
+National Australia Bank Limited
+NatWest Personal Banking
+Navy Federal Credit Union
+NedBank Limited
+Netflix
+netsons
+nordea
+ocn
+Office365
+Orange
+orange_rockland
+otrs
+OurTime Dating
+Outlook
+paschoalotto
+PayPal
+postbank
+qnb
+RBC Royal Bank
+RuneScape
+sharp
+shoptet
+sicil_shop
+smartsheet
+smiles
+snapchat
+Sparkasse Bank
+Standard Chartered Bank
+Steam
+Stripe
+summit_bank
+sunrise
+SunTrust Bank
+Swisscom IT Services AG
+taxact
+tech_target
+test_rite
+timeweb
+TradeKey
+Twitter, Inc
+typeform
+United Services Automobile Association
+walmart
+Wells Fargo & Company
+WhatsApp
+wp60
+xtrix_tv
+Yahoo!
+youtube
+ziggo
+zoominfo

@@ -51,7 +51,7 @@ Before starting, install these tools:
     ```
 
 ## What do you want to do?
-
+TODO: add description how to setup model download libs etc.
 ### Complete Model Evaluation
 TODO
 ### Test Single Model
