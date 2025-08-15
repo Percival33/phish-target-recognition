@@ -61,6 +61,10 @@ def organize_vp_by_target(
 
     # Build domain->label mapping
     domain_to_label = build_inverse_mapping(get_special_domain_mapping())
+    # Add local overrides for domains not in the original mapping
+    domain_to_label["miamidade.gov"] = (
+        "mdpd"  # Map miamidade.gov to mdpd label (same as mps.it)
+    )
 
     # Setup output directories
     phishing_dir = output_dir / "phishing"
