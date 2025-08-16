@@ -110,7 +110,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
         batch_emb = model.predict(imgs, batch_size=batch_size, verbose=0)
         embeddings_list.append(batch_emb)
         labels_list.append(labels)
-        filenames_list.append(files)
+        filenames_list.append(data_path / files)
 
         total_processed += len(imgs)
 
@@ -271,7 +271,7 @@ def evaluate_threshold(
 
     # Calculate ROC curve
     precision, recall, _ = precision_recall_curve(y_true, y_pred, pos_label=1, drop_intermediate=False)
-
+    wandb.log({"precision": precision, "recall": recall})
     # Combine all metrics
     all_metrics = {**class_metrics, **target_metrics}
 
