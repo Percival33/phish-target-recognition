@@ -218,7 +218,7 @@ def process_domain_folder(
 
     # Find existing T number and max N for that T number
     T_re = re.compile(r"^T(\d+)_\d+\.(?:jpg|jpeg|png)$", re.IGNORECASE)
-    Tnum = 0
+    Tnum = 1
     N_start = 0
 
     if os.path.exists(output_path):
@@ -227,16 +227,29 @@ def process_domain_folder(
             for fname in os.listdir(output_path)
             if (m := T_re.match(fname))
         ]
-        Tnum = max(T_numbers) if T_numbers else 0
 
-        # Find max N for this T number
-        N_re = re.compile(rf"^T{Tnum}_(\d+)\.(?:jpg|jpeg|png)$", re.IGNORECASE)
-        N_used = [
-            int(m.group(1))
-            for fname in os.listdir(output_path)
-            if (m := N_re.match(fname))
-        ]
-        N_start = max(N_used) + 1 if N_used else 0
+        if T_numbers:
+            # All files in a target folder should have the same T number
+            # Verify consistency and use the existing T number
+            unique_T = set(T_numbers)
+            if len(unique_T) > 1:
+                raise ValueError(
+                    f"Inconsistent T numbers found in {output_path}: {unique_T}"
+                )
+            Tnum = T_numbers[0]  # Use existing T number
+
+            # Find max N for this T number
+            N_re = re.compile(rf"^T{Tnum}_(\d+)\.(?:jpg|jpeg|png)$", re.IGNORECASE)
+            N_used = [
+                int(m.group(1))
+                for fname in os.listdir(output_path)
+                if (m := N_re.match(fname))
+            ]
+            N_start = max(N_used) + 1 if N_used else 0
+        else:
+            # No existing T-numbered files, start with T1
+            Tnum = 1
+            N_start = 0
 
     # Process each image
     for idx, imgname in enumerate(input_imgs):
