@@ -1,6 +1,6 @@
-# TODO: rename file to make it more descriptive
 import logging
 import logging.config
+import sys
 from argparse import ArgumentParser
 from dataclasses import dataclass
 
@@ -44,14 +44,17 @@ def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_targ
             files = sorted(target_path.iterdir())
             with tqdm(files, desc=f"Processing {target_path.name}", position=1, leave=False) as file_pbar:
                 for file_path in file_pbar:
-                    img = read_image(file_path, logger)
+                    new_file_path = file_path.resolve()
+                    img = read_image(new_file_path, logger)
 
                     if img is None:
-                        img = read_image(file_path, logger, format="jpeg")
+                        img = read_image(new_file_path, logger, format="jpeg")
 
                     if img is None:
-                        logger.error(f"Failed to process {file_path}")
-                        exit(1)
+                        logger.error(f"Failed to process {new_file_path}")
+                        sys.exit(2)
+                    logging.getLogger("PIL").setLevel(logging.WARNING)
+                    logger.debug(f"{file_path} -> {new_file_path}\t {img.shape}, {img.size}")
 
                     try:
                         all_imgs[count] = resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True)
@@ -59,9 +62,9 @@ def read_imgs_per_website(data_path, targets, imgs_num, reshape_size, start_targ
                         all_file_names.append(file_path.name)
                         count += 1
                     except Exception as e:
-                        logger.error(f"Failed to process {file_path}: {str(e)}")
+                        logger.error(f"Failed to process {file_path} - real path {new_file_path}: {str(e)}")
                         logger.error("Full traceback:", exc_info=True)
-                        exit(1)
+                        sys.exit(3)
 
     if count < imgs_num:
         logger.warning(f"Only found {count} images, expected {imgs_num}")
