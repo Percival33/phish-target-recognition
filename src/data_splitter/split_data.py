@@ -74,7 +74,7 @@ class DataSplitter:
         return data
 
     def perform_stratified_split(
-        self, X: np.ndarray, y: np.ndarray
+        self, X: np.ndarray, y: np.ndarray, y_stratify: np.ndarray
     ) -> Tuple[np.ndarray, ...]:
         """
         Two-stage stratified split for 60:30:10 proportions
@@ -82,25 +82,39 @@ class DataSplitter:
         Algorithm:
         1. First split: train+val (90%) vs test (10%)
         2. Second split: train (60/90 = 66.67%) vs val (30/90 = 33.33%)
+
+        Args:
+            X: Array of indices
+            y: Array of true_class values (for returning)
+            y_stratify: Array of combined stratification keys (true_class + true_target)
         """
         random_state = self.config.get("random_state", 42)
 
         # Check if we have enough samples for stratification
-        class_counts = Counter(y)
+        class_counts = Counter(y_stratify)
         min_class_count = min(class_counts.values())
 
-        if min_class_count < 10:
+        if min_class_count < 3:
+            # For multi-column stratification, we need at least 3 samples per combination
+            # to ensure each combination appears in train, val, and test
             raise ValueError(
-                f"Insufficient samples for stratification. Minimum class has only {min_class_count} samples, need at least 10."
+                f"Insufficient samples for stratification. Minimum class combination has only {min_class_count} samples, need at least 3."
             )
 
         self.logger.info(
-            f"Splitting {len(X)} samples with class distribution: {dict(class_counts)}"
+            f"Splitting {len(X)} samples with {len(class_counts)} unique class-target combinations"
         )
 
         # First split: separate test set (10%)
-        X_temp, X_test, y_temp, y_test = train_test_split(
-            X, y, test_size=0.1, stratify=y, random_state=random_state
+        X_temp, X_test, y_temp, y_test, y_stratify_temp, y_stratify_test = (
+            train_test_split(
+                X,
+                y,
+                y_stratify,
+                test_size=0.1,
+                stratify=y_stratify,
+                random_state=random_state,
+            )
         )
 
         # Second split: separate train (60%) and val (30%) from remaining 90%
@@ -109,7 +123,7 @@ class DataSplitter:
             X_temp,
             y_temp,
             test_size=val_ratio,
-            stratify=y_temp,
+            stratify=y_stratify_temp,
             random_state=random_state,
         )
 
@@ -172,7 +186,9 @@ class DataSplitter:
 
         self.logger.info(f"Created symlinks for {dataset_name} in {output_dir}")
 
-    def print_split_summary(self, splits: Tuple, dataset_name: str):
+    def print_split_summary(
+        self, splits: Tuple, dataset_name: str, data: pd.DataFrame = None
+    ):
         """Print split statistics for visual verification"""
         X_train, X_val, X_test, y_train, y_val, y_test = splits
 
@@ -189,13 +205,43 @@ class DataSplitter:
         print(f"Val   - Class 0: {sum(y_val==0)}, Class 1: {sum(y_val==1)}")
         print(f"Test  - Class 0: {sum(y_test==0)}, Class 1: {sum(y_test==1)}")
 
+        # If data is provided, show target distribution statistics
+        if data is not None:
+            print("\n=== Target Distribution (sample counts per unique target) ===")
+            train_data = data.iloc[X_train]
+            val_data = data.iloc[X_val]
+            test_data = data.iloc[X_test]
+
+            # Count unique targets in each split
+            train_targets = train_data["true_target"].nunique()
+            val_targets = val_data["true_target"].nunique()
+            test_targets = test_data["true_target"].nunique()
+            total_targets = data["true_target"].nunique()
+
+            print(f"Unique targets - Total: {total_targets}")
+            print(f"Train: {train_targets} ({train_targets/total_targets*100:.1f}%)")
+            print(f"Val:   {val_targets} ({val_targets/total_targets*100:.1f}%)")
+            print(f"Test:  {test_targets} ({test_targets/total_targets*100:.1f}%)")
+
+            # Show some examples of target preservation across splits
+            print("\n=== Stratification Verification (5 sample targets) ===")
+            sample_targets = data["true_target"].value_counts().head(5).index
+            for target in sample_targets:
+                orig_count = len(data[data["true_target"] == target])
+                train_count = len(train_data[train_data["true_target"] == target])
+                val_count = len(val_data[val_data["true_target"] == target])
+                test_count = len(test_data[test_data["true_target"] == target])
+                print(
+                    f"Target '{target}': Total={orig_count}, Train={train_count}, Val={val_count}, Test={test_count}"
+                )
+
     def process_all_datasets(self):
         """Main processing function for all datasets"""
         self.logger.info("Starting dataset splitting process")
 
         for dataset_name, dataset_config in self.config["datasets"].items():
             try:
-                self.logger.info(f"\nProcessing dataset: {dataset_name}")
+                self.logger.info(f"Processing dataset: {dataset_name}")
 
                 # Load dataset
                 data = self.load_dataset(dataset_name, dataset_config)
@@ -204,8 +250,17 @@ class DataSplitter:
                 X = np.arange(len(data))  # indices
                 y = data["true_class"].values
 
+                # Create combined stratification key from true_class and true_target
+                # This ensures both class and target distributions are preserved
+                y_stratify = (
+                    data["true_class"].astype(str)
+                    + "_"
+                    + data["true_target"].astype(str)
+                )
+                y_stratify = y_stratify.values
+
                 # Perform stratified split
-                splits = self.perform_stratified_split(X, y)
+                splits = self.perform_stratified_split(X, y, y_stratify)
 
                 # Save splits to CSV
                 splits_data = self.save_splits(data, splits, dataset_name)
@@ -214,7 +269,7 @@ class DataSplitter:
                 self.create_symlinks(splits_data, dataset_name, dataset_config)
 
                 # Print summary
-                self.print_split_summary(splits, dataset_name)
+                self.print_split_summary(splits, dataset_name, data)
 
             except Exception as e:
                 self.logger.error(f"Failed to process dataset {dataset_name}: {e}")
