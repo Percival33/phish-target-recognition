@@ -20,11 +20,11 @@ copy-tools-to-baseline: build-common
 
 copy-tools-for-eval: build-common
     mkdir -p src/eval/libs
-    cp src/tools/dist/*.whl src/eval/libs/
+    cp src/tools/dist/*.whl src/eval/libs
 
 copy-tools-to-cv: build-common
     mkdir -p src/cross_validation/libs
-    cp src/tools/dist/*.whl src/cross_validation/libs/
+    cp src/tools/dist/*.whl src/cross_validation/libs
 
 copy-tools-to-data-splitter: build-common
     mkdir -p src/data_splitter/libs
