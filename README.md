@@ -207,10 +207,14 @@ Warning: `screenshots` path is folder which with screenshot_object will form a v
 For CSV preparation, see the [CSV file requirements](#use-own-dataset-for-evaluation) section above.
 
 ```shell
-uv run src/organize_by_target.py \
+uv run src/organize_crossvalidation_splits_for_vp_by_target.py.py \
     --csv path_to_prepared_data.csv \
-    --screenshots my_dataset/images/ \
     --output my_dataset/visualphish_format
+```
+
+to modify it from sample based created from `src/organize_by_sample.py` to target based, you can use `src/organize_vp_by_target` script.
+```shell
+uv run src/organize_vp_by_target.py --csv <CSV PATH> --output <OUTPUT PATH>
 ```
 
 ##### Step 1: Setup environment
@@ -223,7 +227,6 @@ uv run wandb login YOUR_API_KEY
 ```
 
 ##### Step 2: Run models
-
 **Run on each cross-validation split**
 ```bash
 cd $PROJECT_ROOT_DIR/src/models/visualphishnet/
@@ -238,6 +241,14 @@ for split in 0 1 2; do
         --output-dir $PROJECT_ROOT_DIR/data/processed/VisualPhish/split_${split}
 
 done
+```
+
+Attention!
+
+In case of errors with not enough space set this variable, this is known bug
+https://github.com/numpy/numpy/issues/5336#issuecomment-123436239:
+```shell
+export TMPDIR=$HOME/tmp
 ```
 
 ##### Step 3: Run evaluation
@@ -311,3 +322,8 @@ for split in 0 1 2; do
     --log
 done
 ```
+
+
+### Add new method
+To add a new method, follow these steps:
+TODO

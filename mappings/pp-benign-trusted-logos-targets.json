@@ -1,0 +1,366 @@
+[
+    {
+      "target": "1&1 Ionos",
+      "domains": "1and1.com",
+      "phish": true
+    },
+    {
+      "target": "ADP",
+      "domains": "adp.com",
+      "phish": true
+    },
+    {
+      "target": "AOL",
+      "domains": "aol.ca\naol.com\naol.de\naol.jp",
+      "phish": true
+    },
+    {
+      "target": "ASB Bank Limited",
+      "domains": "asb.co.nz",
+      "phish": true
+    },
+    {
+      "target": "AT&T",
+      "domains": "att.com\natt.jobs",
+      "phish": true
+    },
+    {
+      "target": "ATB Financial",
+      "domains": "atb.com\natbonlinebusiness.com",
+      "phish": true
+    },
+    {
+      "target": "Amazon",
+      "domains": "amazon.cn\namazon.co.jp\namazon.co.uk\namazon.com.au\namazon.com.mx\namazon.es\namazon.in\namazon.it\namazonbusiness.com\namazonlogistics.eu\namazonservices.com",
+      "phish": true
+    },
+    {
+      "target": "American Express",
+      "domains": "americanexpress.com.bh",
+      "phish": true
+    },
+    {
+      "target": "AutoScout24",
+      "domains": "autoscout24.de\nautoscout24.es\nautoscout24.it\nautoscout24.nl\nautoscout24.pl\nautoscout24.ro",
+      "phish": true
+    },
+    {
+      "target": "Banco de Chile",
+      "domains": "bancochile.cl",
+      "phish": true
+    },
+    {
+      "target": "Charities Aid Foundation",
+      "domains": "cafonline.org"
+    },
+    {
+      "target": "Citrix ShareFile",
+      "domains": "citrix.com",
+      "phish": true
+    },
+    {
+      "target": "DHL",
+      "domains": "dhl.com\ndhl.de\ndhl.ru",
+      "phish": true
+    },
+    {
+      "target": "Deutsche Telekom",
+      "domains": "telekomaufladen.de",
+      "phish": true
+    },
+    {
+      "target": "Digital Federal Credit Union",
+      "domains": "dcu.org\ndcu-online.org"
+    },
+    {
+      "target": "Discover",
+      "domains": "discoverstudentloans.com",
+      "phish": true
+    },
+    {
+      "target": "Etisalat",
+      "domains": "etisalat.ae\netisalat.eg",
+      "phish": true
+    },
+    {
+      "target": "Facebook",
+      "domains": "fb.com",
+      "phish": true
+    },
+    {
+      "target": "Fifth Third Bank",
+      "domains": "53.com",
+      "phish": true
+    },
+    {
+      "target": "Frontier Communications",
+      "domains": "frontier.com",
+      "phish": true
+    },
+    {
+      "target": "GMX Mail",
+      "domains": "gmx.co.uk\ngmx.com\ngmx.fr",
+      "phish": true
+    },
+    {
+      "target": "Giffgaff",
+      "domains": "giffgaff.com",
+      "phish": true
+    },
+    {
+      "target": "Google",
+      "domains": "google.ad\ngoogle.al\ngoogle.as\ngoogle.at\ngoogle.az\ngoogle.ba\ngoogle.bf\ngoogle.bg\ngoogle.bj\ngoogle.bs\ngoogle.bt\ngoogle.by\ngoogle.ca\ngoogle.cat\ngoogle.cd\ngoogle.cf\ngoogle.cg\ngoogle.ch\ngoogle.ci\ngoogle.cl\ngoogle.cm\ngoogle.co.id\ngoogle.co.il\ngoogle.co.in\ngoogle.co.jp\ngoogle.co.ke\ngoogle.co.ls\ngoogle.co.nz\ngoogle.co.tz\ngoogle.co.ug\ngoogle.co.uk\ngoogle.co.uz\ngoogle.co.zm\ngoogle.com\ngoogle.com.af\ngoogle.com.ar\ngoogle.com.au\ngoogle.com.bd\ngoogle.com.bh\ngoogle.com.bn\ngoogle.com.bo\ngoogle.com.bz\ngoogle.com.cu\ngoogle.com.cy\ngoogle.com.do\ngoogle.com.et\ngoogle.com.gh\ngoogle.com.gi\ngoogle.com.gt\ngoogle.com.hk\ngoogle.com.kh\ngoogle.com.kw\ngoogle.com.mm\ngoogle.com.mt\ngoogle.com.mx\ngoogle.com.my\ngoogle.com.na\ngoogle.com.ng\ngoogle.com.ni\ngoogle.com.np\ngoogle.com.pa\ngoogle.com.pe\ngoogle.com.pg\ngoogle.com.pk\ngoogle.com.pr\ngoogle.com.py\ngoogle.com.qa\ngoogle.com.sa\ngoogle.com.sg\ngoogle.com.sl\ngoogle.com.tj\ngoogle.com.tn\ngoogle.com.tr\ngoogle.com.tw\ngoogle.com.uy\ngoogle.com.vc\ngoogle.com.vn\ngoogle.cz\ngoogle.de\ngoogle.dj\ngoogle.dk\ngoogle.dz\ngoogle.es\ngoogle.fi\ngoogle.fm\ngoogle.fr\ngoogle.ga\ngoogle.ge\ngoogle.gl\ngoogle.gp\ngoogle.gy\ngoogle.hn\ngoogle.hr\ngoogle.ht\ngoogle.ie\ngoogle.im\ngoogle.is\ngoogle.it\ngoogle.je\ngoogle.jo\ngoogle.jp\ngoogle.kg\ngoogle.la\ngoogle.li\ngoogle.lk\ngoogle.lt\ngoogle.lu\ngoogle.lv\ngoogle.md\ngoogle.me\ngoogle.mk\ngoogle.ml\ngoogle.mn\ngoogle.mv\ngoogle.ne\ngoogle.ng\ngoogle.nl\ngoogle.no\ngoogle.ps\ngoogle.pt\ngoogle.ro\ngoogle.sc\ngoogle.se\ngoogle.si\ngoogle.sk\ngoogle.sn\ngoogle.sr\ngoogle.tn\ngoogle.to\ngoogle.tt\ngoogle.vg\ngoogleapps.com\ngooglesciencefair.com"
+      "phish": true
+    },
+    {
+      "target": "Grupo Santander",
+      "domains": "santander.pl\nbancosantander.es",
+      "phish": true
+    },
+    {
+      "target": "HSBC Bank",
+      "domains": "hsbc.ca\nhsbc.com.au\nhsbc.com.cn\nhsbc.com.tw\nhsbc.lk",
+      "phish": true
+    },
+    {
+      "target": "International Card Services B.V",
+      "domains": "icscards.nl",
+      "phish": true
+    },
+    {
+      "target": "Itau Unibanco S.A",
+      "domains": "itau.com.ar",
+      "phish": true
+    },
+    {
+      "target": "LinkedIn Corporation",
+      "domains": "linkedin.com",
+      "phish": true
+    },
+    {
+      "target": "Made-In-China",
+      "domains": "made-in-china.com",
+      "phish": true
+    },
+    {
+      "target": "Match",
+      "domains": "match.com\nmatch.com.ar\nmatch.com.mx",
+      "phish": true
+    },
+    {
+      "target": "NatWest Personal Banking",
+      "domains": "natwest.com",
+      "phish": true
+    },
+    {
+      "target": "National Bank of Canada",
+      "domains": "nbc.ca",
+      "phish": true
+    },
+    {
+      "target": "Nationwide Building Society",
+      "domains": "nationwide.co.uk"
+    },
+    {
+      "target": "Naver",
+      "domains": "naver.com\nnaver.net",
+      "phish": true
+    },
+    {
+      "target": "Navy Federal Credit Union",
+      "domains": "navyfederal.org",
+      "phish": true
+    },
+    {
+      "target": "Neteller",
+      "domains": "neteller.com"
+    },
+    {
+      "target": "Netflix",
+      "domains": "netflix.com",
+      "phish": true
+    },
+    {
+      "target": "Office365",
+      "domains": "office.com",
+      "phish": true
+    },
+    {
+      "target": "Ooredoo QSC",
+      "domains": "ooredoo.om",
+      "phish": true
+    },
+    {
+      "target": "Orange",
+      "domains": "orange.eg\norange.es",
+      "phish": true
+    },
+    {
+      "target": "PayPal",
+      "domains": "paypal-community.com\npaypal.com",
+      "phish": true
+    },
+    {
+      "target": "Raiffeisen Bank S.A",
+      "domains": "raiffeisen.ru\nraiffeisenbank.ba",
+      "phish": true
+    },
+    {
+      "target": "Rakuten",
+      "domains": "rakuten-sec.co.jp\nrakutenmarketing.com",
+      "phish": true
+    },
+    {
+      "target": "RuneScape",
+      "domains": "runescape.com",
+      "phish": true
+    },
+    {
+      "target": "SNS Bank N.V",
+      "domains": "snsbank.nl",
+      "phish": true
+    },
+    {
+      "target": "Sparkasse Bank",
+      "domains": "sparkasse-badneustadt.de\nsparkasse-bayreuth.de\nsparkasse-bielefeld.de\nsparkasse-celle.de\nsparkasse-darmstadt.de\nsparkasse-dieburg.de\nsparkasse-emsland.de\nsparkasse-erlangen.de\nsparkasse-ffb.de\nsparkasse-fuerth.de\nsparkasse-fulda.de\nsparkasse-gelsenkirchen.de\nsparkasse-gera-greiz.de\nsparkasse-giessen.de\nsparkasse-hamm.de\nsparkasse-hanau.de\nsparkasse-hannover.de\nsparkasse-herford.de\nsparkasse-hochfranken.de\nsparkasse-iserlohn.de\nsparkasse-leipzig.de\nsparkasse-lippstadt.de\nsparkasse-lueneburg.de\nsparkasse-magdeburg.de\nsparkasse-mainfranken.de\nsparkasse-mecklenburg-schwerin.de\nsparkasse-meissen.de\nsparkasse-minden-luebbecke.de\nsparkasse-mittelthueringen.de\nsparkasse-msh.de\nsparkasse-muensterland-ost.de\nsparkasse-niederlausitz.de\nsparkasse-nordhorn.de\nsparkasse-nuernberg.de\nsparkasse-oberhessen.de\nsparkasse-oberlausitz-niederschlesien.de\nsparkasse-odenwaldkreis.de\nsparkasse-schwerte.de\nsparkasse-soestwerl.de\nsparkasse-starkenburg.de\nsparkasse-sw-has.de\nsparkasse-uelzen-luechow-dannenberg.de\nsparkasse-unnakamen.de\nsparkasse-unstrut-hainich.de\nsparkasse-vogtland.de\nsparkasse-westmuensterland.de\nsparkasse-wetzlar.de\nsparkasse-witten.de\nsparkassedeggendorf.de\nsparkassen-kreditkarten.de\ntaunussparkasse.de\nfrankfurter-sparkasse.de\nharzsparkasse.de\nkasseler-sparkasse.de\nherner-sparkasse.de\nkasseler-sparkasse.de\nkreissparkasse-augsburg.de\nsaalesparkasse.de\nsalzlandsparkasse.de"
+      "phish": true
+    },
+    {
+      "target": "Steam",
+      "domains": "steamcommunity.com\nsteampowered.com",
+      "phish": true
+    },
+    {
+      "target": "Trade Me NZ",
+      "domains": "trademe.co.nz"
+    },
+    {
+      "target": "Twitter, Inc",
+      "domains": "twitter.com",
+      "phish": true
+    },
+    {
+      "target": "U.S. Bank",
+      "domains": "usbankreliacard.com",
+      "phish": true
+    },
+    {
+      "target": "UBS AG",
+      "domains": "ubs.com",
+      "phish": true
+    },
+    {
+      "target": "URSSAF",
+      "domains": "urssaf.fr"
+    },
+    {
+      "target": "UniCredit Bank Aktiengesellschaft",
+      "domains": "hypovereinsbank.de\nunicreditbulbank.bg"
+    },
+    {
+      "target": "VKontakte",
+      "domains": "vk.cc\nvk.com\nvk.me",
+      "phish": true
+    },
+    {
+      "target": "Visa International Service Association",
+      "domains": "visaonline.com",
+      "phish": true
+    },
+    {
+      "target": "Vodafone",
+      "domains": "vodafone.de\nvodafone.it",
+      "phish": true
+    },
+    {
+      "target": "Yahoo!",
+      "domains": "yahoo.co.jp\nyahoo.com\nyahoo.net\nyahoosmallbusiness.com",
+      "phish": true
+    },
+    {
+      "target": "adidas",
+      "domains": "? adidasoutdoor.com"
+    },
+    {
+      "target": "banco_inter",
+      "domains": "bankinter.com"
+    },
+    {
+      "target": "bcp",
+      "domains": "bcp.com.bo",
+      "phish": true
+    },
+    {
+      "target": "capital_one",
+      "domains": "capitalone.co.uk",
+      "phish": true
+    },
+    {
+      "target": "cetelem",
+      "domains": "cetelem.hu"
+    },
+    {
+      "target": "db",
+      "domains": "db.com",
+      "phish": true
+    },
+    {
+      "target": "docmagic",
+      "domains": "docmagic.com"
+    },
+    {
+      "target": "eBay",
+      "domains": "ebay.at\nebay.ca\nebay.ch\nebay.com\nebay.com.au\nebay.com.hk\nebay.es\nebay.fr\nebay.ie\nebay.in\nebay.it\nebay.nl\nebaystores.co.uk\nebaystores.com\nebaystores.de\nebaystores.es\nebaystores.it",
+      "phish": true
+    },
+    {
+      "target": "eharmony",
+      "domains": "eharmony.ca"
+    },
+    {
+      "target": "etrade",
+      "domains": "etrade.com"
+    },
+    {
+      "target": "gov_uk",
+      "domains": "campaign.gov.uk\ncivilservicejobs.service.gov.uk\neducation.gov.uk\nipo.gov.uk\npassport.service.gov.uk\npayments.service.gov.uk",
+      "phish": true
+    },
+    {
+      "target": "ieee",
+      "domains": "ieee-ras.org\nieee.org"
+    },
+    {
+      "target": "iiNet Limited",
+      "domains": "iinet.net.au",
+      "phish": true
+    },
+    {
+      "target": "mbank",
+      "domains": "mbank.pl"
+    },
+    {
+      "target": "ocn",
+      "domains": "ocn.ne.jp"
+    },
+    {
+      "target": "postbank",
+      "domains": "postbank.de"
+    },
+    {
+      "target": "smiles",
+      "domains": "smiles.com.br"
+    },
+    {
+      "target": "sunrise",
+      "domains": "sunrise.ch"
+    },
+    {
+      "target": "walmart",
+      "domains": "walmartgift.com\nwalmartmoneycard.com"
+    },
+    {
+      "target": "wp60",
+      "domains": "wp60.com"
+    }
+  ]

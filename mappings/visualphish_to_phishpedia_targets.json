@@ -1,0 +1,595 @@
+{
+    "metadata": {
+      "total": 155,
+      "completed": 155,
+      "matched": 144,
+      "notMatched": 11,
+      "matchRate": 93
+    },
+    "matches": {
+      "absa": {
+        "target": "Absa Group",
+        "similarity_score": 0.8
+      },
+      "adidas": {
+        "target": "adidas",
+        "similarity_score": 1
+      },
+      "adobe": {
+        "target": "Adobe",
+        "similarity_score": 1
+      },
+      "airbnb": {
+        "target": "Airbnb, Inc",
+        "similarity_score": 0.8
+      },
+      "alibaba": {
+        "target": "Alibaba",
+        "similarity_score": 1
+      },
+      "allegro": {
+        "target": "Allegro",
+        "similarity_score": 1
+      },
+      "amazon": {
+        "target": "Amazon",
+        "similarity_score": 1
+      },
+      "ameli_fr": {
+        "target": "ameli_fr",
+        "similarity_score": 1
+      },
+      "american_express": {
+        "target": "American Express",
+        "similarity_score": 1
+      },
+      "anadolubank": {
+        "target": "anadolubank",
+        "similarity_score": 1
+      },
+      "aol": {
+        "target": "AOL",
+        "similarity_score": 1
+      },
+      "apple": {
+        "target": "Apple",
+        "similarity_score": 1
+      },
+      "arnet_tech": {
+        "target": "arnet_tech",
+        "similarity_score": 1
+      },
+      "att": {
+        "target": "AT&T",
+        "similarity_score": 0.95
+      },
+      "azul": {
+        "target": "azul",
+        "similarity_score": 1
+      },
+      "bahia": {
+        "target": "bahia",
+        "similarity_score": 1
+      },
+      "banco_de_occidente": {
+        "target": "banco_de_occidente",
+        "similarity_score": 1
+      },
+      "banco_inter": {
+        "target": "banco_inter",
+        "similarity_score": 1
+      },
+      "bankia": {
+        "target": "Bankia",
+        "similarity_score": 1
+      },
+      "barclaycard": {
+        "target": "barclaycard",
+        "similarity_score": 1
+      },
+      "barclays": {
+        "target": "barclays",
+        "similarity_score": 1
+      },
+      "bcp": {
+        "target": "bcp",
+        "similarity_score": 1
+      },
+      "bestchange": {
+        "target": "bestchange",
+        "similarity_score": 1
+      },
+      "blizzard": {
+        "target": "blizzard",
+        "similarity_score": 1
+      },
+      "bmo": {
+        "target": "Bank of Montreal",
+        "similarity_score": 0.95
+      },
+      "bnp_paribas": {
+        "target": "BNP Paribas",
+        "similarity_score": 1
+      },
+      "bnz": {
+        "target": "Bank of New Zealand",
+        "similarity_score": 0.95
+      },
+      "boa": {
+        "target": "Bank of America",
+        "similarity_score": 0.95
+      },
+      "bradesco": {
+        "target": "bradesco",
+        "similarity_score": 1
+      },
+      "bt": {
+        "target": "BT Group plc",
+        "similarity_score": 0.8
+      },
+      "caixa_bank": {
+        "target": "CaixaBank",
+        "similarity_score": 0.9474
+      },
+      "canada": {
+        "target": "Government of Canada",
+        "similarity_score": 0.8
+      },
+      "capital_one": {
+        "target": "capital_one",
+        "similarity_score": 1
+      },
+      "capitec": {
+        "target": "Capitec Bank Limited",
+        "similarity_score": 0.8
+      },
+      "cathay_bank": {
+        "target": "cathay_bank",
+        "similarity_score": 1
+      },
+      "cetelem": {
+        "target": "cetelem",
+        "similarity_score": 1
+      },
+      "chase": {
+        "target": "Chase Personal Banking",
+        "similarity_score": 0.8
+      },
+      "cibc": {
+        "target": "Canadian Imperial Bank of Commerce",
+        "similarity_score": 0.95
+      },
+      "cloudconvert": {
+        "target": "cloudconvert",
+        "similarity_score": 1
+      },
+      "cogeco": {
+        "target": "cogeco",
+        "similarity_score": 1
+      },
+      "commonwealth_bank": {
+        "target": "Commonwealth Bank of Australia",
+        "similarity_score": 0.8
+      },
+      "cox": {
+        "target": "Cox Communications",
+        "similarity_score": 0.8
+      },
+      "crate_and_barrel": {
+        "target": "crate_and_barrel",
+        "similarity_score": 1
+      },
+      "cryptobridge": {
+        "target": "cryptobridge",
+        "similarity_score": 1
+      },
+      "daum": {
+        "target": "Daum",
+        "similarity_score": 1
+      },
+      "db": {
+        "target": "db",
+        "similarity_score": 1
+      },
+      "dhl": {
+        "target": "DHL",
+        "similarity_score": 1
+      },
+      "dkb": {
+        "target": "dkb",
+        "similarity_score": 1
+      },
+      "docmagic": {
+        "target": "docmagic",
+        "similarity_score": 1
+      },
+      "dropbox": {
+        "target": "Dropbox",
+        "similarity_score": 1
+      },
+      "ebay": {
+        "target": "eBay",
+        "similarity_score": 1
+      },
+      "eharmony": {
+        "target": "eharmony",
+        "similarity_score": 1
+      },
+      "erste": {
+        "target": "erste",
+        "similarity_score": 1
+      },
+      "etisalat": {
+        "target": "Etisalat",
+        "similarity_score": 1
+      },
+      "etrade": {
+        "target": "etrade",
+        "similarity_score": 1
+      },
+      "facebook": {
+        "target": "Facebook",
+        "similarity_score": 1
+      },
+      "file_transfer": {
+        "target": "file_transfer",
+        "similarity_score": 1
+      },
+      "fnac": {
+        "target": "fnac",
+        "similarity_score": 1
+      },
+      "fsnb": {
+        "target": "fsnb",
+        "similarity_score": 1
+      },
+      "google": {
+        "target": "Google",
+        "similarity_score": 1
+      },
+      "google_drive": {
+        "target": "Google",
+        "similarity_score": 0.8
+      },
+      "gov_uk": {
+        "target": "gov_uk",
+        "similarity_score": 1
+      },
+      "grupo_bancolombia": {
+        "target": "grupo_bancolombia",
+        "similarity_score": 1
+      },
+      "hfe": {
+        "target": "hfe",
+        "similarity_score": 1
+      },
+      "hsbc": {
+        "target": "HSBC Bank",
+        "similarity_score": 0.95
+      },
+      "htb": {
+        "target": "htb",
+        "similarity_score": 1
+      },
+      "ics": {
+        "target": "International Card Services B.V",
+        "similarity_score": 0.95
+      },
+      "ieee": {
+        "target": "ieee",
+        "similarity_score": 1
+      },
+      "infinisource": {
+        "target": "infinisource",
+        "similarity_score": 1
+      },
+      "instagram": {
+        "target": "Instagram",
+        "similarity_score": 1
+      },
+      "irs": {
+        "target": "IRS",
+        "similarity_score": 1
+      },
+      "itau": {
+        "target": "Itau Unibanco S.A",
+        "similarity_score": 0.8
+      },
+      "itunes": {
+        "target": "itunes",
+        "similarity_score": 1
+      },
+      "knab": {
+        "target": "knab",
+        "similarity_score": 1
+      },
+      "la_banque_postale": {
+        "target": "la_banque_postale",
+        "similarity_score": 1
+      },
+      "la_poste": {
+        "target": "La Poste",
+        "similarity_score": 1
+      },
+      "latam": {
+        "target": "latam",
+        "similarity_score": 1
+      },
+      "lcl": {
+        "target": "lcl",
+        "similarity_score": 1
+      },
+      "linkedin": {
+        "target": "LinkedIn Corporation",
+        "similarity_score": 0.8
+      },
+      "made_in_china": {
+        "target": "Made-In-China",
+        "similarity_score": 0.8462
+      },
+      "mbank": {
+        "target": "mbank",
+        "similarity_score": 1
+      },
+      "mdpd": {
+        "target": "mdpd",
+        "similarity_score": 1
+      },
+      "microsoft": {
+        "target": "Microsoft OneDrive",
+        "similarity_score": 0.8
+      },
+      "momentum_office_design": {
+        "target": "momentum_office_design",
+        "similarity_score": 1
+      },
+      "ms_bing": {
+        "target": "ms_bing",
+        "similarity_score": 1
+      },
+      "ms_office": {
+        "target": "Office365",
+        "similarity_score": 0.6667
+      },
+      "ms_onedrive": {
+        "target": "Microsoft OneDrive",
+        "similarity_score": 0.7586
+      },
+      "ms_outlook": {
+        "target": "Outlook",
+        "similarity_score": 0.8235
+      },
+      "ms_skype": {
+        "target": "ms_skype",
+        "similarity_score": 1
+      },
+      "mweb": {
+        "target": "MWeb",
+        "similarity_score": 1
+      },
+      "nab": {
+        "target": "National Australia Bank Limited",
+        "similarity_score": 0.95
+      },
+      "natwest": {
+        "target": "NatWest Personal Banking",
+        "similarity_score": 0.95
+      },
+      "navy_federal": {
+        "target": "Navy Federal Credit Union",
+        "similarity_score": 0.8
+      },
+      "nedbank": {
+        "target": "NedBank Limited",
+        "similarity_score": 0.95
+      },
+      "netflix": {
+        "target": "Netflix",
+        "similarity_score": 1
+      },
+      "netsons": {
+        "target": "netsons",
+        "similarity_score": 1
+      },
+      "nordea": {
+        "target": "nordea",
+        "similarity_score": 1
+      },
+      "ocn": {
+        "target": "ocn",
+        "similarity_score": 1
+      },
+      "orange": {
+        "target": "Orange",
+        "similarity_score": 1
+      },
+      "orange_rockland": {
+        "target": "orange_rockland",
+        "similarity_score": 1
+      },
+      "otrs": {
+        "target": "otrs",
+        "similarity_score": 1
+      },
+      "ourtime": {
+        "target": "OurTime Dating",
+        "similarity_score": 0.8
+      },
+      "paschoalotto": {
+        "target": "paschoalotto",
+        "similarity_score": 1
+      },
+      "paypal": {
+        "target": "PayPal",
+        "similarity_score": 1
+      },
+      "postbank": {
+        "target": "postbank",
+        "similarity_score": 1
+      },
+      "qnb": {
+        "target": "qnb",
+        "similarity_score": 1
+      },
+      "rbc": {
+        "target": "RBC Royal Bank",
+        "similarity_score": 0.95
+      },
+      "runescape": {
+        "target": "RuneScape",
+        "similarity_score": 1
+      },
+      "sharp": {
+        "target": "sharp",
+        "similarity_score": 1
+      },
+      "shoptet": {
+        "target": "shoptet",
+        "similarity_score": 1
+      },
+      "sicil_shop": {
+        "target": "sicil_shop",
+        "similarity_score": 1
+      },
+      "smartsheet": {
+        "target": "smartsheet",
+        "similarity_score": 1
+      },
+      "smiles": {
+        "target": "smiles",
+        "similarity_score": 1
+      },
+      "snapchat": {
+        "target": "snapchat",
+        "similarity_score": 1
+      },
+      "sparkasse": {
+        "target": "Sparkasse Bank",
+        "similarity_score": 0.95
+      },
+      "standard_bank": {
+        "target": "Standard Chartered Bank",
+        "similarity_score": 0.7222
+      },
+      "steam": {
+        "target": "Steam",
+        "similarity_score": 1
+      },
+      "stripe": {
+        "target": "Stripe",
+        "similarity_score": 1
+      },
+      "summit_bank": {
+        "target": "summit_bank",
+        "similarity_score": 1
+      },
+      "sunrise": {
+        "target": "sunrise",
+        "similarity_score": 1
+      },
+      "suntrust": {
+        "target": "SunTrust Bank",
+        "similarity_score": 0.95
+      },
+      "swisscom": {
+        "target": "Swisscom IT Services AG",
+        "similarity_score": 0.95
+      },
+      "taxact": {
+        "target": "taxact",
+        "similarity_score": 1
+      },
+      "tech_target": {
+        "target": "tech_target",
+        "similarity_score": 1
+      },
+      "test_rite": {
+        "target": "test_rite",
+        "similarity_score": 1
+      },
+      "timeweb": {
+        "target": "timeweb",
+        "similarity_score": 1
+      },
+      "tradekey": {
+        "target": "TradeKey",
+        "similarity_score": 1
+      },
+      "twitter": {
+        "target": "Twitter, Inc",
+        "similarity_score": 0.8
+      },
+      "typeform": {
+        "target": "typeform",
+        "similarity_score": 1
+      },
+      "usaa": {
+        "target": "United Services Automobile Association",
+        "similarity_score": 0.95
+      },
+      "walmart": {
+        "target": "walmart",
+        "similarity_score": 1
+      },
+      "wells_fargo": {
+        "target": "Wells Fargo & Company",
+        "similarity_score": 0.8
+      },
+      "whatsapp": {
+        "target": "WhatsApp",
+        "similarity_score": 1
+      },
+      "wp60": {
+        "target": "wp60",
+        "similarity_score": 1
+      },
+      "xtrix_tv": {
+        "target": "xtrix_tv",
+        "similarity_score": 1
+      },
+      "yahoo": {
+        "target": "Yahoo!",
+        "similarity_score": 0.9091
+      },
+      "youtube": {
+        "target": "youtube",
+        "similarity_score": 1
+      },
+      "ziggo": {
+        "target": "ziggo",
+        "similarity_score": 1
+      },
+      "zoominfo": {
+        "target": "zoominfo",
+        "similarity_score": 1
+      },
+      "bbt": {
+        "target": "BB&T Corporation"
+      },
+      "fibank": {
+        "target": "First Investment Bank"
+      },
+      "lloyds_bank": {
+        "target": "Lloyds TSB Group"
+      },
+      "mew": {
+        "target": "MyEtherWallet"
+      },
+      "one_and_one": {
+        "target": "1&1 Ionos"
+      }
+    },
+    "notMatched": [
+      "aliexpress",
+      "aruba",
+      "cloudns",
+      "godaddy",
+      "icloud",
+      "impots_gov",
+      "lbb",
+      "my_cloud",
+      "strato",
+      "telecom",
+      "twins_bnk"
+    ]
+}
