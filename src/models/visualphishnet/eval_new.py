@@ -186,7 +186,7 @@ def evaluate_threshold(
     for i, label in enumerate(y):
         # Check if the file is from benign dataset based on the filename structure
         # file_names[i] format: "[...]/dataset_type/target_name/image_name.png"
-        filename_parts = file_names[i].split("/")
+        filename_parts = str(file_names[i]).split("/")
         is_benign = any("trusted_list" in part.lower() or "benign" in part.lower() for part in filename_parts)
         y_true.append(0 if is_benign else 1)
 
@@ -207,7 +207,7 @@ def evaluate_threshold(
         names_min_distance, only_names, min_distances = find_names_min_distances(idx, values, all_file_names)
 
         # Get the filename
-        filename = file_names[i]
+        filename = str(file_names[i])
 
         # true_target is the actual target name from the folder structure
         true_target = y[i]
