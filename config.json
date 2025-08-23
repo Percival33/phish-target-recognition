@@ -74,6 +74,7 @@
   "data_split": {
     "random_state": 42,
     "output_directory": "data_splits",
+    "create_symlinks": true,
     "datasets": {
       "visualphish": {
         "path": "data/raw/visualphish",
@@ -81,8 +82,7 @@
         "target_mapping": {
           "phishing": "newly_crawled_phishing",
           "benign": "benign_test"
-        },
-        "create_symlinks": false
+        }
       },
       "phishpedia": {
         "path": "data/raw/phishpedia",
@@ -90,8 +90,7 @@
         "target_mapping": {
           "phishing": "phish_sample_30k",
           "benign": "benign_sample_30k"
-        },
-        "create_symlinks": true
+        }
       }
     }
   },

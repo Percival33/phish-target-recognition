@@ -2,11 +2,13 @@
 """
 Single script for dataset splitting into 60:30:10 train/val/test splits
 with stratified sampling and optional symlink creation.
+Creates both visualphish and phishpedia formatted outputs.
 """
 
 import json
 import sys
 import argparse
+import shutil
 from pathlib import Path
 from typing import Dict, Tuple
 import pandas as pd
@@ -23,6 +25,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from cross_validation.cv_splits import SimpleDataProcessor
 from cross_validation.common import DatasetConfig
 
+# Import domain mapping from phishpedia organize script
+sys.path.insert(
+    0, str(Path(__file__).parent.parent / "models" / "phishpedia" / "scripts")
+)
+from organize import get_special_domain_mapping
+
 
 class DataSplitter:
     """Main class for splitting datasets into train/val/test splits"""
@@ -34,6 +42,37 @@ class DataSplitter:
 
         self.config = self.load_config(config_path)
         self.data_processor = SimpleDataProcessor()
+
+        # Get domain mapping for visualphish format
+        self.domain_to_label = self._build_inverse_mapping(get_special_domain_mapping())
+        # Add local overrides for domains not in the original mapping
+        self.domain_to_label["miamidade.gov"] = (
+            "mdpd"  # Map miamidade.gov to mdpd label
+        )
+
+    def _build_inverse_mapping(self, forward_map: Dict[str, str]) -> Dict[str, str]:
+        """Invert mapping, ensuring no domain collisions."""
+        inverse = {}
+        for label, domain in forward_map.items():
+            if domain in inverse and inverse[domain] != label:
+                raise ValueError(f"Domain '{domain}' maps to multiple labels")
+            inverse[domain] = label
+        return inverse
+
+    def _parse_true_target(self, true_target: str) -> Tuple[str, str]:
+        """Parse `true_target` as 'domain--Txx_x', return (domain, identifier)."""
+        if not true_target or "--" not in true_target:
+            # If no '--' separator, use the whole string as domain and generate identifier
+            return true_target, "T00_0"
+
+        parts = true_target.split("--", 1)
+        domain, identifier = parts[0], parts[1]
+
+        if not identifier.startswith("T") or "_" not in identifier:
+            # If identifier format is wrong, use a default
+            identifier = "T00_0"
+
+        return domain, identifier
 
     def load_config(self, config_path: str) -> Dict:
         """Load JSON configuration file"""
@@ -162,8 +201,152 @@ class DataSplitter:
 
         return X_train, X_val, X_test, y_train, y_val, y_test
 
+    def _create_visualphish_format(
+        self, split_df: pd.DataFrame, output_dir: Path, split_name: str
+    ) -> pd.DataFrame:
+        """Create VisualPhish format: organized by target with phishing/trusted_list folders"""
+        data_dir = output_dir / "data" / split_name
+        phishing_dir = data_dir / "phishing"
+        trusted_dir = data_dir / "trusted_list"
+        phishing_dir.mkdir(parents=True, exist_ok=True)
+        trusted_dir.mkdir(parents=True, exist_ok=True)
+
+        new_paths = []
+        phishing_labels = set()
+        trusted_labels = set()
+
+        for idx, row in split_df.iterrows():
+            source_path = Path(row["file"]).resolve()
+
+            # Parse target and get label
+            domain, identifier = self._parse_true_target(row["true_target"])
+            if domain in self.domain_to_label:
+                label = self.domain_to_label[domain]
+            else:
+                # Use first two characters of domain as fallback
+                label = domain[:2] if domain else "unknown"
+
+            # Choose destination directory
+            is_phishing = int(row["true_class"]) == 1
+            dest_base = phishing_dir if is_phishing else trusted_dir
+            dest_dir = dest_base / label
+            dest_dir.mkdir(exist_ok=True)
+
+            # Create symlink or copy
+            dest_file = dest_dir / f"{identifier}{source_path.suffix}"
+            relative_path = dest_file.relative_to(data_dir)
+            new_paths.append(str(relative_path))
+
+            if self.config.get("create_symlinks", True):
+                if not dest_file.exists():
+                    dest_file.symlink_to(source_path)
+            else:
+                if not dest_file.exists():
+                    shutil.copy2(source_path, dest_file)
+
+            # Track labels
+            (phishing_labels if is_phishing else trusted_labels).add(label)
+
+        # Write target files
+        if phishing_labels:
+            (phishing_dir / "targets2.txt").write_text(
+                "\n".join(sorted(phishing_labels)) + "\n"
+            )
+        if trusted_labels:
+            (trusted_dir / "targets.txt").write_text(
+                "\n".join(sorted(trusted_labels)) + "\n"
+            )
+
+        # Create DataFrame with new paths
+        result_df = pd.DataFrame(
+            {
+                "original_path": split_df["file"].values,
+                "new_path": new_paths,
+                "true_target": split_df["true_target"].values,
+                "true_class": split_df["true_class"].values,
+            }
+        )
+
+        return result_df
+
+    def _create_phishpedia_format(
+        self, split_df: pd.DataFrame, output_dir: Path, split_name: str
+    ) -> pd.DataFrame:
+        """Create Phishpedia format: organized by sample with shot.png and info.txt"""
+        data_dir = output_dir / "data" / split_name
+        phishing_dir = data_dir / "phishing"
+        trusted_dir = data_dir / "trusted_list"
+        phishing_dir.mkdir(parents=True, exist_ok=True)
+        trusted_dir.mkdir(parents=True, exist_ok=True)
+
+        new_paths = []
+        phishing_targets = set()
+        trusted_targets = set()
+
+        for idx, row in split_df.iterrows():
+            source_path = Path(row["file"]).resolve()
+
+            # Get target name (use domain from true_target or fallback to "unknown")
+            if row["true_target"]:
+                domain, _ = self._parse_true_target(row["true_target"])
+                target = domain.lower() if domain else "unknown"
+            else:
+                target = "unknown"
+
+            # Determine destination
+            is_phishing = int(row["true_class"]) == 1
+            if is_phishing:
+                phishing_targets.add(target)
+                parent_dir = phishing_dir
+            else:
+                trusted_targets.add(target)
+                parent_dir = trusted_dir
+
+            # Create sample directory
+            sample_id = f"sample{idx + 1}"
+            sample_dir = parent_dir / f"{target}+{sample_id}"
+            sample_dir.mkdir(exist_ok=True)
+
+            # Create shot.png (symlink or copy)
+            dest_file = sample_dir / "shot.png"
+            relative_path = dest_file.relative_to(data_dir)
+            new_paths.append(str(relative_path))
+
+            if self.config.get("create_symlinks", True):
+                if not dest_file.exists():
+                    dest_file.symlink_to(source_path)
+            else:
+                if not dest_file.exists():
+                    shutil.copy2(source_path, dest_file)
+
+            # Create info.txt
+            info_file = sample_dir / "info.txt"
+            if not info_file.exists():
+                # Check if original has info.txt (for subfolders strategy)
+                original_info = source_path.parent / "info.txt"
+                if original_info.exists():
+                    if self.config.get("create_symlinks", True):
+                        info_file.symlink_to(original_info.resolve())
+                    else:
+                        shutil.copy2(original_info, info_file)
+                else:
+                    # Create placeholder info.txt with file path
+                    info_file.write_text(str(source_path))
+
+        # Create DataFrame with new paths
+        result_df = pd.DataFrame(
+            {
+                "original_path": split_df["file"].values,
+                "new_path": new_paths,
+                "true_target": split_df["true_target"].values,
+                "true_class": split_df["true_class"].values,
+            }
+        )
+
+        return result_df
+
     def save_splits(self, data: pd.DataFrame, splits: Tuple, dataset_name: str):
-        """Save train/val/test CSV files"""
+        """Save train/val/test CSV files and create visualphish/phishpedia formats"""
         X_train, X_val, X_test, y_train, y_val, y_test = splits
 
         # Create output directory using resolved path
@@ -176,48 +359,44 @@ class DataSplitter:
         val_df = data.iloc[X_val].copy()
         test_df = data.iloc[X_test].copy()
 
-        # Save CSV files
+        # Save main CSV files (for backward compatibility)
         train_df.to_csv(output_dir / "train.csv", index=False)
         val_df.to_csv(output_dir / "val.csv", index=False)
         test_df.to_csv(output_dir / "test.csv", index=False)
 
-        self.logger.info(f"Saved splits for {dataset_name} to {output_dir}")
+        # Create visualphish format
+        vp_dir = output_dir / "visualphish"
+        vp_dir.mkdir(exist_ok=True)
+
+        vp_train_df = self._create_visualphish_format(train_df, vp_dir, "train")
+        vp_val_df = self._create_visualphish_format(val_df, vp_dir, "val")
+        vp_test_df = self._create_visualphish_format(test_df, vp_dir, "test")
+
+        # Save visualphish CSVs
+        vp_train_df.to_csv(vp_dir / "train.csv", index=False)
+        vp_val_df.to_csv(vp_dir / "val.csv", index=False)
+        vp_test_df.to_csv(vp_dir / "test.csv", index=False)
+
+        self.logger.info(f"Created VisualPhish format for {dataset_name}")
+
+        # Create phishpedia format
+        pp_dir = output_dir / "phishpedia"
+        pp_dir.mkdir(exist_ok=True)
+
+        pp_train_df = self._create_phishpedia_format(train_df, pp_dir, "train")
+        pp_val_df = self._create_phishpedia_format(val_df, pp_dir, "val")
+        pp_test_df = self._create_phishpedia_format(test_df, pp_dir, "test")
+
+        # Save phishpedia CSVs
+        pp_train_df.to_csv(pp_dir / "train.csv", index=False)
+        pp_val_df.to_csv(pp_dir / "val.csv", index=False)
+        pp_test_df.to_csv(pp_dir / "test.csv", index=False)
+
+        self.logger.info(f"Created Phishpedia format for {dataset_name}")
+
+        self.logger.info(f"Saved all splits for {dataset_name} to {output_dir}")
 
         return train_df, val_df, test_df
-
-    def create_symlinks(
-        self, splits_data: Tuple, dataset_name: str, dataset_config: Dict
-    ):
-        """Optional: Create symlink structure for easier access"""
-        if not dataset_config.get("create_symlinks", False):
-            return
-
-        train_df, val_df, test_df = splits_data
-
-        # Create symlink directory structure using resolved path
-        output_base = self._resolve_output_path(self.config["output_directory"])
-        output_dir = output_base / dataset_name / "images"
-
-        for split_name, split_df in [
-            ("train", train_df),
-            ("val", val_df),
-            ("test", test_df),
-        ]:
-            split_dir = output_dir / split_name
-            split_dir.mkdir(parents=True, exist_ok=True)
-
-            for _, row in split_df.iterrows():
-                src_path = Path(row["file"])
-                dst_path = split_dir / src_path.name
-
-                # Create symlink if it doesn't exist
-                if not dst_path.exists():
-                    try:
-                        dst_path.symlink_to(src_path.absolute())
-                    except OSError as e:
-                        self.logger.warning(f"Failed to create symlink {dst_path}: {e}")
-
-        self.logger.info(f"Created symlinks for {dataset_name} in {output_dir}")
 
     def print_split_summary(
         self, splits: Tuple, dataset_name: str, data: pd.DataFrame = None
@@ -295,11 +474,8 @@ class DataSplitter:
                 # Perform stratified split
                 splits = self.perform_stratified_split(X, y, y_stratify)
 
-                # Save splits to CSV
-                splits_data = self.save_splits(data, splits, dataset_name)
-
-                # Create symlinks if requested
-                self.create_symlinks(splits_data, dataset_name, dataset_config)
+                # Save splits to CSV and create formatted outputs
+                _ = self.save_splits(data, splits, dataset_name)
 
                 # Print summary
                 self.print_split_summary(splits, dataset_name, data)
