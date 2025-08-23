@@ -92,13 +92,46 @@ class DataSplitter:
 
         # Check if we have enough samples for stratification
         class_counts = Counter(y_stratify)
-        min_class_count = min(class_counts.values())
 
-        if min_class_count < 3:
-            # For multi-column stratification, we need at least 3 samples per combination
-            # to ensure each combination appears in train, val, and test
+        # Identify and filter out classes with insufficient samples
+        classes_to_drop = [cls for cls, count in class_counts.items() if count < 3]
+
+        if classes_to_drop:
+            # Log warnings for each dropped class combination
+            self.logger.warning(
+                f"Dropping {len(classes_to_drop)} class-target combinations with insufficient samples (<3):"
+            )
+            for cls in classes_to_drop:
+                count = class_counts[cls]
+                self.logger.warning(
+                    f"  - Dropping combination '{cls}': only {count} sample{'s' if count != 1 else ''}"
+                )
+
+            # Create a mask to keep only valid samples
+            mask = np.array([cls not in classes_to_drop for cls in y_stratify])
+
+            # Filter the data
+            X = X[mask]
+            y = y[mask]
+            y_stratify = y_stratify[mask]
+
+            # Update class counts after filtering
+            class_counts = Counter(y_stratify)
+
+            self.logger.info(
+                f"After filtering: {len(X)} samples remaining with {len(class_counts)} unique class-target combinations"
+            )
+
+        # Check if we have any samples left after filtering
+        if len(X) == 0:
             raise ValueError(
-                f"Insufficient samples for stratification. Minimum class combination has only {min_class_count} samples, need at least 3."
+                "No samples remaining after filtering classes with insufficient samples"
+            )
+
+        # Check if we still have enough unique classes for stratification
+        if len(class_counts) < 2:
+            raise ValueError(
+                f"Insufficient unique class combinations for stratification. Only {len(class_counts)} combination(s) remaining."
             )
 
         self.logger.info(
