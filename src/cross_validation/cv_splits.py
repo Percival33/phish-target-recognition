@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold
 from collections import Counter
 import glob
 from tools.config import setup_logging
-from common import (
+from .common import (
     DatasetConfig,
     CrossValidationConfig,
     ConfigLoader,
