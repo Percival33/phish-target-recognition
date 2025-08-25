@@ -105,7 +105,7 @@ class DataSplitter:
 
     def _validate_url_format(self, url: str, target: str, sample_num: str) -> bool:
         """Validate URL format before writing to info.txt."""
-        expected_pattern = f"https://{target}+{sample_num}\."
+        expected_pattern = f"https://{target}+{sample_num}."
         if not url.startswith(expected_pattern):
             self.logger.error(
                 f"Invalid URL format generated: {url}. Expected pattern: {expected_pattern}*"
