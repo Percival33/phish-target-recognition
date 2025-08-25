@@ -2,7 +2,7 @@
 """
 Single script for dataset splitting into 60:30:10 train/val/test splits
 with stratified sampling and optional symlink creation.
-Creates both visualphish and phishpedia formatted outputs.
+Creates both visualphish and phishpedia formatted outputs from VisualPhish dataset.
 """
 
 import json
@@ -10,12 +10,13 @@ import sys
 import argparse
 import shutil
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Set
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from collections import Counter
+from collections import Counter, defaultdict
 import logging
+import re
 
 from tools.config import setup_logging, PROJ_ROOT
 
@@ -59,20 +60,58 @@ class DataSplitter:
             inverse[domain] = label
         return inverse
 
-    def _parse_true_target(self, true_target: str) -> Tuple[str, str]:
-        """Parse `true_target` as 'domain--Txx_x', return (domain, identifier)."""
-        if not true_target or "--" not in true_target:
-            # If no '--' separator, use the whole string as domain and generate identifier
-            return true_target, "T00_0"
+    def _parse_true_target(self, true_target: str) -> str:
+        """Extract domain from true_target (no longer assumes -- separator)."""
+        if not true_target:
+            return "unknown"
 
-        parts = true_target.split("--", 1)
-        domain, identifier = parts[0], parts[1]
+        # If it contains '--', take the part before it as domain
+        if "--" in true_target:
+            return true_target.split("--", 1)[0]
 
-        if not identifier.startswith("T") or "_" not in identifier:
-            # If identifier format is wrong, use a default
-            identifier = "T00_0"
+        # Otherwise, use the entire string as domain
+        return true_target
 
-        return domain, identifier
+    def _get_domain_suffix(self, target: str) -> str:
+        """Extract domain suffix from target using special_domain_mapping."""
+        domain_mapping = get_special_domain_mapping()
+
+        if target in domain_mapping:
+            full_domain = domain_mapping[target]
+            # Split on first dot and take everything after
+            if "." in full_domain:
+                return full_domain.split(".", 1)[1]  # e.g., "absa.co.za" -> "co.za"
+
+        # Default to .com for unknown domains
+        return "com"
+
+    def _check_duplicate_before_write(self, dest_file: Path, source_file: Path) -> None:
+        """Raise error if file already exists with different content."""
+        if dest_file.exists():
+            if not dest_file.samefile(source_file):
+                raise ValueError(
+                    f"Duplicate filename collision: {dest_file} already exists "
+                    f"and would be overwritten by {source_file}"
+                )
+
+    def _handle_empty_target(self, row: pd.Series) -> str:
+        """Handle cases where true_target is None or empty."""
+        if not row.get("true_target") or pd.isna(row["true_target"]):
+            self.logger.warning(
+                f"Empty or None true_target found for file: {row.get('file', 'unknown')}. Using 'unknown' as fallback."
+            )
+            return "unknown"
+        return str(row["true_target"])
+
+    def _validate_url_format(self, url: str, target: str, sample_num: str) -> bool:
+        """Validate URL format before writing to info.txt."""
+        expected_pattern = f"https://{target}+{sample_num}\."
+        if not url.startswith(expected_pattern):
+            self.logger.error(
+                f"Invalid URL format generated: {url}. Expected pattern: {expected_pattern}*"
+            )
+            return False
+        return True
 
     def load_config(self, config_path: str) -> Dict:
         """Load JSON configuration file"""
@@ -215,16 +254,24 @@ class DataSplitter:
         phishing_labels = set()
         trusted_labels = set()
 
+        # Track used filenames per directory to prevent collisions
+        used_filenames: Dict[Path, Set[str]] = defaultdict(set)
+
         for idx, row in split_df.iterrows():
             source_path = Path(row["file"]).resolve()
 
-            # Parse target and get label
-            domain, identifier = self._parse_true_target(row["true_target"])
-            if domain in self.domain_to_label:
-                label = self.domain_to_label[domain]
-            else:
-                # Use first two characters of domain as fallback
-                label = domain[:2] if domain else "unknown"
+            # Handle empty/None true_target with proper logging
+            true_target = self._handle_empty_target(row)
+
+            # Get domain (use full domain name, not abbreviation)
+            domain = self._parse_true_target(true_target)
+
+            # Use domain directly as folder name (full name, not abbreviation)
+            label = domain
+
+            self.logger.debug(
+                f"Processing file {source_path} with target '{true_target}' -> domain '{domain}'"
+            )
 
             # Choose destination directory
             is_phishing = int(row["true_class"]) == 1
@@ -232,8 +279,38 @@ class DataSplitter:
             dest_dir = dest_base / label
             dest_dir.mkdir(exist_ok=True)
 
-            # Create symlink or copy
+            # Preserve original filename structure
+            original_stem = source_path.stem  # e.g., "T7_41" or "T0_1"
+
+            # Parse T{X}_{Y} format if present, otherwise use original stem
+            match = re.match(r"T(\d+)_(\d+)", original_stem)
+            if match:
+                x_num = match.group(1)
+                y_num = int(match.group(2))
+                base_identifier = f"T{x_num}"
+            else:
+                # Fallback if not in expected format - use original stem
+                base_identifier = original_stem
+                y_num = 0
+
+            # Ensure uniqueness - generate unique Y value if collision detected
+            identifier = f"{base_identifier}_{y_num}"
+            while identifier in used_filenames[dest_dir]:
+                y_num += 1
+                identifier = f"{base_identifier}_{y_num}"
+
+            used_filenames[dest_dir].add(identifier)
+
+            # Create symlink or copy with collision detection
             dest_file = dest_dir / f"{identifier}{source_path.suffix}"
+
+            # Check for file existence to prevent overwrites
+            self._check_duplicate_before_write(dest_file, source_path)
+
+            self.logger.debug(
+                f"Creating {'symlink' if self.config.get('create_symlinks', True) else 'copy'}: {source_path} -> {dest_file}"
+            )
+
             relative_path = dest_file.relative_to(data_dir)
             new_paths.append(str(relative_path))
 
@@ -286,12 +363,25 @@ class DataSplitter:
         for idx, row in split_df.iterrows():
             source_path = Path(row["file"]).resolve()
 
-            # Get target name (use domain from true_target or fallback to "unknown")
-            if row["true_target"]:
-                domain, _ = self._parse_true_target(row["true_target"])
-                target = domain.lower() if domain else "unknown"
+            # Handle empty/None true_target with proper logging
+            true_target = self._handle_empty_target(row)
+
+            # Get target name (use domain from true_target)
+            domain = self._parse_true_target(true_target)
+            target = domain.lower() if domain else "unknown"
+
+            self.logger.debug(
+                f"Processing Phishpedia format for file {source_path} with target '{true_target}' -> '{target}'"
+            )
+
+            # Extract sample number from original filename
+            original_stem = source_path.stem  # e.g., "T1_14"
+            match = re.match(r"T\d+_(\d+)", original_stem)
+            if match:
+                sample_num = match.group(1)  # Extract Y number (e.g., "14")
             else:
-                target = "unknown"
+                # Fallback: use index if filename doesn't match pattern
+                sample_num = str(idx + 1)
 
             # Determine destination
             is_phishing = int(row["true_class"]) == 1
@@ -303,8 +393,7 @@ class DataSplitter:
                 parent_dir = trusted_dir
 
             # Create sample directory
-            sample_id = f"sample{idx + 1}"
-            sample_dir = parent_dir / f"{target}+{sample_id}"
+            sample_dir = parent_dir / f"{target}+sample{sample_num}"
             sample_dir.mkdir(exist_ok=True)
 
             # Create shot.png (symlink or copy)
@@ -319,7 +408,7 @@ class DataSplitter:
                 if not dest_file.exists():
                     shutil.copy2(source_path, dest_file)
 
-            # Create info.txt
+            # Create info.txt with proper URL
             info_file = sample_dir / "info.txt"
             if not info_file.exists():
                 # Check if original has info.txt (for subfolders strategy)
@@ -330,8 +419,23 @@ class DataSplitter:
                     else:
                         shutil.copy2(original_info, info_file)
                 else:
-                    # Create placeholder info.txt with file path
-                    info_file.write_text(str(source_path))
+                    # Generate URL with proper domain suffix
+                    domain_suffix = self._get_domain_suffix(target)
+                    url = f"https://{target}+{sample_num}.{domain_suffix}"
+
+                    # Validate URL format before writing
+                    if self._validate_url_format(url, target, sample_num):
+                        info_file.write_text(url)
+                        self.logger.debug(
+                            f"Generated URL for {target}+sample{sample_num}: {url}"
+                        )
+                    else:
+                        # Write a fallback URL if validation fails
+                        fallback_url = f"https://{target}+{sample_num}.com"
+                        info_file.write_text(fallback_url)
+                        self.logger.warning(
+                            f"Used fallback URL due to validation failure: {fallback_url}"
+                        )
 
         # Create DataFrame with new paths
         result_df = pd.DataFrame(
