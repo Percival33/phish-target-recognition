@@ -164,7 +164,7 @@ class SimpleDataProcessor:
                         {
                             "file": str(img_file),
                             "true_target": brand_name,
-                            "true_class": class_value ^ 1,
+                            "true_class": class_value,
                         }
                     )
 
