@@ -1,0 +1,114 @@
+uv run filter_visualphish.py /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train --threshold 25 --output /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train-filtered
+15:56:08 - INFO - Processing VisualPhish data from: /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train
+15:56:08 - INFO - Phish folder: phishing
+15:56:08 - INFO - Benign folder: trusted_list
+15:56:08 - INFO - Threshold: 25
+15:56:08 - INFO - Output folder: /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train-filtered
+15:56:08 - INFO - Found 70 targets in phish folder
+15:56:08 - INFO - Found 144 targets in benign folder
+15:56:08 - INFO - Found 70 targets in both folders
+15:56:08 - WARNING - Skipping target 'absa': phish=8, benign=42 (threshold=25)
+15:56:08 - WARNING - Skipping target 'adidas': phish=4, benign=47 (threshold=25)
+15:56:08 - WARNING - Skipping target 'adobe': phish=21, benign=47 (threshold=25)
+15:56:08 - INFO - Processing target 'alibaba' (phish=34, benign=88)
+15:56:08 - INFO - Created 34 phish + 88 benign symlinks for 'alibaba'
+15:56:08 - WARNING - Skipping target 'allegro': phish=17, benign=27 (threshold=25)
+15:56:08 - INFO - Processing target 'amazon' (phish=44, benign=27)
+15:56:08 - INFO - Created 44 phish + 27 benign symlinks for 'amazon'
+15:56:08 - WARNING - Skipping target 'ameli_fr': phish=2, benign=32 (threshold=25)
+15:56:08 - INFO - Processing target 'american_express' (phish=32, benign=44)
+15:56:08 - INFO - Created 32 phish + 44 benign symlinks for 'american_express'
+15:56:08 - WARNING - Skipping target 'aol': phish=5, benign=16 (threshold=25)
+15:56:08 - INFO - Processing target 'apple' (phish=29, benign=62)
+15:56:08 - INFO - Created 29 phish + 62 benign symlinks for 'apple'
+15:56:08 - WARNING - Skipping target 'att': phish=17, benign=72 (threshold=25)
+15:56:08 - WARNING - Skipping target 'azul': phish=2, benign=28 (threshold=25)
+15:56:08 - WARNING - Skipping target 'bahia': phish=2, benign=41 (threshold=25)
+15:56:08 - WARNING - Skipping target 'banco_inter': phish=2, benign=21 (threshold=25)
+15:56:08 - WARNING - Skipping target 'barclays': phish=2, benign=44 (threshold=25)
+15:56:08 - WARNING - Skipping target 'bcp': phish=5, benign=35 (threshold=25)
+15:56:08 - WARNING - Skipping target 'bmo': phish=2, benign=118 (threshold=25)
+15:56:08 - INFO - Processing target 'boa' (phish=49, benign=32)
+15:56:09 - INFO - Created 49 phish + 32 benign symlinks for 'boa'
+15:56:09 - WARNING - Skipping target 'bradesco': phish=12, benign=32 (threshold=25)
+15:56:09 - WARNING - Skipping target 'bt': phish=17, benign=39 (threshold=25)
+15:56:09 - WARNING - Skipping target 'caixa_bank': phish=2, benign=41 (threshold=25)
+15:56:09 - WARNING - Skipping target 'canada': phish=2, benign=32 (threshold=25)
+15:56:09 - WARNING - Skipping target 'capital_one': phish=3, benign=28 (threshold=25)
+15:56:09 - INFO - Processing target 'chase' (phish=46, benign=59)
+15:56:09 - INFO - Created 46 phish + 59 benign symlinks for 'chase'
+15:56:09 - WARNING - Skipping target 'cibc': phish=2, benign=40 (threshold=25)
+15:56:09 - WARNING - Skipping target 'cox': phish=5, benign=16 (threshold=25)
+15:56:09 - INFO - Processing target 'dhl' (phish=33, benign=53)
+15:56:09 - INFO - Created 33 phish + 53 benign symlinks for 'dhl'
+15:56:09 - WARNING - Skipping target 'dkb': phish=2, benign=25 (threshold=25)
+15:56:09 - INFO - Processing target 'dropbox' (phish=25, benign=43)
+15:56:09 - INFO - Created 25 phish + 43 benign symlinks for 'dropbox'
+15:56:09 - INFO - Processing target 'ebay' (phish=28, benign=118)
+15:56:09 - INFO - Created 28 phish + 118 benign symlinks for 'ebay'
+15:56:09 - INFO - Processing target 'facebook' (phish=97, benign=50)
+15:56:10 - INFO - Created 97 phish + 50 benign symlinks for 'facebook'
+15:56:10 - WARNING - Skipping target 'google': phish=17, benign=23 (threshold=25)
+15:56:10 - WARNING - Skipping target 'google_drive': phish=14, benign=15 (threshold=25)
+15:56:10 - WARNING - Skipping target 'gov_uk': phish=5, benign=20 (threshold=25)
+15:56:10 - WARNING - Skipping target 'grupo_bancolombia': phish=21, benign=104 (threshold=25)
+15:56:10 - WARNING - Skipping target 'hsbc': phish=4, benign=37 (threshold=25)
+15:56:10 - WARNING - Skipping target 'ics': phish=2, benign=15 (threshold=25)
+15:56:10 - WARNING - Skipping target 'ieee': phish=2, benign=47 (threshold=25)
+15:56:10 - WARNING - Skipping target 'instagram': phish=4, benign=34 (threshold=25)
+15:56:10 - WARNING - Skipping target 'irs': phish=10, benign=46 (threshold=25)
+15:56:10 - WARNING - Skipping target 'itau': phish=17, benign=68 (threshold=25)
+15:56:10 - WARNING - Skipping target 'itunes': phish=2, benign=3 (threshold=25)
+15:56:10 - WARNING - Skipping target 'la_banque_postale': phish=7, benign=29 (threshold=25)
+15:56:10 - WARNING - Skipping target 'linkedin': phish=20, benign=49 (threshold=25)
+15:56:10 - WARNING - Skipping target 'lloyds_bank': phish=3, benign=42 (threshold=25)
+15:56:10 - WARNING - Skipping target 'made_in_china': phish=4, benign=26 (threshold=25)
+15:56:10 - WARNING - Skipping target 'mdpd': phish=3, benign=32 (threshold=25)
+15:56:10 - INFO - Processing target 'microsoft' (phish=77, benign=95)
+15:56:10 - INFO - Created 77 phish + 95 benign symlinks for 'microsoft'
+15:56:10 - INFO - Processing target 'ms_office' (phish=31, benign=29)
+15:56:10 - INFO - Created 31 phish + 29 benign symlinks for 'ms_office'
+15:56:10 - INFO - Processing target 'ms_onedrive' (phish=37, benign=22)
+15:56:10 - INFO - Created 37 phish + 22 benign symlinks for 'ms_onedrive'
+15:56:10 - INFO - Processing target 'ms_outlook' (phish=30, benign=8)
+15:56:10 - INFO - Created 30 phish + 8 benign symlinks for 'ms_outlook'
+15:56:10 - WARNING - Skipping target 'nab': phish=5, benign=29 (threshold=25)
+15:56:10 - WARNING - Skipping target 'natwest': phish=3, benign=50 (threshold=25)
+15:56:10 - WARNING - Skipping target 'navy_federal': phish=2, benign=16 (threshold=25)
+15:56:10 - WARNING - Skipping target 'nedbank': phish=5, benign=37 (threshold=25)
+15:56:10 - WARNING - Skipping target 'netflix': phish=14, benign=25 (threshold=25)
+15:56:10 - INFO - Processing target 'orange' (phish=32, benign=52)
+15:56:10 - INFO - Created 32 phish + 52 benign symlinks for 'orange'
+15:56:10 - WARNING - Skipping target 'ourtime': phish=5, benign=9 (threshold=25)
+15:56:10 - INFO - Processing target 'paypal' (phish=152, benign=59)
+15:56:11 - INFO - Created 152 phish + 59 benign symlinks for 'paypal'
+15:56:11 - WARNING - Skipping target 'runescape': phish=7, benign=29 (threshold=25)
+15:56:11 - WARNING - Skipping target 'smartsheet': phish=2, benign=40 (threshold=25)
+15:56:11 - WARNING - Skipping target 'sparkasse': phish=2, benign=36 (threshold=25)
+15:56:11 - WARNING - Skipping target 'standard_bank': phish=3, benign=64 (threshold=25)
+15:56:11 - WARNING - Skipping target 'steam': phish=5, benign=117 (threshold=25)
+15:56:11 - WARNING - Skipping target 'suntrust': phish=3, benign=36 (threshold=25)
+15:56:11 - WARNING - Skipping target 'twitter': phish=2, benign=45 (threshold=25)
+15:56:11 - WARNING - Skipping target 'usaa': phish=7, benign=27 (threshold=25)
+15:56:11 - WARNING - Skipping target 'walmart': phish=2, benign=74 (threshold=25)
+15:56:11 - INFO - Processing target 'wells_fargo' (phish=45, benign=31)
+15:56:11 - INFO - Created 45 phish + 31 benign symlinks for 'wells_fargo'
+15:56:11 - INFO - Processing target 'yahoo' (phish=47, benign=40)
+15:56:11 - INFO - Created 47 phish + 40 benign symlinks for 'yahoo'
+15:56:11 - INFO - Created targets.txt with 18 targets: /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train-filtered/trusted_list/targets.txt
+15:56:11 - INFO - Created targets.txt with 18 targets: /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train-filtered/phishing/targets.txt
+15:56:11 - INFO -
+==================================================
+15:56:11 - INFO - PROCESSING SUMMARY
+15:56:11 - INFO - ==================================================
+15:56:11 - INFO - Input folder: /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train
+15:56:11 - INFO - Output folder: /home/phish-target-recognition/data_splits/visualphish/visualphish/data/train-filtered
+15:56:11 - INFO - Threshold: 25
+15:56:11 - INFO - Total targets found: 70
+15:56:11 - INFO - Valid targets (passed threshold): 18
+15:56:11 - INFO - Skipped targets: 52
+15:56:11 - INFO - Total phish samples: 868
+15:56:11 - INFO - Total benign samples: 912
+15:56:11 - INFO - Total samples: 1780
+15:56:11 - INFO - Skipped targets: absa, adidas, adobe, allegro, ameli_fr, aol, att, azul, bahia, banco_inter, barclays, bcp, bmo, bradesco, bt, caixa_bank, canada, capital_one, cibc, cox, dkb, google, google_drive, gov_uk, grupo_bancolombia, hsbc, ics, ieee, instagram, irs, itau, itunes, la_banque_postale, linkedin, lloyds_bank, made_in_china, mdpd, nab, natwest, navy_federal, nedbank, netflix, ourtime, runescape, smartsheet, sparkasse, standard_bank, steam, suntrust, twitter, usaa, walmart
+15:56:11 - INFO - Processing completed successfully!

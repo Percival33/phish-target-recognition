@@ -180,7 +180,7 @@ Examples:
 
         logger.debug(f"Target '{target}': phish={phish_count}, benign={benign_count}")
 
-        if phish_count >= args.threshold and benign_count >= args.threshold:
+        if phish_count >= args.threshold: # and benign_count >= args.threshold:
             logger.info(
                 f"Processing target '{target}' (phish={phish_count}, benign={benign_count})"
             )
@@ -211,7 +211,7 @@ Examples:
 
     if valid_targets:
         write_targets_file(output_benign_dir, "targets.txt", valid_targets, logger)
-        write_targets_file(output_phish_dir, "targets2.txt", valid_targets, logger)
+        write_targets_file(output_phish_dir, "targets.txt", valid_targets, logger)
 
     logger.info("\n" + "=" * 50)
     logger.info("PROCESSING SUMMARY")

@@ -72,7 +72,7 @@ def get_targets_needing_augmentation(input_folder, threshold, phish_folder, beni
         phish_count = count_samples(phish_dir, target) if target in phish_targets else 0
         benign_count = count_samples(benign_dir, target) if target in benign_targets else 0
         
-        needs_phish = max(0, threshold - phish_count)
+        needs_phish = 0 # augumenting only benign
         needs_benign = max(0, threshold - benign_count)
         
         if needs_phish > 0 or needs_benign > 0:
