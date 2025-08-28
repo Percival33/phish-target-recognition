@@ -98,9 +98,9 @@ class ResultsAggregator:
         metadata = results["metadata"]
         summary = results["summary"]
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"BASELINE EVALUATION RESULTS - {metadata['dataset']}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(
             f"Successful splits: {metadata['successful_splits']}/{metadata['total_splits']}"
         )
@@ -116,4 +116,4 @@ class ResultsAggregator:
         for metric, stats in summary["target_metrics"].items():
             print(f"  {metric:15}: {stats['mean']:.3f} ± {stats['std']:.3f}")
 
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
