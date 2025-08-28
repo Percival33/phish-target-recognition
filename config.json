@@ -54,19 +54,11 @@
     "output_splits_directory": "data_splits",
     "dataset_image_paths": {
       "visualphish": {
-        "path": "data/raw/visualphish",
-        "label_strategy": "labels_file",
+        "path": "/home/phish-target-recognition/data/interim/vp-for-vp-pp",
+        "label_strategy": "directory",
         "target_mapping": {
-          "phishing": "newly_crawled_phishing",
-          "benign": "benign_test"
-        }
-      },
-      "phishpedia": {
-        "path": "data/raw/phishpedia",
-        "label_strategy": "subfolders",
-        "target_mapping": {
-          "phishing": "phish_sample_30k",
-          "benign": "benign_sample_30k"
+          "phishing": "phishing",
+          "benign": "trusted_list"
         }
       }
     }
@@ -77,19 +69,19 @@
     "create_symlinks": true,
     "datasets": {
       "visualphish": {
-        "path": "data/raw/visualphish",
-        "label_strategy": "labels_file",
+        "path": "/home/phish-target-recognition/data/interim/vp-for-vp-pp",
+        "label_strategy": "directory",
         "target_mapping": {
-          "phishing": "newly_crawled_phishing",
-          "benign": "benign_test"
+          "phishing": "phishing",
+          "benign": "trusted_list"
         }
       },
       "phishpedia": {
-        "path": "data/raw/phishpedia",
-        "label_strategy": "subfolders",
+        "path": "/home/phish-target-recognition/data/raw/phishpedia",
+        "label_strategy": "directory",
         "target_mapping": {
-          "phishing": "phish_sample_30k",
-          "benign": "benign_sample_30k"
+          "phishing": "benign_sample_30k",
+          "benign": "phish_sample_30k"
         }
       }
     }
