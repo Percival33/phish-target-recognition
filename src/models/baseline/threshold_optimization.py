@@ -94,18 +94,14 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
     benign_labels_path = f"benign_labels_threshold_{threshold}.txt"
 
     # Create labels files for each directory
-    phish_count = create_labels_file_for_directory(
-        val_df, "phishing", phish_labels_path
-    )
-    benign_count = create_labels_file_for_directory(
-        val_df, "trusted_list", benign_labels_path
-    )
+    _ = create_labels_file_for_directory(val_df, "phishing", phish_labels_path)
+    _ = create_labels_file_for_directory(val_df, "trusted_list", benign_labels_path)
 
     env = os.environ.copy()
     env["WANDB_MODE"] = "disabled"
 
     try:
-        print(f"Processing phishing samples...")
+        print("Processing phishing samples...")
         # Run query on phishing samples with proper labels
         phish_cmd = [
             "uv",
@@ -132,7 +128,7 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
             )
             return False
 
-        print(f"  🔍 Processing benign samples...")
+        print("  🔍 Processing benign samples...")
         # Run query on trusted_list samples with proper labels
         benign_cmd = [
             "uv",
@@ -158,7 +154,7 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
             )
             return False
 
-        print(f"Combining results...")
+        print("Combining results...")
         # Combine results
         phish_df = pd.read_csv(phish_output)
         benign_df = pd.read_csv(benign_output)
@@ -297,13 +293,13 @@ def main():
         logger.info(f"Best MCC threshold: {best_threshold_mcc}")
         logger.info(f"Best Target MCC threshold: {best_threshold_target_mcc}")
 
-        print(f"\nOPTIMIZATION COMPLETE!")
+        print("\nOPTIMIZATION COMPLETE!")
         print(f"Best F1: {best_f1:.4f} at threshold {best_threshold_f1}")
         print(f"Best MCC: {best_mcc:.4f} at threshold {best_threshold_mcc}")
         print(
             f"Best Target MCC: {best_target_mcc:.4f} at threshold {best_threshold_target_mcc}"
         )
-        print(f"Results saved to results_summary.csv")
+        print("Results saved to results_summary.csv")
     else:
         logger.error("No successful results obtained")
         sys.exit(1)
