@@ -1,6 +1,6 @@
 # Data Splitter
 
-Dataset splitting tool for creating stratified 60:30:10 train/validation/test splits.
+Dataset splitting tool for creating stratified 60:20:20 train/validation/test splits.
 
 ## Installation
 
@@ -72,8 +72,8 @@ file,true_target,true_class
 
 ### Split Proportions
 - **Train**: 60%
-- **Validation**: 30%
-- **Test**: 10%
+- **Validation**: 20%
+- **Test**: 20%
 
 All splits maintain class distribution through stratified sampling.
 

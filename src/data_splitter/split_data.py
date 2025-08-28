@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Single script for dataset splitting into 60:30:10 train/val/test splits
+Single script for dataset splitting into 60:20:20 train/val/test splits
 with stratified sampling and optional symlink creation.
 Creates both visualphish and phishpedia formatted outputs from VisualPhish dataset.
 """
@@ -71,6 +71,18 @@ class DataSplitter:
 
         # Otherwise, use the entire string as domain
         return true_target
+    
+    def _parse_target_name_only(self, true_target: str) -> str:
+        """Extract target name without timestamp for subfolders strategy."""
+        if not true_target:
+            return ""
+        
+        # For subfolders format like "Outlook+2020-09-14-10`07`35", extract just "Outlook"
+        if "+" in true_target:
+            return true_target.split("+", 1)[0]
+        
+        # If no timestamp format, return as is
+        return true_target
 
     def _get_domain_suffix(self, target: str) -> str:
         """Extract domain suffix from target using special_domain_mapping."""
@@ -133,6 +145,30 @@ class DataSplitter:
         else:
             return PROJ_ROOT / output_path
 
+    def _get_label_strategy(self, dataset_config: Dict) -> str:
+        """Get the label strategy from dataset config."""
+        return dataset_config.get("label_strategy", "directory")
+    
+    def _get_stratification_keys(self, data: pd.DataFrame, label_strategy: str) -> np.ndarray:
+        """Create stratification keys based on label strategy."""
+        if label_strategy == "subfolders":
+            # For subfolders: group by target name only (without timestamp)
+            target_names_only = data["true_target"].apply(self._parse_target_name_only)
+            y_stratify = (
+                data["true_class"].astype(str)
+                + "_"
+                + target_names_only.astype(str)
+            )
+        else:
+            # For other strategies: use full target name
+            y_stratify = (
+                data["true_class"].astype(str)
+                + "_"
+                + data["true_target"].astype(str)
+            )
+        
+        return y_stratify.values
+
     def load_dataset(self, dataset_name: str, dataset_config: Dict) -> pd.DataFrame:
         """Load images and labels using existing components"""
         self.logger.info(f"Loading dataset: {dataset_name}")
@@ -155,11 +191,11 @@ class DataSplitter:
         self, X: np.ndarray, y: np.ndarray, y_stratify: np.ndarray
     ) -> Tuple[np.ndarray, ...]:
         """
-        Two-stage stratified split for 60:30:10 proportions
+        Two-stage stratified split for 60:20:20 proportions
 
         Algorithm:
-        1. First split: train+val (90%) vs test (10%)
-        2. Second split: train (60/90 = 66.67%) vs val (30/90 = 33.33%)
+        1. First split: train+val (80%) vs test (20%)
+        2. Second split: train (60/80 = 75%) vs val (20/80 = 25%)
 
         Args:
             X: Array of indices
@@ -222,14 +258,14 @@ class DataSplitter:
                 X,
                 y,
                 y_stratify,
-                test_size=0.1,
+                test_size=0.2,
                 stratify=y_stratify,
                 random_state=random_state,
             )
         )
 
-        # Second split: separate train (60%) and val (30%) from remaining 90%
-        val_ratio = 0.3 / 0.9  # 30% of total / 90% remaining = 33.33% of remaining
+        # Second split: separate train (60%) and val (20%) from remaining 80%
+        val_ratio = 0.2 / 0.8  # 20% of total / 80% remaining = 25% of remaining
         X_train, X_val, y_train, y_val = train_test_split(
             X_temp,
             y_temp,
@@ -566,14 +602,12 @@ class DataSplitter:
                 X = np.arange(len(data))  # indices
                 y = data["true_class"].values
 
-                # Create combined stratification key from true_class and true_target
-                # This ensures both class and target distributions are preserved
-                y_stratify = (
-                    data["true_class"].astype(str)
-                    + "_"
-                    + data["true_target"].astype(str)
-                )
-                y_stratify = y_stratify.values
+                # Create stratification keys based on label strategy
+                # For subfolders: group by target name only (ignoring timestamps)
+                # For other strategies: use full target name
+                dataset_config = self.config["datasets"][dataset_name]
+                label_strategy = self._get_label_strategy(dataset_config)
+                y_stratify = self._get_stratification_keys(data, label_strategy)
 
                 # Perform stratified split
                 splits = self.perform_stratified_split(X, y, y_stratify)
@@ -594,7 +628,7 @@ class DataSplitter:
 def create_argument_parser() -> argparse.ArgumentParser:
     """Create argument parser for CLI"""
     parser = argparse.ArgumentParser(
-        description="Split datasets into stratified 60:30:10 train/val/test splits",
+        description="Split datasets into stratified 60:20:20 train/val/test splits",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

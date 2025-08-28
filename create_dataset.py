@@ -3,6 +3,21 @@
 Simple dataset creation script for phishing target recognition.
 Creates symlinked datasets from phishpedia data in VisualPhish format.
 
+VisualPhish format structure:
+output_directory/
+├── trusted_list/
+│   ├── target_name_1/
+│   │   ├── T0_0.png, T0_1.png, etc.
+│   ├── target_name_2/
+│   │   ├── T1_0.png, T1_1.png, etc.
+│   └── targets.txt
+├── phishing/
+│   ├── target_name_1/
+│   │   ├── T0_0.png, T0_1.png, etc.
+│   ├── target_name_2/
+│   │   ├── T1_0.png, T1_1.png, etc.
+│   └── targets.txt
+
 Usage:
     uv run create_dataset.py \
         --benign-dir /path/to/benign/folders \
@@ -16,6 +31,7 @@ import os
 import argparse
 import pickle
 import sys
+import re
 from pathlib import Path
 
 
@@ -190,26 +206,63 @@ def load_domain_mapping():
         return get_special_domain_mapping()
 
 
-def save_visualphish_format(target_num, image_paths, output_dir, is_phishing=False):
-    """Save images in VisualPhish format using symlinks."""
-    subdir = "phishing" if is_phishing else "benign"
-    output_path = Path(output_dir) / subdir
-    output_path.mkdir(parents=True, exist_ok=True)
+def sanitize_folder_name(name):
+    """Sanitize target name for use as folder name."""
+    # Replace problematic characters with underscores
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
+    # Remove multiple consecutive underscores
+    sanitized = re.sub(r'_+', '_', sanitized)
+    # Remove leading/trailing underscores and dots
+    sanitized = sanitized.strip('_.')
+    return sanitized
+
+
+def save_visualphish_format(target_name, target_num, benign_images, phishing_images, output_dir):
+    """Save images in VisualPhish format using symlinks - trusted_list and phishing folders with target subfolders."""
+    sanitized_name = sanitize_folder_name(target_name)
     
-    count = 0
-    for i, img_path in enumerate(image_paths):
-        if Path(img_path).exists():
-            link_name = f"T{target_num}_{i}.png"
-            link_path = output_path / link_name
-            
-            # Remove existing symlink if it exists
-            if link_path.exists():
-                link_path.unlink()
-            
-            os.symlink(str(Path(img_path).absolute()), str(link_path))
-            count += 1
+    # Create trusted_list and phishing top-level folders
+    trusted_list_dir = Path(output_dir) / "trusted_list"
+    phishing_dir = Path(output_dir) / "phishing"
     
-    return count
+    benign_count = 0
+    phishing_count = 0
+    
+    # Save benign images in trusted_list/target_folder
+    if benign_images:
+        benign_target_folder = trusted_list_dir / sanitized_name
+        benign_target_folder.mkdir(parents=True, exist_ok=True)
+        
+        for i, img_path in enumerate(benign_images):
+            if Path(img_path).exists():
+                link_name = f"T{target_num}_{i}.png"
+                link_path = benign_target_folder / link_name
+                
+                # Remove existing symlink if it exists
+                if link_path.exists():
+                    link_path.unlink()
+                
+                os.symlink(str(Path(img_path).absolute()), str(link_path))
+                benign_count += 1
+    
+    # Save phishing images in phishing/target_folder
+    if phishing_images:
+        phishing_target_folder = phishing_dir / sanitized_name
+        phishing_target_folder.mkdir(parents=True, exist_ok=True)
+        
+        for i, img_path in enumerate(phishing_images):
+            if Path(img_path).exists():
+                link_name = f"T{target_num}_{i}.png"
+                link_path = phishing_target_folder / link_name
+                
+                # Remove existing symlink if it exists
+                if link_path.exists():
+                    link_path.unlink()
+                
+                os.symlink(str(Path(img_path).absolute()), str(link_path))
+                phishing_count += 1
+    
+    return benign_count, phishing_count
 
 
 def find_benign_images(domains, benign_dir):
@@ -339,22 +392,54 @@ def main():
     # Process each target
     total_benign = 0
     total_phishing = 0
+    benign_targets = []
+    phishing_targets = []
     
     for i, target in enumerate(targets):
-        print(f"\nProcessing target {i}: {target['target']}")
+        target_name = target['target']
+        print(f"\nProcessing target {i}: {target_name}")
         
         # Find benign images by domain
         domains = target["domains"].split("\n") if target.get("domains") else []
         benign_images = find_benign_images(domains, args.benign_dir)
-        benign_count = save_visualphish_format(i, benign_images, args.output_dir, is_phishing=False)
-        total_benign += benign_count
         
         # Find phishing images by target name
-        phishing_images = find_phishing_images(target["target"], args.phishing_dir, domain_mapping)
-        phishing_count = save_visualphish_format(i, phishing_images, args.output_dir, is_phishing=True)
-        total_phishing += phishing_count
+        phishing_images = find_phishing_images(target_name, args.phishing_dir, domain_mapping)
         
-        print(f"  → {benign_count} benign, {phishing_count} phishing images")
+        # Save images in VisualPhish format
+        if benign_images or phishing_images:
+            benign_count, phishing_count = save_visualphish_format(
+                target_name, i, benign_images, phishing_images, args.output_dir
+            )
+            total_benign += benign_count
+            total_phishing += phishing_count
+            
+            # Track targets that have images in each category
+            if benign_count > 0:
+                benign_targets.append(target_name)
+            if phishing_count > 0:
+                phishing_targets.append(target_name)
+                
+            print(f"  → {benign_count} benign, {phishing_count} phishing images")
+        else:
+            print(f"  → No images found for {target_name}")
+    
+    # Create separate targets.txt files
+    if benign_targets:
+        trusted_targets_file = Path(args.output_dir) / "trusted_list" / "targets.txt"
+        trusted_targets_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(trusted_targets_file, 'w') as f:
+            for target_name in benign_targets:
+                f.write(f"{target_name}\n")
+        print(f"\nCreated trusted_list/targets.txt with {len(benign_targets)} targets")
+    
+    if phishing_targets:
+        phishing_targets_file = Path(args.output_dir) / "phishing" / "targets.txt"
+        phishing_targets_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(phishing_targets_file, 'w') as f:
+            for target_name in phishing_targets:
+                f.write(f"{target_name}\n")
+        print(f"Created phishing/targets.txt with {len(phishing_targets)} targets")
     
     print(f"\n=== Summary ===")
     print(f"Processed {len(targets)} targets")
