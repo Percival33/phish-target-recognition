@@ -186,7 +186,7 @@ def main():
 
                 for i, split_name in enumerate(splits_to_process):
                     logger.info(
-                        f"Processing {dataset_name}/{split_name} ({i+1}/{len(splits_to_process)})"
+                        f"Processing {dataset_name}/{split_name} ({i + 1}/{len(splits_to_process)})"
                     )
 
                     try:

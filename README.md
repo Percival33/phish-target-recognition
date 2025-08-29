@@ -67,7 +67,7 @@ Prepare csv file with such columns:
     "fqdn", # fully qualified domain
     "screenshot_object", # path to image
     "affected_entity",
-    "is_phishing" # column with 1 and 0 depending on sample being phishing
+    "is_phishing" # column 1 is phishing, 0 is benign
 ```
 
 #### Update configuration

@@ -1,0 +1,9 @@
+Timestamp | Target | Class | Original File | Augmented File | Parameters
+--------------------------------------------------------------------------------
+2025-08-28 16:02:49 | ms_outlook | benign | T150_13.png | T150_13_aug1.png | blur kernel=7
+2025-08-28 16:02:50 | ms_outlook | benign | T150_12.png | T150_12_aug2.png | brightness factor=0.68
+2025-08-28 16:02:51 | ms_outlook | benign | T150_13.png | T150_13_aug3.png | blur kernel=11
+2025-08-28 16:02:52 | ms_outlook | benign | T150_11.png | T150_11_aug4.png | blur kernel=3
+2025-08-28 16:02:53 | ms_outlook | benign | T150_13.png | T150_13_aug5.png | brightness factor=0.80
+2025-08-28 16:02:53 | ms_outlook | benign | T150_4.PNG | T150_4_aug6.PNG | brightness factor=1.43
+2025-08-28 16:02:55 | ms_outlook | benign | T150_11.png | T150_11_aug7.png | brightness factor=1.08
