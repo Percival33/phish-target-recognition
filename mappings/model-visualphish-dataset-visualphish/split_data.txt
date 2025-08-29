@@ -1,0 +1,114 @@
+uv run split_data.py --config $PROJECT_ROOT_DIR/config.json
+Using PROJECT_ROOT_DIR from env: /home/phish-target-recognition
+/home/phish-target-recognition
+2025-08-28 15:40:15,674 INFO Starting dataset splitting process
+2025-08-28 15:40:15,676 INFO Processing dataset: visualphish
+2025-08-28 15:40:15,676 INFO Loading dataset: visualphish
+2025-08-28 15:40:17,681 INFO visualphish: 10864 samples, classes: Counter({0: 8757, 1: 2107})
+2025-08-28 15:40:17,681 INFO Loaded 10864 samples for visualphish
+2025-08-28 15:40:17,685 WARNING Dropping 74 class-target combinations with insufficient samples (<3):
+2025-08-28 15:40:17,685 WARNING   - Dropping combination '1_mew': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_bnz': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_sharp': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_cathay_bank': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_crate_and_barrel': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_ocn': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_rbc': only 2 samples
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_taxact': only 1 sample
+2025-08-28 15:40:17,686 WARNING   - Dropping combination '1_hfe': only 1 sample
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_db': only 1 sample
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_ziggo': only 2 samples
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_mweb': only 2 samples
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_ms_skype': only 1 sample
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_wp60': only 1 sample
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_commonwealth_bank': only 1 sample
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_lcl': only 2 samples
+2025-08-28 15:40:17,687 WARNING   - Dropping combination '1_youtube': only 2 samples
+2025-08-28 15:40:17,688 WARNING   - Dropping combination '1_bestchange': only 2 samples
+2025-08-28 15:40:17,688 WARNING   - Dropping combination '1_fibank': only 2 samples
+2025-08-28 15:40:17,688 WARNING   - Dropping combination '1_otrs': only 1 sample
+2025-08-28 15:40:17,688 WARNING   - Dropping combination '1_bankia': only 2 samples
+2025-08-28 15:40:17,688 WARNING   - Dropping combination '1_airbnb': only 1 sample
+2025-08-28 15:40:17,688 WARNING   - Dropping combination '1_la_poste': only 2 samples
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_netsons': only 1 sample
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_smiles': only 1 sample
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_file_transfer': only 1 sample
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_fsnb': only 1 sample
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_erste': only 1 sample
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_ms_bing': only 2 samples
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_eharmony': only 1 sample
+2025-08-28 15:40:17,689 WARNING   - Dropping combination '1_tech_target': only 1 sample
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_whatsapp': only 2 samples
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_sicil_shop': only 1 sample
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_bnp_paribas': only 2 samples
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_etisalat': only 1 sample
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_qnb': only 1 sample
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_arnet_tech': only 1 sample
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_postbank': only 1 sample
+2025-08-28 15:40:17,690 WARNING   - Dropping combination '1_infinisource': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_zoominfo': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_stripe': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_bbt': only 2 samples
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_orange_rockland': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_typeform': only 2 samples
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_paschoalotto': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_banco_de_occidente': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_cogeco': only 1 sample
+2025-08-28 15:40:17,691 WARNING   - Dropping combination '1_cloudconvert': only 1 sample
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_fnac': only 1 sample
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_momentum_office_design': only 1 sample
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_barclaycard': only 2 samples
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_tradekey': only 2 samples
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_nordea': only 1 sample
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_daum': only 1 sample
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_anadolubank': only 1 sample
+2025-08-28 15:40:17,692 WARNING   - Dropping combination '1_knab': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_one_and_one': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_shoptet': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_snapchat': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_timeweb': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_cryptobridge': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_test_rite': only 1 sample
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_mbank': only 2 samples
+2025-08-28 15:40:17,693 WARNING   - Dropping combination '1_sunrise': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_docmagic': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_blizzard': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_etrade': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_xtrix_tv': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_swisscom': only 2 samples
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_capitec': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_latam': only 1 sample
+2025-08-28 15:40:17,694 WARNING   - Dropping combination '1_cetelem': only 1 sample
+2025-08-28 15:40:17,695 WARNING   - Dropping combination '1_summit_bank': only 2 samples
+2025-08-28 15:40:17,695 WARNING   - Dropping combination '1_htb': only 1 sample
+2025-08-28 15:40:17,702 INFO After filtering: 10771 samples remaining with 214 unique class-target combinations
+2025-08-28 15:40:17,702 INFO Splitting 10771 samples with 214 unique class-target combinations
+2025-08-28 15:40:26,314 INFO Created VisualPhish format for visualphish
+2025-08-28 15:40:46,002 INFO Created Phishpedia format for visualphish
+2025-08-28 15:40:46,002 INFO Saved all splits for visualphish to /home/phish-target-recognition/data_splits/visualphish
+
+=== Split Summary for visualphish ===
+Total samples: 10771
+Train: 6462 (60.0%)
+Val:   2154 (20.0%)
+Test:  2155 (20.0%)
+
+=== Class Distribution ===
+Train - Class 0: 5258, Class 1: 1204
+Val   - Class 0: 1743, Class 1: 411
+Test  - Class 0: 1756, Class 1: 399
+
+=== Target Distribution (sample counts per unique target) ===
+Unique targets - Total: 144
+Train: 144 (100.0%)
+Val:   144 (100.0%)
+Test:  144 (100.0%)
+
+=== Stratification Verification (5 sample targets) ===
+Target 'paypal': Total=352, Train=211, Val=70, Test=71
+Target 'microsoft': Total=287, Train=172, Val=57, Test=58
+Target 'facebook': Total=244, Train=147, Val=49, Test=48
+Target 'ebay': Total=243, Train=146, Val=49, Test=48
+Target 'grupo_bancolombia': Total=208, Train=125, Val=41, Test=42
+2025-08-28 15:40:46,035 INFO
+Dataset splitting completed successfully!

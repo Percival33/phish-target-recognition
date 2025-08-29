@@ -20,11 +20,26 @@ copy-tools-to-baseline: build-common
 
 copy-tools-for-eval: build-common
     mkdir -p src/eval/libs
-    cp src/tools/dist/*.whl src/eval/libs/
+    cp src/tools/dist/*.whl src/eval/libs
 
 copy-tools-to-cv: build-common
     mkdir -p src/cross_validation/libs
-    cp src/tools/dist/*.whl src/cross_validation/libs/
+    cp src/tools/dist/*.whl src/cross_validation/libs
+
+copy-tools-to-data-splitter: build-common
+    mkdir -p src/data_splitter/libs
+    cp src/tools/dist/*.whl src/data_splitter/libs/
+
+setup-data-splitter: copy-tools-to-data-splitter
+    cd src/data_splitter && \
+    echo "Setting up 'data_splitter' package environment in src/data_splitter/ ..." && \
+    uv sync --frozen --quiet && \
+    echo "'data_splitter' environment setup complete."
+
+run-data-split config_path='config.json': setup-data-splitter
+    echo "Running data split with config: {{ config_path }}"
+    cd src/data_splitter && \
+    uv run split_data.py {{ config_path }}
 
 setup-eval: copy-tools-for-eval
     cd src/eval && \
@@ -47,7 +62,13 @@ clean-eval:
     rm -rf src/eval/critical_difference_analysis_results
     echo "Cleaned 'eval' libs, virtual environment, and results."
 
-tools: copy-tools-to-visualphishnet copy-tools-to-phishpedia copy-tools-to-baseline copy-tools-to-cv
+clean-data-splitter:
+    rm -rf src/data_splitter/libs
+    rm -rf src/data_splitter/.venv
+    rm -rf src/data_splitter/data_splits
+    echo "Cleaned 'data_splitter' libs, virtual environment, and results."
+
+tools: copy-tools-to-visualphishnet copy-tools-to-phishpedia copy-tools-to-baseline copy-tools-to-cv copy-tools-to-data-splitter
     echo "Tools package was built"
 
 run-pp recipe-name:

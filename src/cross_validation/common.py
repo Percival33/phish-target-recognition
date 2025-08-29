@@ -20,7 +20,7 @@ class CVConstants:
     TRAIN_CSV = "train.csv"
     VAL_CSV = "val.csv"
     CONFIG_JSON = "config.json"
-    LABELS_TXT = "labels.txt"
+    LABELS_TXT = "targets.txt"
 
     # Directory patterns
     SPLIT_DIR_PATTERN = "split_{}"
