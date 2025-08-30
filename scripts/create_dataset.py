@@ -193,14 +193,19 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
     ]
 
     for search_name in search_names:
-        # Find folders that start with the search name
+        # Find folders by splitting on '+' and comparing the first part
         for folder in phishing_path.iterdir():
-            if folder.is_dir() and folder.name.startswith(search_name + "+"):
-                shot_png = folder / "shot.png"
-                if shot_png.exists():
-                    image_paths.append(str(shot_png))
-                else:
-                    print(f"Warning: No shot.png found in {folder}")
+            if folder.is_dir() and "+" in folder.name:
+                # Split folder name on '+' and get the first part (target name)
+                folder_target = folder.name.split("+")[0]
+
+                # Compare with search name (case-insensitive)
+                if folder_target.lower() == search_name.lower():
+                    shot_png = folder / "shot.png"
+                    if shot_png.exists():
+                        image_paths.append(str(shot_png))
+                    else:
+                        print(f"Warning: No shot.png found in {folder}")
 
         if image_paths:  # Found some matches, stop searching
             break
