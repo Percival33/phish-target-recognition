@@ -59,10 +59,30 @@ def load_domain_mapping():
 
 
 def load_target_mappings():
-    """Load target name mappings from target_mappings.json."""
+    """Load target name mappings from target_mappings.json and expand them."""
     try:
         with open(Path(__file__).parent.parent / "target_mappings.json", "r") as f:
-            return json.load(f)
+            original_mappings = json.load(f)
+
+        # Expand mappings so each item in values also becomes a key
+        # For key: [item1, item2] -> create:
+        # key: [key, item1, item2]
+        # item1: [key, item1, item2]
+        # item2: [key, item1, item2]
+        expanded_mappings = {}
+
+        for key, values in original_mappings.items():
+            # Create the full list including the key itself
+            all_items = [key] + values
+
+            # Add mapping for the original key
+            expanded_mappings[key] = all_items
+
+            # Add mapping for each value as a key
+            for value in values:
+                expanded_mappings[value] = all_items
+
+        return expanded_mappings
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Warning: Could not load target_mappings.json: {e}")
         return {}
@@ -210,6 +230,7 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
 
     if not image_paths:
         print(f"Warning: No phishing folders found for target '{target_name}'")
+        raise ValueError(f"No phishing folders found for target '{target_name}'")
 
     return image_paths
 
