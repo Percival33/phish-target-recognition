@@ -65,11 +65,12 @@ class DataSplitter:
         if not true_target:
             return "unknown"
 
-        # If it contains '--', take the part before it as domain
         if "--" in true_target:
             return true_target.split("--", 1)[0]
 
-        # Otherwise, use the entire string as domain
+        if "+" in true_target:
+            return true_target.split("+", 1)[0]
+
         return true_target
     
     def _parse_target_name_only(self, true_target: str) -> str:

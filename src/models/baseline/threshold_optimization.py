@@ -116,7 +116,7 @@ def run_query_with_threshold(
         result = subprocess.run(phish_cmd, capture_output=True, text=True, env=env)
         if result.returncode != 0:
             logger.error(
-                f"Phishing query failed for threshold {threshold}: {result.stderr}"
+                f"Phishing query failed for threshold {threshold}: {result.stdout}"
             )
             return False
 
@@ -209,25 +209,25 @@ def main():
     )
     parser.add_argument(
         "--val-csv",
-        default="/home/phish-target-recognition/data_splits/visualphish/phishpedia/val.csv",
+        default="/home/phish-target-recognition/data_splits/visualphish/visualphish/val.csv",
         help="Path to validation CSV file",
         dest="val_csv",
     )
     parser.add_argument(
         "--data-base",
-        default="/home/phish-target-recognition/data_splits/visualphish/phishpedia/data/val",
+        default="/home/phish-target-recognition/data_splits/visualphish/visualphish/data/val",
         help="Base path to validation data directory",
         dest="data_base",
     )
     parser.add_argument(
         "--index-path",
-        default="/home/phish-target-recognition/logs/vp/vp-for-baseline/index.faiss",
         help="Path to FAISS index file",
+        required=True,
         dest="index_path",
     )
     args = parser.parse_args()
 
-    thresholds = [30, 50, 70, 90, 110, 130, 150, 170, 200]
+    thresholds = range(0, 100, 10)
     results = []
     best_f1 = 0
     best_mcc = -1
@@ -288,7 +288,7 @@ def main():
             )
 
             # Clean up temporary file
-            Path(output_file).unlink(missing_ok=True)
+            # Path(output_file).unlink(missing_ok=True)
         else:
             print(f"Failed to process threshold {threshold}")
             logger.error(f"Skipping threshold {threshold} due to query failure")
