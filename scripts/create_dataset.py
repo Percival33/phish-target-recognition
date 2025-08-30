@@ -201,11 +201,20 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
 
                 # Compare with search name (case-insensitive)
                 if folder_target.lower() == search_name.lower():
-                    shot_png = folder / "shot.png"
-                    if shot_png.exists():
-                        image_paths.append(str(shot_png))
-                    else:
-                        print(f"Warning: No shot.png found in {folder}")
+                    # Find all image files in the folder
+                    for img_file in folder.iterdir():
+                        if img_file.is_file() and img_file.suffix.lower() in [
+                            ".png",
+                            ".jpg",
+                            ".jpeg",
+                        ]:
+                            image_paths.append(str(img_file))
+
+                    if not any(
+                        f.is_file() and f.suffix.lower() in [".png", ".jpg", ".jpeg"]
+                        for f in folder.iterdir()
+                    ):
+                        print(f"Warning: No image files found in {folder}")
 
         if image_paths:  # Found some matches, stop searching
             break
