@@ -35,7 +35,7 @@ import re
 from pathlib import Path
 
 sys.path.insert(
-    0, str(Path(__file__).parent.parent / "models" / "phishpedia" / "scripts")
+    0, str(Path(__file__).parent.parent / "src" / "models" / "phishpedia" / "scripts")
 )
 from organize import get_special_domain_mapping
 
@@ -43,7 +43,15 @@ from organize import get_special_domain_mapping
 def load_domain_mapping():
     """Load target name mappings from pickle file or fallback to hardcoded mapping."""
     try:
-        with open("src/models/phishpedia/models/domain_map.pkl", "rb") as f:
+        domain_map_path = (
+            Path(__file__).parent.parent
+            / "src"
+            / "models"
+            / "phishpedia"
+            / "models"
+            / "domain_map.pkl"
+        )
+        with open(domain_map_path, "rb") as f:
             return pickle.load(f)
     except (FileNotFoundError, PermissionError):
         print("Warning: Could not load domain_map.pkl, using fallback mapping")
@@ -53,7 +61,7 @@ def load_domain_mapping():
 def load_target_mappings():
     """Load target name mappings from target_mappings.json."""
     try:
-        with open("target_mappings.json", "r") as f:
+        with open(Path(__file__).parent.parent / "target_mappings.json", "r") as f:
             mappings = json.load(f)
 
         # Create a flat mapping from all possible names to the key
@@ -231,7 +239,12 @@ def main():
 
     # Load JSON file and filter phish=true entries
     try:
-        with open(args.json_file) as f:
+        # If path is relative, make it relative to project root
+        json_path = Path(args.json_file)
+        if not json_path.is_absolute():
+            json_path = Path(__file__).parent.parent / json_path
+
+        with open(json_path) as f:
             all_targets = json.load(f)
         targets = [t for t in all_targets if t.get("phish")]
         print(f"Loaded {len(targets)} targets with phish=true from {args.json_file}")
