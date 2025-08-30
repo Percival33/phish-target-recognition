@@ -62,18 +62,7 @@ def load_target_mappings():
     """Load target name mappings from target_mappings.json."""
     try:
         with open(Path(__file__).parent.parent / "target_mappings.json", "r") as f:
-            mappings = json.load(f)
-
-        # Create a flat mapping from all possible names to the key
-        target_mappings = {}
-        for key, names in mappings.items():
-            # Add the key itself
-            target_mappings[key.lower().replace(" ", "_")] = key
-            # Add all alternative names
-            for name in names:
-                target_mappings[name.lower().replace(" ", "_")] = key
-
-        return target_mappings
+            return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Warning: Could not load target_mappings.json: {e}")
         return {}
@@ -176,21 +165,21 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
         print(f"Warning: Phishing directory {phishing_dir} does not exist")
         return image_paths
 
-    # Try to map target name to known company names
-    target_lower = target_name.lower().replace(" ", "_")
+    # Get all name variants for this target
+    search_names = set(
+        [
+            target_name,
+            target_name.replace("_", " "),
+            target_name.replace(" ", "_"),
+            target_name.lower(),
+            target_name.lower().replace("_", " "),
+            target_name.lower().replace(" ", "_"),
+        ]
+    )
 
-    # Create reverse mapping from company names to target keys
-    reverse_mapping = {}
-    for key, domain in domain_mapping.items():
-        reverse_mapping[key] = key
-
-    # Try different variations of the target name
-    search_names = [
-        target_name,
-        target_mappings.get(target_lower, target_name),
-        target_name.replace("_", " "),
-        target_name.replace(" ", "_"),
-    ]
+    # Add all mapped variants if target is found in mappings
+    if target_name in target_mappings:
+        search_names.update(target_mappings[target_name])
 
     for search_name in search_names:
         # Find folders by splitting on '+' and comparing the first part
