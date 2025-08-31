@@ -370,7 +370,7 @@ class BaselineEmbedder:
                         baseline_target = closest_metadata["true_target"]
 
                     result = {
-                        "file": query_path.name,
+                        "file": query_path,
                         "baseline_class": baseline_class,
                         "baseline_distance": closest_distance,
                         "baseline_target": baseline_target,

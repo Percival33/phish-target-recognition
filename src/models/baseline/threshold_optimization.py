@@ -37,11 +37,11 @@ def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.Da
     results_df = pd.read_csv(results_file)
     val_df = load_validation_data(val_csv_path)
 
-    # Create mapping from filename to validation info
+    # Create mapping from new_path to validation info
     val_mapping = {}
     for _, row in val_df.iterrows():
-        filename = Path(row["new_path"]).name
-        val_mapping[filename] = {
+        new_path = row["new_path"]
+        val_mapping[new_path] = {
             "true_class": row["true_class"],
             "true_target": row["true_target"],
         }
@@ -51,12 +51,24 @@ def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.Da
     true_targets = []
 
     for _, row in results_df.iterrows():
-        filename = row["file"]
-
-        if filename in val_mapping:
+        full_path = row["file"]
+        
+        # Extract the relative path suffix that matches new_path in validation data
+        # Look for patterns like "phishing/..." or "trusted_list/..." in the full path
+        path_parts = full_path.split('/')
+        relative_path = None
+        
+        # Find the index of "phishing" or "trusted_list" in the path
+        for i, part in enumerate(path_parts):
+            if part in ["phishing", "trusted_list"]:
+                # Extract from this part onwards
+                relative_path = '/'.join(path_parts[i:])
+                break
+        
+        if relative_path and relative_path in val_mapping:
             # Use validation data
-            true_classes.append(val_mapping[filename]["true_class"])
-            true_targets.append(val_mapping[filename]["true_target"])
+            true_classes.append(val_mapping[relative_path]["true_class"])
+            true_targets.append(val_mapping[relative_path]["true_target"])
         else:
             # Fallback: infer from directory structure based on baseline_target
             # If baseline_target is "benign", assume it's from trusted_list (class 0)
@@ -227,7 +239,13 @@ def main():
     )
     args = parser.parse_args()
 
-    thresholds = range(0, 100, 10)
+    # mean = 7.447219
+    # std = 21.387345
+
+    # thresholds = sorted(
+    #     set(range(max(0, int(mean - std)), int(mean + std))) | set(range(0, 100, 10))
+    # )
+    thresholds = [7]
     results = []
     best_f1 = 0
     best_mcc = -1
