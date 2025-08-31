@@ -52,19 +52,19 @@ def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.Da
 
     for _, row in results_df.iterrows():
         full_path = row["file"]
-        
+
         # Extract the relative path suffix that matches new_path in validation data
         # Look for patterns like "phishing/..." or "trusted_list/..." in the full path
-        path_parts = full_path.split('/')
+        path_parts = full_path.split("/")
         relative_path = None
-        
+
         # Find the index of "phishing" or "trusted_list" in the path
         for i, part in enumerate(path_parts):
             if part in ["phishing", "trusted_list"]:
                 # Extract from this part onwards
-                relative_path = '/'.join(path_parts[i:])
+                relative_path = "/".join(path_parts[i:])
                 break
-        
+
         if relative_path and relative_path in val_mapping:
             # Use validation data
             true_classes.append(val_mapping[relative_path]["true_class"])
@@ -206,11 +206,7 @@ def calculate_metrics_from_results(results_file: str) -> tuple:
     )
     logger.info(f"Target MCC: {target_metrics['target_mcc']:.4f}")
 
-    return (
-        class_metrics["f1_weighted"],
-        class_metrics["mcc"],
-        target_metrics["target_mcc"],
-    )
+    return (class_metrics, target_metrics)
 
 
 def main():
@@ -247,10 +243,10 @@ def main():
     # )
     thresholds = [7]
     results = []
-    best_f1 = 0
+    best_identification_rate = 0
     best_mcc = -1
     best_target_mcc = -1
-    best_threshold_f1 = None
+    best_threshold_identification_rate = None
     best_threshold_mcc = None
     best_threshold_target_mcc = None
 
@@ -277,32 +273,30 @@ def main():
             threshold, val_csv_path, args.data_base, args.index_path
         ):
             output_file = f"results_threshold_{threshold}.csv"
-            f1, mcc, target_mcc = calculate_metrics_from_results(output_file)
+            class_metrics, target_metrics = calculate_metrics_from_results(output_file)
 
             results.append(
                 {
                     "threshold": threshold,
-                    "f1_weighted": f1,
-                    "mcc": mcc,
-                    "target_mcc": target_mcc,
+                    "class_metrics": class_metrics,
+                    "target_metrics": target_metrics,
                 }
             )
 
-            if f1 > best_f1:
-                best_f1 = f1
-                best_threshold_f1 = threshold
+            if target_metrics["identification_rate"] > best_identification_rate:
+                best_identification_rate = target_metrics["identification_rate"]
+                best_threshold_identification_rate = threshold
 
-            if mcc > best_mcc:
-                best_mcc = mcc
+            if class_metrics["mcc"] > best_mcc:
+                best_mcc = class_metrics["mcc"]
                 best_threshold_mcc = threshold
 
-            if target_mcc > best_target_mcc:
-                best_target_mcc = target_mcc
+            if target_metrics["target_mcc"] > best_target_mcc:
+                best_target_mcc = target_metrics["target_mcc"]
                 best_threshold_target_mcc = threshold
 
-            print(f"Results: F1={f1:.4f}, MCC={mcc:.4f}, Target MCC={target_mcc:.4f}")
             logger.info(
-                f"Threshold {threshold}: F1={f1:.4f}, MCC={mcc:.4f}, Target MCC={target_mcc:.4f}"
+                f"Threshold {threshold}: F1_weighted={class_metrics['f1_weighted']:.4f}, MCC={class_metrics['mcc']:.4f}, Target MCC={target_metrics['target_mcc']:.4f} Identification Rate={target_metrics['identification_rate']:.4f}"
             )
 
             # Clean up temporary file
@@ -319,16 +313,22 @@ def main():
         logger.info("Saved results_summary.csv")
 
         # Save best thresholds
-        Path("best_threshold_f1.txt").write_text(str(best_threshold_f1))
+        Path("best_threshold_identification_rate.txt").write_text(
+            str(best_threshold_identification_rate)
+        )
         Path("best_threshold_mcc.txt").write_text(str(best_threshold_mcc))
         Path("best_threshold_target_mcc.txt").write_text(str(best_threshold_target_mcc))
 
-        logger.info(f"Best F1 threshold: {best_threshold_f1}")
+        logger.info(
+            f"Best Identification Rate threshold: {best_threshold_identification_rate}"
+        )
         logger.info(f"Best MCC threshold: {best_threshold_mcc}")
         logger.info(f"Best Target MCC threshold: {best_threshold_target_mcc}")
 
         print("\nOPTIMIZATION COMPLETE!")
-        print(f"Best F1: {best_f1:.4f} at threshold {best_threshold_f1}")
+        print(
+            f"Best Identification Rate: {best_identification_rate:.4f} at threshold {best_threshold_identification_rate}"
+        )
         print(f"Best MCC: {best_mcc:.4f} at threshold {best_threshold_mcc}")
         print(
             f"Best Target MCC: {best_target_mcc:.4f} at threshold {best_threshold_target_mcc}"
