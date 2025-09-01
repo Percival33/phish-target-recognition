@@ -3,13 +3,33 @@
     "Absa Group",
     "absa"
   ],
+  "ADP": [
+    "ADP",
+    "ADP, LLC",
+    "ADP, LLC."
+  ],
   "adidas": [
     "Adidas",
     "adidas"
   ],
+  "Airbnb, Inc.": [
+    "Airbnb, Inc.",
+    "Airbnb, Inc"
+  ],
+  "AOL": [
+    "AOL",
+    "AOL Inc.",
+    "AOL Inc"
+  ],
+  "Azul": [
+    "Azul",
+    "azul"
+  ],
   "Adobe": [
     "Adobe",
-    "adobe"
+    "adobe",
+    "Adobe Inc.",
+    "Adobe Inc"
   ],
   "Alibaba": [
     "Alibaba",
@@ -21,7 +41,13 @@
   ],
   "Amazon": [
     "Amazon",
-    "amazon"
+    "amazon",
+    "Amazon.com Inc.",
+    "Amazon.com Inc"
+  ],
+  "Americanas.com S": [
+    "Americanas.com S",
+    "Americanas.com S,A Comercio Electrnico"
   ],
   "American Express": [
     "American Express",
@@ -29,7 +55,9 @@
   ],
   "apple": [
     "Apple",
-    "apple"
+    "apple",
+    "Apple Inc.",
+    "Apple Inc"
   ],
   "aruba": [
     "Aruba S.p.A",
@@ -38,7 +66,9 @@
   ],
   "AT&T": [
     "AT&T",
-    "att"
+    "att",
+    "AT&T Inc.",
+    "AT&T Inc"
   ],
   "bahia": [
     "Bahia",
@@ -56,9 +86,14 @@
     "Barclays Bank Plc",
     "barclays"
   ],
+  "Banco do Brasil S.A": [
+    "Banco do Brasil S.A",
+    "Banco do Brasil S.A."
+  ],
   "bcp": [
     "BCP",
-    "bcp"
+    "bcp",
+    "Banco de Credito del Peru"
   ],
   "BNP Paribas": [
     "BNP Paribas",
@@ -77,6 +112,14 @@
     "BT Group plc",
     "bt"
   ],
+  "Cogeco": [
+    "Cogeco",
+    "cogeco"
+  ],
+  "Credit Agricole S.A": [
+    "Credit Agricole S.A",
+    "Credit Agricole S.A."
+  ],
   "caixa_bank": [
     "CaixaBank",
     "caixa_bank"
@@ -93,9 +136,20 @@
     "Canadian Imperial Bank of Commerce",
     "cibc"
   ],
+  "Deutsche Bank AG": [
+    "Deutsche Bank AG",
+    "db"
+  ],
+  "Deutsche Telekom": [
+    "Deutsche Telekom",
+    "T-Online"
+  ],
   "dhl": [
     "DHL Airways",
-    "dhl"
+    "dhl",
+    "DHL Airways, Inc.",
+    "DHL Airways, Inc",
+    "DHL"
   ],
   "dkb": [
     "DKB",
@@ -103,11 +157,15 @@
   ],
   "dropbox": [
     "Dropbox",
-    "dropbox"
+    "dropbox",
+    "Dropbox, Inc.",
+    "Dropbox, Inc"
   ],
   "eBay": [
     "eBay",
-    "ebay"
+    "ebay",
+    "eBay Inc.",
+    "eBay Inc"
   ],
   "ExampleBank": [
     "EB",
@@ -117,18 +175,39 @@
   "Facebook": [
     "Facebook",
     "facebook",
-    "meta"
+    "meta",
+    "Facebook, Inc.",
+    "Facebook, Inc"
+  ],
+  "Free ISP": [
+    "Free ISP",
+    "Free (ISP)"
+  ],
+  "French Health Insurance": [
+    "French Health Insurance",
+    "ameli_fr"
+  ],
+  "Global Sources HK": [
+    "Global Sources HK",
+    "Global Sources (HK)"
+  ],
+  "Government of Canada": [
+    "Government of Canada",
+    "Canada Revenue Agency"
   ],
   "Google": [
     "Google",
     "gmail",
-    "google"
+    "google",
+    "Google Inc.",
+    "Google Inc"
   ],
   "google_drive": [
     "Google Drive",
     "google_drive"
   ],
   "gov_uk": [
+    "Government of the United Kingdom",
     "Government of the United Kingdom",
     "gov_uk"
   ],
@@ -144,7 +223,8 @@
   ],
   "impots_gov": [
     "DGI French Tax Authority",
-    "impots_gov"
+    "impots_gov",
+    "DGI (French Tax Authority)"
   ],
   "Instagram": [
     "Instagram",
@@ -166,6 +246,10 @@
     "La Poste",
     "la_poste"
   ],
+  "Mastercard International": [
+    "Mastercard International",
+    "Mastercard International Incorporated"
+  ],
   "LinkedIn Corporation": [
     "LinkedIn Corporation",
     "linkedin"
@@ -185,7 +269,10 @@
     "ms_office",
     "ms_onedrive",
     "ms_outlook",
-    "ms_skype"
+    "ms_skype",
+    "Microsoft OneDrive",
+    "Office365",
+    "Outlook"
   ],
   "nab": [
     "National Australia Bank Limited",
@@ -197,7 +284,9 @@
   ],
   "Netflix": [
     "Netflix",
-    "netflix"
+    "netflix",
+    "Netflix Inc.",
+    "Netflix Inc"
   ],
   "Orange": [
     "Orange",
@@ -209,11 +298,38 @@
   ],
   "PayPal": [
     "PayPal",
-    "paypal"
+    "paypal",
+    "PayPal Inc.",
+    "PayPal Inc"
+  ],
+  "PostFinance": [
+    "PostFinance",
+    "Swiss Post"
+  ],
+  "Raiffeisen Bank S.A.": [
+    "Raiffeisen Bank S.A.",
+    "Raiffeisen Bank S.A"
+  ],
+  "Royal KPN N.V": [
+    "Royal KPN N.V",
+    "Royal KPN N.V."
   ],
   "RuneScape": [
     "RuneScape",
     "runescape"
+  ],
+  "SF Express Co": [
+    "SF Express Co",
+    "SF Express Co."
+  ],
+  "SNS Bank N.V": [
+    "SNS Bank N.V",
+    "SNS Bank N.V."
+  ],
+  "Square": [
+    "Square",
+    "Square, Inc.",
+    "Square, Inc"
   ],
   "sparkasse": [
     "Sparkasse Bank",
@@ -232,17 +348,31 @@
     "SunTrust Bank",
     "suntrust"
   ],
+  "TSB Bank Limited": [
+    "TSB Bank Limited",
+    "TSB Bank Plc"
+  ],
   "Twitter, Inc.": [
     "Twitter, Inc.",
-    "twitter"
+    "twitter",
+    "Twitter, Inc",
+    "Twitter"
   ],
   "typeform": [
     "Typeform",
     "typeform"
   ],
+  "UniCredit Bank Aktiengesellschaft": [
+    "UniCredit Bank Aktiengesellschaft",
+    "UniCredit Bulbank"
+  ],
   "usaa": [
     "United Services Automobile Association",
     "usaa"
+  ],
+  "Webmail Provider": [
+    "Webmail Provider",
+    "Webmail Providers"
   ],
   "walmart": [
     "Walmart",
@@ -254,6 +384,8 @@
   ],
   "Yahoo!": [
     "Yahoo!",
-    "yahoo"
+    "yahoo",
+    "Yahoo! Inc",
+    "Yahoo! Inc."
   ]
 }

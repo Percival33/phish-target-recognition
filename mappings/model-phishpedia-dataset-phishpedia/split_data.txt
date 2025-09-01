@@ -1,0 +1,38 @@
+uv run split_data.py --config $PROJECT_ROOT_DIR/config.json
+Using PROJECT_ROOT_DIR from env: /home/phish-target-recognition
+/home/phish-target-recognition
+2025-08-30 23:01:14,770 INFO Starting dataset splitting process
+2025-08-30 23:01:14,772 INFO Processing dataset: phishpedia
+2025-08-30 23:01:14,773 INFO Loading dataset: phishpedia
+2025-08-30 23:01:15,251 INFO phishpedia: 16042 samples, classes: Counter({1: 14500, 0: 1542})
+2025-08-30 23:01:15,252 INFO Loaded 16042 samples for phishpedia
+2025-08-30 23:01:15,256 INFO Splitting 16042 samples with 112 unique class-target combinations
+2025-08-30 23:01:29,731 INFO Created VisualPhish format for phishpedia
+2025-08-30 23:02:40,582 INFO Created Phishpedia format for phishpedia
+2025-08-30 23:02:40,582 INFO Saved all splits for phishpedia to /home/phish-target-recognition/data_splits/phishpedia
+
+=== Split Summary for phishpedia ===
+Total samples: 16042
+Train: 9624 (60.0%)
+Val:   3209 (20.0%)
+Test:  3209 (20.0%)
+
+=== Class Distribution ===
+Train - Class 0: 924, Class 1: 8700
+Val   - Class 0: 309, Class 1: 2900
+Test  - Class 0: 309, Class 1: 2900
+
+=== Target Distribution (sample counts per unique target) ===
+Unique targets - Total: 56
+Train: 56 (100.0%)
+Val:   56 (100.0%)
+Test:  56 (100.0%)
+
+=== Stratification Verification (5 sample targets) ===
+Target 'PayPal': Total=4836, Train=2902, Val=967, Test=967
+Target 'Office365': Total=2084, Train=1250, Val=417, Test=417
+Target 'Facebook': Total=1018, Train=610, Val=204, Test=204
+Target 'Amazon': Total=832, Train=499, Val=166, Test=167
+Target 'Netflix': Total=772, Train=463, Val=154, Test=155
+2025-08-30 23:02:40,617 INFO
+Dataset splitting completed successfully!

@@ -1,0 +1,282 @@
+uv run augment_data.py \
+  /home/phish-target-recognition/data/interim/pp-for-vp-augumented \
+  --label-strategy directory \
+  --output /home/phish-target-recognition/data/interim/pp-for-vp-augumented \
+  --threshold 25
+Reading inline script metadata from `augment_data.py`
+Found 54 targets that need augmentation:
+  Office365: phish=2059→25 (+0), benign=1→25 (+24)
+  ADP: phish=25→25 (+0), benign=1→25 (+24)
+  capital_one: phish=25→25 (+0), benign=1→25 (+24)
+  Match: phish=115→25 (+0), benign=3→25 (+22)
+  Navy Federal Credit Union: phish=47→25 (+0), benign=1→25 (+24)
+  Amazon: phish=807→25 (+0), benign=11→25 (+14)
+  NatWest Personal Banking: phish=25→25 (+0), benign=1→25 (+24)
+  bcp: phish=25→25 (+0), benign=1→25 (+24)
+  Ooredoo QSC: phish=25→25 (+0), benign=1→25 (+24)
+  Discover: phish=30→25 (+0), benign=1→25 (+24)
+  Vodafone: phish=25→25 (+0), benign=2→25 (+23)
+  Steam: phish=183→25 (+0), benign=2→25 (+23)
+  1&1 Ionos: phish=159→25 (+0), benign=1→25 (+24)
+  eBay: phish=232→25 (+0), benign=17→25 (+8)
+  Yahoo!: phish=385→25 (+0), benign=4→25 (+21)
+  gov_uk: phish=25→25 (+0), benign=6→25 (+19)
+  SNS Bank N.V: phish=25→25 (+0), benign=1→25 (+24)
+  ASB Bank Limited: phish=96→25 (+0), benign=1→25 (+24)
+  PayPal: phish=4811→25 (+0), benign=2→25 (+23)
+  iiNet Limited: phish=25→25 (+0), benign=1→25 (+24)
+  DHL: phish=727→25 (+0), benign=3→25 (+22)
+  Rakuten: phish=222→25 (+0), benign=2→25 (+23)
+  Facebook: phish=993→25 (+0), benign=1→25 (+24)
+  UBS AG: phish=25→25 (+0), benign=1→25 (+24)
+  Frontier Communications: phish=25→25 (+0), benign=1→25 (+24)
+  Netflix: phish=747→25 (+0), benign=1→25 (+24)
+  AT&T: phish=252→25 (+0), benign=2→25 (+23)
+  AOL: phish=31→25 (+0), benign=4→25 (+21)
+  Itau Unibanco S.A: phish=312→25 (+0), benign=1→25 (+24)
+  Raiffeisen Bank S.A: phish=49→25 (+0), benign=2→25 (+23)
+  Banco de Chile: phish=25→25 (+0), benign=1→25 (+24)
+  American Express: phish=46→25 (+0), benign=1→25 (+24)
+  National Bank of Canada: phish=25→25 (+0), benign=1→25 (+24)
+  Orange: phish=277→25 (+0), benign=2→25 (+23)
+  AutoScout24: phish=25→25 (+0), benign=6→25 (+19)
+  VKontakte: phish=37→25 (+0), benign=3→25 (+22)
+  ATB Financial: phish=25→25 (+0), benign=2→25 (+23)
+  Visa International Service Association: phish=66→25 (+0), benign=1→25 (+24)
+  HSBC Bank: phish=25→25 (+0), benign=5→25 (+20)
+  Giffgaff: phish=25→25 (+0), benign=1→25 (+24)
+  U.S. Bank: phish=95→25 (+0), benign=1→25 (+24)
+  RuneScape: phish=231→25 (+0), benign=1→25 (+24)
+  Twitter, Inc: phish=25→25 (+0), benign=1→25 (+24)
+  Etisalat: phish=25→25 (+0), benign=2→25 (+23)
+  Deutsche Telekom: phish=25→25 (+0), benign=1→25 (+24)
+  Naver: phish=25→25 (+0), benign=2→25 (+23)
+  Fifth Third Bank: phish=25→25 (+0), benign=1→25 (+24)
+  Made-In-China: phish=52→25 (+0), benign=1→25 (+24)
+  Grupo Santander: phish=45→25 (+0), benign=2→25 (+23)
+  GMX Mail: phish=25→25 (+0), benign=3→25 (+22)
+  International Card Services B.V: phish=25→25 (+0), benign=1→25 (+24)
+  LinkedIn Corporation: phish=501→25 (+0), benign=1→25 (+24)
+  Citrix ShareFile: phish=25→25 (+0), benign=1→25 (+24)
+  db: phish=25→25 (+0), benign=1→25 (+24)
+
+Processing target: Office365
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: ADP
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: capital_one
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Match
+  Augmenting benign class: 22 images needed
+    Created 22 augmented images
+
+Processing target: Navy Federal Credit Union
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Amazon
+  Augmenting benign class: 14 images needed
+    Created 14 augmented images
+
+Processing target: NatWest Personal Banking
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: bcp
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Ooredoo QSC
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Discover
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Vodafone
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: Steam
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: 1&1 Ionos
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: eBay
+  Augmenting benign class: 8 images needed
+    Created 8 augmented images
+
+Processing target: Yahoo!
+  Augmenting benign class: 21 images needed
+    Created 21 augmented images
+
+Processing target: gov_uk
+  Augmenting benign class: 19 images needed
+    Created 19 augmented images
+
+Processing target: SNS Bank N.V
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: ASB Bank Limited
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: PayPal
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: iiNet Limited
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: DHL
+  Augmenting benign class: 22 images needed
+    Created 22 augmented images
+
+Processing target: Rakuten
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: Facebook
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: UBS AG
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Frontier Communications
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Netflix
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: AT&T
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: AOL
+  Augmenting benign class: 21 images needed
+    Created 21 augmented images
+
+Processing target: Itau Unibanco S.A
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Raiffeisen Bank S.A
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: Banco de Chile
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: American Express
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: National Bank of Canada
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Orange
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: AutoScout24
+  Augmenting benign class: 19 images needed
+    Created 19 augmented images
+
+Processing target: VKontakte
+  Augmenting benign class: 22 images needed
+    Created 22 augmented images
+
+Processing target: ATB Financial
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: Visa International Service Association
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: HSBC Bank
+  Augmenting benign class: 20 images needed
+    Created 20 augmented images
+
+Processing target: Giffgaff
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: U.S. Bank
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: RuneScape
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Twitter, Inc
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Etisalat
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: Deutsche Telekom
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Naver
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: Fifth Third Bank
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Made-In-China
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Grupo Santander
+  Augmenting benign class: 23 images needed
+    Created 23 augmented images
+
+Processing target: GMX Mail
+  Augmenting benign class: 22 images needed
+    Created 22 augmented images
+
+Processing target: International Card Services B.V
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: LinkedIn Corporation
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: Citrix ShareFile
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+Processing target: db
+  Augmenting benign class: 24 images needed
+    Created 24 augmented images
+
+=== Augmentation Complete ===
+Targets processed: 54
+Total augmented images created: 1231
+Techniques used: blur, brightness, shift, noise

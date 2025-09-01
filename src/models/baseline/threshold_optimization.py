@@ -4,6 +4,7 @@ Simple threshold optimization for baseline phishing detection.
 Grid search over thresholds to find optimal F1 and MCC values.
 """
 
+import argparse
 import subprocess
 import pandas as pd
 import numpy as np
@@ -30,79 +31,84 @@ def load_validation_data(val_csv_path: str) -> pd.DataFrame:
     return val_df
 
 
-def create_labels_file_for_directory(
-    val_df: pd.DataFrame, data_dir: str, output_labels_path: str
-):
-    """Create a labels.txt file for a specific directory based on validation data."""
-    # Create a mapping from new_path to true_target
-    path_to_target = {}
+def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.DataFrame:
+    """Match query results with validation data to add true classes and targets."""
+    # Load results and validation data
+    results_df = pd.read_csv(results_file)
+    val_df = load_validation_data(val_csv_path)
+
+    # Create mapping from new_path to validation info
+    val_mapping = {}
     for _, row in val_df.iterrows():
-        if row["new_path"].startswith(data_dir):
-            # Extract the filename from the relative path
-            filename = Path(row["new_path"]).name
-            path_to_target[filename] = row["true_target"]
+        new_path = row["new_path"]
+        val_mapping[new_path] = {
+            "true_class": row["true_class"],
+            "true_target": row["true_target"],
+        }
 
-    # Get the actual image paths from the directory to match get_image_paths() order
-    from common import get_image_paths
+    # Add true classes and targets to results
+    true_classes = []
+    true_targets = []
 
-    images_dir = Path(
-        f"/home/phish-target-recognition/data_splits/visualphish/phishpedia/data/val/{data_dir}"
-    )
-    image_paths = get_image_paths(images_dir)
+    for _, row in results_df.iterrows():
+        full_path = row["file"]
 
-    # Create labels in the same order as get_image_paths()
-    labels = []
-    missing_count = 0
-    for img_path in image_paths:
-        filename = img_path.name
-        if filename in path_to_target:
-            labels.append(path_to_target[filename])
+        # Extract the relative path suffix that matches new_path in validation data
+        # Look for patterns like "phishing/..." or "trusted_list/..." in the full path
+        path_parts = full_path.split("/")
+        relative_path = None
+
+        # Find the index of "phishing" or "trusted_list" in the path
+        for i, part in enumerate(path_parts):
+            if part in ["phishing", "trusted_list"]:
+                # Extract from this part onwards
+                relative_path = "/".join(path_parts[i:])
+                break
+
+        if relative_path and relative_path in val_mapping:
+            # Use validation data
+            true_classes.append(val_mapping[relative_path]["true_class"])
+            true_targets.append(val_mapping[relative_path]["true_target"])
         else:
-            # Fallback to directory-based naming if not found in CSV
-            labels.append(img_path.parent.name.split("+")[0])
-            missing_count += 1
+            # Fallback: infer from directory structure based on baseline_target
+            # If baseline_target is "benign", assume it's from trusted_list (class 0)
+            # Otherwise assume it's from phishing (class 1)
+            baseline_target = row.get("baseline_target", "unknown")
+            if baseline_target == "benign":
+                true_classes.append(0)
+                true_targets.append("benign")
+            else:
+                true_classes.append(1)
+                true_targets.append(
+                    baseline_target
+                )  # Use baseline prediction as fallback
 
-    # Create labels.txt file
-    with open(output_labels_path, "w") as f:
-        for label in labels:
-            f.write(f"{label}\n")
+    # Add true classes and targets to results dataframe
+    results_df["true_class"] = true_classes
+    results_df["true_target"] = true_targets
 
-    logger.info(
-        f"Created labels file for {data_dir}: {len(labels)} images ({missing_count} fallback labels)"
-    )
-    return len(labels)
+    logger.info(f"Matched {len(results_df)} results with validation data")
+    return results_df
 
 
-def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
-    """Run query.py with specific threshold on validation data."""
-    val_data_base = (
-        "/home/phish-target-recognition/data_splits/visualphish/phishpedia/data/val"
-    )
+def run_query_with_threshold(
+    threshold: float, val_csv_path: str, data_base_path: str, index_path: str
+) -> bool:
+    """Run query.py with specific threshold on validation data using --unknown flag."""
+    val_data_base = data_base_path
     phish_data_path = f"{val_data_base}/phishing"
     benign_data_path = f"{val_data_base}/trusted_list"
-    index_path = "/home/phish-target-recognition/logs/vp/vp-for-baseline/index.faiss"
 
     phish_output = f"phish_results_threshold_{threshold}.csv"
     benign_output = f"benign_results_threshold_{threshold}.csv"
     combined_output = f"results_threshold_{threshold}.csv"
-
-    # Load validation data
-    val_df = load_validation_data(val_csv_path)
-
-    # Create temporary labels files
-    phish_labels_path = f"phish_labels_threshold_{threshold}.txt"
-    benign_labels_path = f"benign_labels_threshold_{threshold}.txt"
-
-    # Create labels files for each directory
-    _ = create_labels_file_for_directory(val_df, "phishing", phish_labels_path)
-    _ = create_labels_file_for_directory(val_df, "trusted_list", benign_labels_path)
 
     env = os.environ.copy()
     env["WANDB_MODE"] = "disabled"
 
     try:
         print("Processing phishing samples...")
-        # Run query on phishing samples with proper labels
+        # Run query on phishing samples with --unknown flag (blind evaluation)
         phish_cmd = [
             "uv",
             "run",
@@ -115,21 +121,19 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
             phish_output,
             "--threshold",
             str(threshold),
-            "--labels",
-            phish_labels_path,
-            "--is-phish",
+            "--unknown",
             "--overwrite",
         ]
 
         result = subprocess.run(phish_cmd, capture_output=True, text=True, env=env)
         if result.returncode != 0:
             logger.error(
-                f"Phishing query failed for threshold {threshold}: {result.stderr}"
+                f"Phishing query failed for threshold {threshold}: {result.stdout}"
             )
             return False
 
         print("  🔍 Processing benign samples...")
-        # Run query on trusted_list samples with proper labels
+        # Run query on trusted_list samples with --unknown flag (blind evaluation)
         benign_cmd = [
             "uv",
             "run",
@@ -142,8 +146,7 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
             benign_output,
             "--threshold",
             str(threshold),
-            "--labels",
-            benign_labels_path,
+            "--unknown",
             "--overwrite",
         ]
 
@@ -155,17 +158,21 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
             return False
 
         print("Combining results...")
-        # Combine results
+        # Combine raw results (without true labels)
         phish_df = pd.read_csv(phish_output)
         benign_df = pd.read_csv(benign_output)
         combined_df = pd.concat([phish_df, benign_df], ignore_index=True)
+
+        # Save raw combined results first
         combined_df.to_csv(combined_output, index=False)
+
+        # Match results with validation data to add true labels
+        matched_df = match_results_with_validation(combined_output, val_csv_path)
+        matched_df.to_csv(combined_output, index=False)
 
         # Clean up temporary files
         Path(phish_output).unlink(missing_ok=True)
         Path(benign_output).unlink(missing_ok=True)
-        Path(phish_labels_path).unlink(missing_ok=True)
-        Path(benign_labels_path).unlink(missing_ok=True)
 
         logger.info(
             f"Successfully ran query for threshold {threshold} ({len(phish_df)} phish + {len(benign_df)} benign)"
@@ -174,9 +181,6 @@ def run_query_with_threshold(threshold: float, val_csv_path: str) -> bool:
 
     except Exception as e:
         logger.error(f"Error running query for threshold {threshold}: {e}")
-        # Clean up temporary files on error
-        Path(phish_labels_path).unlink(missing_ok=True)
-        Path(benign_labels_path).unlink(missing_ok=True)
         return False
 
 
@@ -202,28 +206,52 @@ def calculate_metrics_from_results(results_file: str) -> tuple:
     )
     logger.info(f"Target MCC: {target_metrics['target_mcc']:.4f}")
 
-    return (
-        class_metrics["f1_weighted"],
-        class_metrics["mcc"],
-        target_metrics["target_mcc"],
-    )
+    return (class_metrics, target_metrics)
 
 
 def main():
     """Main threshold optimization function."""
-    thresholds = [30, 50, 70, 90, 110, 130, 150, 170, 200]
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description="Optimize thresholds for baseline phishing detection"
+    )
+    parser.add_argument(
+        "--val-csv",
+        default="/home/phish-target-recognition/data_splits/visualphish/visualphish/val.csv",
+        help="Path to validation CSV file",
+        dest="val_csv",
+    )
+    parser.add_argument(
+        "--data-base",
+        default="/home/phish-target-recognition/data_splits/visualphish/visualphish/data/val",
+        help="Base path to validation data directory",
+        dest="data_base",
+    )
+    parser.add_argument(
+        "--index-path",
+        help="Path to FAISS index file",
+        required=True,
+        dest="index_path",
+    )
+    args = parser.parse_args()
+
+    # mean = 7.447219
+    # std = 21.387345
+
+    # thresholds = sorted(
+    #     set(range(max(0, int(mean - std)), int(mean + std))) | set(range(0, 100, 10))
+    # )
+    thresholds = [7]
     results = []
-    best_f1 = 0
+    best_identification_rate = 0
     best_mcc = -1
     best_target_mcc = -1
-    best_threshold_f1 = None
+    best_threshold_identification_rate = None
     best_threshold_mcc = None
     best_threshold_target_mcc = None
 
-    # Path to validation CSV
-    val_csv_path = (
-        "/home/phish-target-recognition/data_splits/visualphish/phishpedia/val.csv"
-    )
+    # Use parsed arguments
+    val_csv_path = args.val_csv
 
     print(
         f"Starting threshold optimization with {len(thresholds)} thresholds: {thresholds}"
@@ -241,38 +269,38 @@ def main():
         print(f"\n[{i}/{len(thresholds)}] > Testing threshold: {threshold}")
         logger.info(f"Testing threshold: {threshold}")
 
-        if run_query_with_threshold(threshold, val_csv_path):
+        if run_query_with_threshold(
+            threshold, val_csv_path, args.data_base, args.index_path
+        ):
             output_file = f"results_threshold_{threshold}.csv"
-            f1, mcc, target_mcc = calculate_metrics_from_results(output_file)
+            class_metrics, target_metrics = calculate_metrics_from_results(output_file)
 
             results.append(
                 {
                     "threshold": threshold,
-                    "f1_weighted": f1,
-                    "mcc": mcc,
-                    "target_mcc": target_mcc,
+                    "class_metrics": class_metrics,
+                    "target_metrics": target_metrics,
                 }
             )
 
-            if f1 > best_f1:
-                best_f1 = f1
-                best_threshold_f1 = threshold
+            if target_metrics["identification_rate"] > best_identification_rate:
+                best_identification_rate = target_metrics["identification_rate"]
+                best_threshold_identification_rate = threshold
 
-            if mcc > best_mcc:
-                best_mcc = mcc
+            if class_metrics["mcc"] > best_mcc:
+                best_mcc = class_metrics["mcc"]
                 best_threshold_mcc = threshold
 
-            if target_mcc > best_target_mcc:
-                best_target_mcc = target_mcc
+            if target_metrics["target_mcc"] > best_target_mcc:
+                best_target_mcc = target_metrics["target_mcc"]
                 best_threshold_target_mcc = threshold
 
-            print(f"Results: F1={f1:.4f}, MCC={mcc:.4f}, Target MCC={target_mcc:.4f}")
             logger.info(
-                f"Threshold {threshold}: F1={f1:.4f}, MCC={mcc:.4f}, Target MCC={target_mcc:.4f}"
+                f"Threshold {threshold}: F1_weighted={class_metrics['f1_weighted']:.4f}, MCC={class_metrics['mcc']:.4f}, Target MCC={target_metrics['target_mcc']:.4f} Identification Rate={target_metrics['identification_rate']:.4f}"
             )
 
             # Clean up temporary file
-            Path(output_file).unlink(missing_ok=True)
+            # Path(output_file).unlink(missing_ok=True)
         else:
             print(f"Failed to process threshold {threshold}")
             logger.error(f"Skipping threshold {threshold} due to query failure")
@@ -285,16 +313,22 @@ def main():
         logger.info("Saved results_summary.csv")
 
         # Save best thresholds
-        Path("best_threshold_f1.txt").write_text(str(best_threshold_f1))
+        Path("best_threshold_identification_rate.txt").write_text(
+            str(best_threshold_identification_rate)
+        )
         Path("best_threshold_mcc.txt").write_text(str(best_threshold_mcc))
         Path("best_threshold_target_mcc.txt").write_text(str(best_threshold_target_mcc))
 
-        logger.info(f"Best F1 threshold: {best_threshold_f1}")
+        logger.info(
+            f"Best Identification Rate threshold: {best_threshold_identification_rate}"
+        )
         logger.info(f"Best MCC threshold: {best_threshold_mcc}")
         logger.info(f"Best Target MCC threshold: {best_threshold_target_mcc}")
 
         print("\nOPTIMIZATION COMPLETE!")
-        print(f"Best F1: {best_f1:.4f} at threshold {best_threshold_f1}")
+        print(
+            f"Best Identification Rate: {best_identification_rate:.4f} at threshold {best_threshold_identification_rate}"
+        )
         print(f"Best MCC: {best_mcc:.4f} at threshold {best_threshold_mcc}")
         print(
             f"Best Target MCC: {best_target_mcc:.4f} at threshold {best_threshold_target_mcc}"

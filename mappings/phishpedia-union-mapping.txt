@@ -1,0 +1,184 @@
+uv run create_dataset.py \
+  --benign-dir /home/phish-target-recognition/data/raw/phishpedia/benign_sample_30k \
+  --phishing-dir /home/phish-target-recognition/data/raw/phishpedia/phish_sample_30k \
+  --output-dir /home/phish-target-recognition/data/interim/pp-for-vp
+Loaded 56 targets with phish=true from mappings/pp-benign-trusted-logos-targets.json
+Loaded domain mapping with 5311 entries
+Loaded target mappings with 218 entries
+
+Processing target 0: 1&1 Ionos
+  → 1 benign, 159 phishing images
+
+Processing target 1: ADP
+  → 1 benign, 15 phishing images
+
+Processing target 2: AOL
+  → 4 benign, 31 phishing images
+
+Processing target 3: ASB Bank Limited
+  → 1 benign, 96 phishing images
+
+Processing target 4: AT&T
+  → 2 benign, 252 phishing images
+
+Processing target 5: ATB Financial
+  → 2 benign, 17 phishing images
+
+Processing target 6: Amazon
+  → 11 benign, 807 phishing images
+
+Processing target 7: American Express
+  → 1 benign, 46 phishing images
+
+Processing target 8: AutoScout24
+  → 6 benign, 17 phishing images
+
+Processing target 9: Banco de Chile
+  → 1 benign, 8 phishing images
+
+Processing target 10: Citrix ShareFile
+  → 1 benign, 8 phishing images
+
+Processing target 11: DHL
+  → 3 benign, 727 phishing images
+
+Processing target 12: Deutsche Telekom
+  → 1 benign, 15 phishing images
+
+Processing target 13: Discover
+  → 1 benign, 30 phishing images
+
+Processing target 14: Etisalat
+  → 2 benign, 18 phishing images
+
+Processing target 15: Facebook
+  → 1 benign, 993 phishing images
+
+Processing target 16: Fifth Third Bank
+  → 1 benign, 10 phishing images
+
+Processing target 17: Frontier Communications
+  → 1 benign, 19 phishing images
+
+Processing target 18: GMX Mail
+  → 3 benign, 22 phishing images
+
+Processing target 19: Giffgaff
+  → 1 benign, 14 phishing images
+
+Processing target 20: Google
+  → 133 benign, 218 phishing images
+
+Processing target 21: Grupo Santander
+  → 2 benign, 45 phishing images
+
+Processing target 22: HSBC Bank
+  → 5 benign, 18 phishing images
+
+Processing target 23: International Card Services B.V
+  → 1 benign, 25 phishing images
+
+Processing target 24: Itau Unibanco S.A
+  → 1 benign, 312 phishing images
+
+Processing target 25: LinkedIn Corporation
+  → 1 benign, 501 phishing images
+
+Processing target 26: Made-In-China
+  → 1 benign, 52 phishing images
+
+Processing target 27: Match
+  → 3 benign, 115 phishing images
+
+Processing target 28: NatWest Personal Banking
+  → 1 benign, 22 phishing images
+
+Processing target 29: National Bank of Canada
+  → 1 benign, 16 phishing images
+
+Processing target 30: Naver
+  → 2 benign, 10 phishing images
+
+Processing target 31: Navy Federal Credit Union
+  → 1 benign, 47 phishing images
+
+Processing target 32: Netflix
+  → 1 benign, 747 phishing images
+
+Processing target 33: Office365
+  → 1 benign, 2059 phishing images
+
+Processing target 34: Ooredoo QSC
+  → 1 benign, 7 phishing images
+
+Processing target 35: Orange
+  → 2 benign, 277 phishing images
+
+Processing target 36: PayPal
+  → 2 benign, 4811 phishing images
+
+Processing target 37: Raiffeisen Bank S.A
+  → 2 benign, 49 phishing images
+
+Processing target 38: Rakuten
+  → 2 benign, 222 phishing images
+
+Processing target 39: RuneScape
+  → 1 benign, 231 phishing images
+
+Processing target 40: SNS Bank N.V
+  → 1 benign, 12 phishing images
+
+Processing target 41: Sparkasse Bank
+  → 59 benign, 22 phishing images
+
+Processing target 42: Steam
+  → 2 benign, 183 phishing images
+
+Processing target 43: Twitter, Inc
+  → 1 benign, 8 phishing images
+
+Processing target 44: U.S. Bank
+  → 1 benign, 95 phishing images
+
+Processing target 45: UBS AG
+  → 1 benign, 1 phishing images
+
+Processing target 46: VKontakte
+  → 3 benign, 37 phishing images
+
+Processing target 47: Visa International Service Association
+  → 1 benign, 66 phishing images
+
+Processing target 48: Vodafone
+  → 2 benign, 11 phishing images
+
+Processing target 49: Yahoo!
+  → 4 benign, 385 phishing images
+
+Processing target 50: bcp
+  → 1 benign, 7 phishing images
+
+Processing target 51: capital_one
+  → 1 benign, 4 phishing images
+
+Processing target 52: db
+  → 1 benign, 7 phishing images
+
+Processing target 53: eBay
+  → 17 benign, 232 phishing images
+
+Processing target 54: gov_uk
+  → 6 benign, 23 phishing images
+
+Processing target 55: iiNet Limited
+  → 1 benign, 2 phishing images
+
+Created trusted_list/targets.txt with 56 targets
+Created phishing/targets.txt with 56 targets
+
+=== Summary ===
+Processed 56 targets
+Created 311 benign symlinks
+Created 14183 phishing symlinks
+Output directory: /home/phish-target-recognition/data/interim/pp-for-vp
