@@ -354,11 +354,26 @@ class BaselineEmbedder:
                     closest_idx = int(indices[0])
                     closest_metadata = self.image_metadata[closest_idx]
 
+                    # Apply threshold-based classification if threshold provided
+                    if threshold is not None:
+                        if closest_distance < threshold:
+                            # Distance < threshold: classify as phishing with closest target
+                            baseline_class = 1
+                            baseline_target = closest_metadata["true_target"]
+                        else:
+                            # Distance >= threshold: classify as benign
+                            baseline_class = 0
+                            baseline_target = "benign"
+                    else:
+                        # No threshold: use closest match class and target
+                        baseline_class = closest_metadata["true_class"]
+                        baseline_target = closest_metadata["true_target"]
+
                     result = {
-                        "file": query_path.name,
-                        "baseline_class": closest_metadata["true_class"],
+                        "file": query_path,
+                        "baseline_class": baseline_class,
                         "baseline_distance": closest_distance,
-                        "baseline_target": closest_metadata["true_target"],
+                        "baseline_target": baseline_target,
                         "true_class": true_classes[batch_start + i]
                         if true_classes is not None
                         else None,

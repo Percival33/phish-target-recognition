@@ -98,7 +98,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
         for folder in data_path.iterdir()
         if folder.is_dir()
         for file in folder.iterdir()
-        if file.suffix.lower() in [".png", ".jpg", ".jpeg", ".bmp", ".gif"]
+        if file.suffix.lower() in [".png", ".jpg", ".jpeg"]
     )
 
     data_generator = read_data_batched(data_path, reshape_size, batch_size)
