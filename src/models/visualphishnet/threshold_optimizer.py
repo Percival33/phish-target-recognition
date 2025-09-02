@@ -7,7 +7,6 @@ A standalone script to optimize threshold for VisualPhish using Equal Error Rate
 
 import json
 import logging
-import pickle
 from argparse import ArgumentParser
 from pathlib import Path
 
@@ -60,14 +59,13 @@ def generate_threshold_ranges(mean, std, max_val, logger):
     stat_end = int(mean + std)
     stat_range = np.arange(stat_start, stat_end + 1, 1)
 
-    abs_max = min(int(max_val), 10)
-    abs_range = np.arange(0, abs_max + 1, 10)
+    abs_range = np.arange(0, int(max_val) + 1, 10)
 
     combined_thresholds = np.unique(np.concatenate([stat_range, abs_range])).astype(int)
     combined_thresholds = np.sort(combined_thresholds)
 
     logger.info(f"Statistical range: [{stat_start:.1f}, {stat_end:.1f}] with {len(stat_range)} points")
-    logger.info(f"Absolute range: [0, {abs_max:.1f}] with {len(abs_range)} points")
+    logger.info(f"Absolute range: [0, {max_val:.1f}] with {len(abs_range)} points")
     logger.info(f"Combined range: {len(combined_thresholds)} unique thresholds")
 
     return combined_thresholds
@@ -151,16 +149,26 @@ def save_embeddings_data(output_dir, embeddings_data, config_hash, logger):
     with open(config_file, "w") as f:
         json.dump({"config_hash": config_hash}, f)
 
-    cache_file = cache_dir / "embeddings_data.pkl"
-    with open(cache_file, "wb") as f:
-        pickle.dump(embeddings_data, f)
+    cache_file = cache_dir / "embeddings_data.npz"
+    np.savez_compressed(
+        cache_file,
+        targetlist_emb=embeddings_data["targetlist_emb"],
+        target_labels=embeddings_data["target_labels"],
+        target_filenames=embeddings_data["target_filenames"],
+        val_phish_emb=embeddings_data["val_phish_emb"],
+        val_phish_labels=embeddings_data["val_phish_labels"],
+        val_phish_files=embeddings_data["val_phish_files"],
+        val_benign_emb=embeddings_data["val_benign_emb"],
+        val_benign_labels=embeddings_data["val_benign_labels"],
+        val_benign_files=embeddings_data["val_benign_files"],
+    )
     logger.info(f"Saved embeddings data to {cache_file}")
 
 
 def load_embeddings_data(output_dir, current_config_hash, logger):
     """Load previously computed embeddings if they match current configuration."""
     cache_dir = output_dir / "cache"
-    cache_file = cache_dir / "embeddings_data.pkl"
+    cache_file = cache_dir / "embeddings_data.npz"
     config_file = cache_dir / "config.json"
 
     if not cache_file.exists() or not config_file.exists():
@@ -172,17 +180,27 @@ def load_embeddings_data(output_dir, current_config_hash, logger):
             cached_config = json.load(f)
 
         if cached_config.get("config_hash") != current_config_hash:
-            logger.info("Configuration changed, invalidating cache")
+            logger.warning("Configuration changed, invalidating cache")
             return None
 
-        with open(cache_file, "rb") as f:
-            embeddings_data = pickle.load(f)
+        npz_data = np.load(cache_file, allow_pickle=True)
+        embeddings_data = {
+            "targetlist_emb": npz_data["targetlist_emb"],
+            "target_labels": npz_data["target_labels"],
+            "target_filenames": npz_data["target_filenames"],
+            "val_phish_emb": npz_data["val_phish_emb"],
+            "val_phish_labels": npz_data["val_phish_labels"],
+            "val_phish_files": npz_data["val_phish_files"],
+            "val_benign_emb": npz_data["val_benign_emb"],
+            "val_benign_labels": npz_data["val_benign_labels"],
+            "val_benign_files": npz_data["val_benign_files"],
+        }
 
         logger.info("Using cached embeddings")
         return embeddings_data
 
     except Exception as e:
-        logger.warning(f"Cache load failed: {e}")
+        logger.error(f"Cache load failed: {e}")
         return None
 
 
