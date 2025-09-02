@@ -71,7 +71,8 @@ def read_data_batched(data_path, reshape_size, batch_size=32, logger=None):
             if img is None:
                 img = read_image(item["path"], logger, format="jpeg")
             if img is None:
-                logger.error(f"Failed to process {item['path']}")
+                if logger:
+                    logger.error(f"Failed to process {item['path']}")
                 continue
 
             batch_imgs.append(resize(img, (reshape_size[0], reshape_size[1]), anti_aliasing=True))
@@ -278,7 +279,7 @@ def evaluate_threshold(
     return class_metrics["roc_auc"], precision, recall, results_df, all_metrics
 
 
-def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder, batch_size):
+def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_folder, benign_folder, batch_size, logger):
     """
     Process both datasets and compute pairwise distances
     Args:
@@ -296,6 +297,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         model,
         save_path=args.save_folder / phish_folder if args.save_intermediate else None,
         batch_size=batch_size,
+        logger=logger,
     )
     logger.info(f"Processed {phish_count} phishing images")
 
@@ -312,6 +314,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
         model,
         save_path=args.save_folder / benign_folder if args.save_intermediate else None,
         batch_size=batch_size,
+        logger=logger,
     )
     logger.info(f"Processed {benign_count} benign images")
 
@@ -479,6 +482,7 @@ if __name__ == "__main__":
         phish_folder=args.phish_folder,
         benign_folder=args.benign_folder,
         batch_size=args.batch_size,
+        logger=logger,
     )
     # data_emb = np.load(args.save_folder / "all_embeddings.npy")
     # pairwise_distance = np.load(args.save_folder / "pairwise_distances.npy")
