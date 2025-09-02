@@ -173,7 +173,7 @@ def find_names_min_distances(idx, values, all_file_names):
 
 
 def evaluate_threshold(
-    pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path
+    pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path, all_labels
 ):
     """
     Evaluate model performance for a given threshold and return results as a pandas DataFrame
@@ -222,8 +222,8 @@ def evaluate_threshold(
 
         # Store targets for later metric calculation
         true_targets.append(true_target)
-        # Extract predicted target from the matched whitelist entry
-        vp_target = "benign" if vp_class == 0 else only_names[0].split("/")[0]
+        # Extract predicted target from the matched whitelist entry using all_labels
+        vp_target = "benign" if vp_class == 0 else all_labels[idx[0]]
         pred_targets.append(vp_target)
 
         # Add data to the list
@@ -353,7 +353,7 @@ def process_and_evaluate(args, model, targetlist_emb, all_file_names, phish_fold
     return data_emb, pairwise_distance, y, file_names
 
 
-def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args):
+def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args, all_labels):
     # Test different thresholds
     thresholds = np.arange(3, 20, 1)
     # np.arange(4, 71, 2)
@@ -365,7 +365,15 @@ def calculate_roc_curve(pairwise_distance, data_emb, targetlist_emb, all_file_na
 
     for threshold in thresholds:
         auc_score, precision, recall, _, all_metrics = evaluate_threshold(
-            pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, args.result_path
+            pairwise_distance,
+            data_emb,
+            targetlist_emb,
+            all_file_names,
+            file_names,
+            y,
+            threshold,
+            args.result_path,
+            all_labels,
         )
         results.append(
             {"threshold": threshold, "auc_score": auc_score, "f1_weighted": all_metrics.get("target_f1_weighted", 0)}
@@ -490,7 +498,15 @@ if __name__ == "__main__":
     # file_names = np.load(args.save_folder / "all_file_names.npy")
 
     evaluate_threshold(
-        pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, args.threshold, args.result_path
+        pairwise_distance,
+        data_emb,
+        targetlist_emb,
+        all_file_names,
+        file_names,
+        y,
+        args.threshold,
+        args.result_path,
+        all_labels,
     )
 
     # Finish wandb run
