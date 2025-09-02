@@ -358,6 +358,22 @@ def generate_plots(
     return density_plot_path, eer_plot_path
 
 
+def convert_numpy_types(obj):
+    """Convert NumPy types to native Python types for JSON serialization."""
+    if isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    else:
+        return obj
+
+
 def save_results(optimal_metrics, all_results, output_dir, logger):
     """Save results in enhanced JSON format matching plan specification."""
     results = {
@@ -372,6 +388,9 @@ def save_results(optimal_metrics, all_results, output_dir, logger):
             "fnr": optimal_metrics["fnr"],
         },
     }
+
+    # Convert NumPy types to native Python types for JSON serialization
+    results = convert_numpy_types(results)
 
     optimal_threshold_file = output_dir / "optimal_threshold.json"
     with open(optimal_threshold_file, "w") as f:
