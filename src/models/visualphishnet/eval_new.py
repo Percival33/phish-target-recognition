@@ -30,7 +30,7 @@ def load_targetemb(emb_path, label_path, file_name_path):
     return targetlist_emb, all_labels, all_file_names
 
 
-def read_data_batched(data_path, reshape_size, batch_size=32):
+def read_data_batched(data_path, reshape_size, batch_size=32, logger=None):
     """
     Read and process data in batches, yielding each batch
     Data is expected to be organized as:
@@ -82,7 +82,7 @@ def read_data_batched(data_path, reshape_size, batch_size=32):
             yield (np.asarray(batch_imgs), np.asarray(batch_labels), np.asarray(batch_files))
 
 
-def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=256):
+def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=256, logger=None):
     """
     Process dataset in batches and compute embeddings
     Returns total count of processed images and accumulated embeddings
@@ -101,7 +101,7 @@ def process_dataset(data_path, reshape_size, model, save_path=None, batch_size=2
         if file.suffix.lower() in [".png", ".jpg", ".jpeg"]
     )
 
-    data_generator = read_data_batched(data_path, reshape_size, batch_size)
+    data_generator = read_data_batched(data_path, reshape_size, batch_size, logger)
 
     for imgs, labels, files in tqdm(
         data_generator, desc=f"Processing {data_path.name}", total=(total_files + batch_size - 1) // batch_size
