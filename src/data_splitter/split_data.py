@@ -72,16 +72,16 @@ class DataSplitter:
             return true_target.split("+", 1)[0]
 
         return true_target
-    
+
     def _parse_target_name_only(self, true_target: str) -> str:
         """Extract target name without timestamp for subfolders strategy."""
         if not true_target:
             return ""
-        
+
         # For subfolders format like "Outlook+2020-09-14-10`07`35", extract just "Outlook"
         if "+" in true_target:
             return true_target.split("+", 1)[0]
-        
+
         # If no timestamp format, return as is
         return true_target
 
@@ -149,25 +149,23 @@ class DataSplitter:
     def _get_label_strategy(self, dataset_config: Dict) -> str:
         """Get the label strategy from dataset config."""
         return dataset_config.get("label_strategy", "directory")
-    
-    def _get_stratification_keys(self, data: pd.DataFrame, label_strategy: str) -> np.ndarray:
+
+    def _get_stratification_keys(
+        self, data: pd.DataFrame, label_strategy: str
+    ) -> np.ndarray:
         """Create stratification keys based on label strategy."""
         if label_strategy == "subfolders":
             # For subfolders: group by target name only (without timestamp)
             target_names_only = data["true_target"].apply(self._parse_target_name_only)
             y_stratify = (
-                data["true_class"].astype(str)
-                + "_"
-                + target_names_only.astype(str)
+                data["true_class"].astype(str) + "_" + target_names_only.astype(str)
             )
         else:
             # For other strategies: use full target name
             y_stratify = (
-                data["true_class"].astype(str)
-                + "_"
-                + data["true_target"].astype(str)
+                data["true_class"].astype(str) + "_" + data["true_target"].astype(str)
             )
-        
+
         return y_stratify.values
 
     def load_dataset(self, dataset_name: str, dataset_config: Dict) -> pd.DataFrame:
@@ -580,12 +578,34 @@ class DataSplitter:
             print("\n=== Stratification Verification (5 sample targets) ===")
             sample_targets = data["true_target"].value_counts().head(5).index
             for target in sample_targets:
-                orig_count = len(data[data["true_target"] == target])
-                train_count = len(train_data[train_data["true_target"] == target])
-                val_count = len(val_data[val_data["true_target"] == target])
-                test_count = len(test_data[test_data["true_target"] == target])
+                parsed_target = self._parse_true_target(target)
+                # Count all samples that parse to the same target (e.g., all "olx+*" samples)
+                orig_count = len(
+                    data[
+                        data["true_target"].apply(self._parse_true_target)
+                        == parsed_target
+                    ]
+                )
+                train_count = len(
+                    train_data[
+                        train_data["true_target"].apply(self._parse_true_target)
+                        == parsed_target
+                    ]
+                )
+                val_count = len(
+                    val_data[
+                        val_data["true_target"].apply(self._parse_true_target)
+                        == parsed_target
+                    ]
+                )
+                test_count = len(
+                    test_data[
+                        test_data["true_target"].apply(self._parse_true_target)
+                        == parsed_target
+                    ]
+                )
                 print(
-                    f"Target '{target}': Total={orig_count}, Train={train_count}, Val={val_count}, Test={test_count}"
+                    f"Sample '{target}'\tTarget '{self._parse_true_target(target)}': Total={orig_count},\tTrain={train_count},\tVal={val_count},\tTest={test_count}"
                 )
 
     def process_all_datasets(self):
