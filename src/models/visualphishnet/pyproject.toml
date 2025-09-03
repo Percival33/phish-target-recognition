@@ -1,3 +1,4 @@
+
 [project]
 name = "visualphishnet"
 version = "0.1.0"
@@ -20,6 +21,9 @@ dependencies = [
 macos = [
     "tensorflow-macos>=2.13.1",
     "tensorflow-metal>=1.2.0",
+]
+plotting = [
+    "scipy>=1.9.0",
 ]
 
 [dependency-groups]

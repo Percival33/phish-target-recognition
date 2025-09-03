@@ -17,11 +17,13 @@ def read_image(file_path, logger, format=None):
     try:
         img = imread(file_path) if format is None else imread(file_path, format=format)
         if len(img.shape) != 3 or img.shape[2] < 3:
-            logger.warning(f"Skipping {file_path}: wrong number of channels")
+            if logger:
+                logger.warning(f"Skipping {file_path}: wrong number of channels")
             return None
         return img[:, :, :3]  # Take only first 3 channels if more exist
     except Exception as read_error:
-        logger.warning(f"Image reading error for {file_path}: {str(read_error)}")
+        if logger:
+            logger.warning(f"Image reading error for {file_path}: {str(read_error)}")
         return None
 
 

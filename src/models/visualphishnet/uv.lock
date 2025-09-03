@@ -1319,6 +1319,9 @@ macos = [
     { name = "tensorflow-macos" },
     { name = "tensorflow-metal" },
 ]
+plotting = [
+    { name = "scipy" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -1332,6 +1335,7 @@ requires-dist = [
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "scikit-image", specifier = ">=0.21.0" },
     { name = "scikit-learn", specifier = ">=1.3.2" },
+    { name = "scipy", marker = "extra == 'plotting'", specifier = ">=1.9.0" },
     { name = "tensorflow", specifier = "==2.13" },
     { name = "tensorflow-macos", marker = "extra == 'macos'", specifier = ">=2.13.1" },
     { name = "tensorflow-metal", marker = "extra == 'macos'", specifier = ">=1.2.0" },
