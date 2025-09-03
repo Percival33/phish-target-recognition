@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 from argparse import ArgumentParser
@@ -139,8 +140,18 @@ def find_names_min_distances(idx, values, all_file_names):
 
 def get_model_hash(args):
     """Generate hash for model-related parameters only."""
-    model_str = f"{args.saved_model_name}_{args.margin}_{args.emb_dir.name}_{args.weights_only}_{args.weights_path}_{args.phish_folder}_{args.benign_folder}"
-    return str(hash(model_str))
+    # Use a deterministic hash: built-in hash() is salted per process (PYTHONHASHSEED)
+    params = {
+        "saved_model_name": args.saved_model_name,
+        "margin": args.margin,
+        "emb_dir": str(Path(args.emb_dir).resolve()),
+        "weights_only": bool(args.weights_only),
+        "weights_path": str(Path(args.weights_path).resolve()) if args.weights_path else None,
+        "phish_folder": args.phish_folder,
+        "benign_folder": args.benign_folder,
+    }
+    serialized = json.dumps(params, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def save_embeddings_data(output_dir, embeddings_data, config_hash, logger):
@@ -244,7 +255,7 @@ def evaluate_threshold(
             y_pred[i] = vp_class
 
         true_targets.append(true_target)
-        vp_target = "benign" if vp_class == 0 else all_labels[idx[0]]
+        vp_target = "benign" if vp_class == 0 else names_min_distance
         logger.debug(f"vp_target: {vp_target}")
         pred_targets.append(vp_target)
 
