@@ -18,6 +18,21 @@ from Evaluate import Evaluate
 from ModelHelper import ModelHelper
 
 
+def load_targets_list(targets_file, logger):
+    """
+    Load target names from a plain text file (one target per line).
+    Returns an empty list if the file cannot be read.
+    """
+    try:
+        with open(targets_file, "r") as f:
+            targets = [line.strip() for line in f if line.strip()]
+        logger.info(f"Loaded {len(targets)} targets from {targets_file}")
+        return targets
+    except Exception as e:
+        logger.warning(f"Failed to read targets list from {targets_file}: {e}. Falling back to raw labels.")
+        return []
+
+
 def load_targetemb(emb_path, label_path, file_name_path):
     """
     load targetlist embedding
@@ -212,7 +227,16 @@ def load_embeddings_data(output_dir, current_config_hash, logger):
 
 
 def evaluate_threshold(
-    pairwise_distance, data_emb, targetlist_emb, all_file_names, file_names, y, threshold, result_path, all_labels
+    pairwise_distance,
+    data_emb,
+    targetlist_emb,
+    all_file_names,
+    file_names,
+    y,
+    threshold,
+    result_path,
+    all_labels,
+    targets_list,
 ):
     """
     Evaluate model performance for a given threshold and return results as a pandas DataFrame
@@ -255,8 +279,24 @@ def evaluate_threshold(
             y_pred[i] = vp_class
 
         true_targets.append(true_target)
-        vp_target = "benign" if vp_class == 0 else names_min_distance
-        logger.debug(f"vp_target: {vp_target}")
+        if vp_class == 0:
+            vp_target = "benign"
+        else:
+            # Map numeric label index (possibly stored as float or wrapped array) to a target name from targets_list
+            vp_target = None
+            try:
+                label_value = all_labels[idx[0]]
+                # unwrap arrays like array([2.]) to scalar
+                if isinstance(label_value, (np.ndarray, list)):
+                    if len(label_value) > 0:
+                        label_value = label_value[0]
+                label_index = int(float(label_value))
+                if 0 <= label_index < len(targets_list):
+                    vp_target = targets_list[label_index]
+            except Exception:
+                raise ValueError(f"Failed to map label index {label_index} to a target name")
+
+        logger.debug(f"vp_target: {vp_target}\t{names_min_distance=}\t{only_names=}")
         pred_targets.append(vp_target)
 
         # Add data to the list
@@ -394,6 +434,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--force-recompute", action="store_true", help="Force recomputation of embeddings even if cache exists"
     )
+    parser.add_argument(
+        "--targets-file",
+        type=Path,
+        default=None,
+        help="Path to targets.txt containing target names (defaults to <emb-dir>/targets.txt)",
+    )
 
     args = parser.parse_args()
     logger.info("Evaluating VisualPhishNet")
@@ -465,6 +511,10 @@ if __name__ == "__main__":
         }
         save_embeddings_data(args.save_folder, embeddings_data, config_hash, logger)
 
+    # Load targets.txt mapping (one target per line). If not provided, default to <emb-dir>/targets.txt
+    targets_file = args.targets_file if args.targets_file else args.emb_dir / "targets.txt"
+    targets_list = load_targets_list(targets_file, logger)
+
     evaluate_threshold(
         pairwise_distance,
         data_emb,
@@ -475,6 +525,7 @@ if __name__ == "__main__":
         args.threshold,
         args.result_path,
         all_labels,
+        targets_list,
     )
 
     wandb.finish()
