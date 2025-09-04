@@ -180,7 +180,7 @@ Examples:
 
         logger.debug(f"Target '{target}': phish={phish_count}, benign={benign_count}")
 
-        if phish_count >= args.threshold: # and benign_count >= args.threshold:
+        if phish_count >= args.threshold:  # and benign_count >= args.threshold:
             logger.info(
                 f"Processing target '{target}' (phish={phish_count}, benign={benign_count})"
             )
