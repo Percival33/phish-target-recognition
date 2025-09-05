@@ -281,20 +281,12 @@ def evaluate_threshold(
         true_targets.append(true_target)
         if vp_class == 0:
             vp_target = "benign"
+            closest_file = None
         else:
-            # Map numeric label index (possibly stored as float or wrapped array) to a target name from targets_list
-            vp_target = None
-            try:
-                label_value = all_labels[idx[0]]
-                # unwrap arrays like array([2.]) to scalar
-                if isinstance(label_value, (np.ndarray, list)):
-                    if len(label_value) > 0:
-                        label_value = label_value[0]
-                label_index = int(float(label_value))
-                if 0 <= label_index < len(targets_list):
-                    vp_target = targets_list[label_index]
-            except Exception:
-                raise ValueError(f"Failed to map label index {label_index} to a target name")
+            # Map label index to target name from targets_list
+            label_index = int(all_labels[idx[0]])
+            vp_target = targets_list[label_index] if label_index < len(targets_list) else f"unknown_{label_index}"
+            closest_file = all_file_names[idx[0]]
 
         logger.debug(f"vp_target: {vp_target}\t{names_min_distance=}\t{only_names=}")
         pred_targets.append(vp_target)
@@ -306,6 +298,7 @@ def evaluate_threshold(
                 "vp_class": int(vp_class),
                 "vp_distance": float(min_distances),
                 "vp_target": vp_target,
+                "closest_file": closest_file,
                 "true_class": y_true[i],
                 "true_target": true_target,
             }
