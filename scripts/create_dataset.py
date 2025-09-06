@@ -186,16 +186,14 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
         return image_paths
 
     # Get all name variants for this target
-    search_names = set(
-        [
-            target_name,
-            target_name.replace("_", " "),
-            target_name.replace(" ", "_"),
-            target_name.lower(),
-            target_name.lower().replace("_", " "),
-            target_name.lower().replace(" ", "_"),
-        ]
-    )
+    search_names = {
+        target_name,
+        target_name.replace("_", " "),
+        target_name.replace(" ", "_"),
+        target_name.lower(),
+        target_name.lower().replace("_", " "),
+        target_name.lower().replace(" ", "_"),
+    }
 
     # Add all mapped variants if target is found in mappings
     if target_name in target_mappings:
