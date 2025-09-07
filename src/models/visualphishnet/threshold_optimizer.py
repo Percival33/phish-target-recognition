@@ -5,6 +5,7 @@ VisualPhish Threshold Optimizer
 A standalone script to optimize threshold for VisualPhish using Equal Error Rate (EER).
 """
 
+import hashlib
 import json
 import logging
 from argparse import ArgumentParser
@@ -14,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import wandb
+from matplotlib.ticker import FuncFormatter
 from tools.config import setup_logging
 
 from eval_new import load_targetemb, process_dataset
@@ -205,11 +207,18 @@ def load_embeddings_data(output_dir, current_config_hash, logger):
 
 
 def get_config_hash(args):
-    """Generate simple hash of key configuration parameters."""
-    config_str = (
-        f"{args.model_name}_{args.margin}_{args.val_phish_dir.name}_{args.val_benign_dir.name}_{args.emb_dir.name}"
-    )
-    return str(hash(config_str))
+    """Generate deterministic SHA-256 hash of key configuration parameters."""
+    params = {
+        "model_name": args.model_name,
+        "margin": float(args.margin),
+        "emb_dir": str(Path(args.emb_dir).resolve()),
+        "val_phish_dir": str(Path(args.val_phish_dir).resolve()),
+        "val_benign_dir": str(Path(args.val_benign_dir).resolve()),
+        "reshape_size": list(args.reshape_size) if isinstance(args.reshape_size, (list, tuple)) else args.reshape_size,
+        "batch_size": int(args.batch_size),
+    }
+    serialized = json.dumps(params, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def analyze_distributions(benign_min_distances, phish_min_distances, logger):
@@ -295,13 +304,31 @@ def generate_plots(
     stats = _get_scipy_stats()
     logger.info("Generating plots...")
 
+    def fmt_pl(value, decimals=3):
+        return (f"{value:.{decimals}f}").replace(".", ",")
+
+    comma_formatter_2 = FuncFormatter(lambda x, pos: f"{x:.2f}".replace(".", ","))
+    comma_formatter_3 = FuncFormatter(lambda x, pos: f"{x:.3f}".replace(".", ","))
+
     plt.figure(figsize=(12, 8))
     bins = np.linspace(0, max(np.max(benign_min_distances), np.max(phish_min_distances)), 50)
-    plt.hist(
-        benign_min_distances, bins=bins, density=True, alpha=0.6, label="Benign Sites", color="blue", edgecolor="black"
+    n_benign, _, _ = plt.hist(
+        benign_min_distances,
+        bins=bins,
+        density=True,
+        alpha=0.6,
+        label="Strony nieszkodliwe",
+        color="blue",
+        edgecolor="black",
     )
-    plt.hist(
-        phish_min_distances, bins=bins, density=True, alpha=0.6, label="Phishing Sites", color="red", edgecolor="black"
+    n_phish, _, _ = plt.hist(
+        phish_min_distances,
+        bins=bins,
+        density=True,
+        alpha=0.6,
+        label="Strony phishingowe",
+        color="red",
+        edgecolor="black",
     )
 
     x_range = np.linspace(0, max(bins), 200)
@@ -314,14 +341,14 @@ def generate_plots(
         benign_pdf,
         "b-",
         linewidth=2,
-        label=f"Benign Fit (μ={distribution_params['benign_mu']:.2f}, σ={distribution_params['benign_sigma']:.2f})",
+        label=f"Dopasowanie (μ={fmt_pl(distribution_params['benign_mu'], 2)}, σ={fmt_pl(distribution_params['benign_sigma'], 2)})",
     )
     plt.plot(
         x_range,
         phish_pdf,
         "r-",
         linewidth=2,
-        label=f"Phishing Fit (μ={distribution_params['phish_mu']:.2f}, σ={distribution_params['phish_sigma']:.2f})",
+        label=f"Dopasowanie (μ={fmt_pl(distribution_params['phish_mu'], 2)}, σ={fmt_pl(distribution_params['phish_sigma'], 2)})",
     )
 
     plt.axvline(
@@ -329,28 +356,47 @@ def generate_plots(
         color="green",
         linestyle="--",
         linewidth=2,
-        label=f"Optimal EER Threshold ({optimal_threshold:.2f})",
+        label=f"Optymalny próg EER ({fmt_pl(optimal_threshold, 2)})",
     )
 
-    plt.xlabel("Distance to Closest Target")
-    plt.ylabel("Density")
-    plt.title("Distance Distribution with Gaussian Fits and Optimal EER Threshold")
+    ax = plt.gca()
+    ax.xaxis.set_major_formatter(comma_formatter_2)
+    ax.yaxis.set_major_formatter(comma_formatter_3)
+
+    plt.xlabel("Odległość do najbliższego celu")
+    plt.ylabel("Gęstość")
+    plt.title("Rozkłady odległości z dopasowaniem Gaussa i optymalnym progiem EER")
     plt.legend()
     plt.grid(True, alpha=0.3)
 
     density_plot_path = output_dir / "density_histogram.png"
+    density_data_path = output_dir / "density_histogram_data.json"
     plt.tight_layout()
     plt.savefig(density_plot_path, bbox_inches="tight", dpi=300, facecolor="white")
     plt.close()
     logger.info(f"Saved density histogram to {density_plot_path}")
+
+    # Save underlying data for the density plot
+    density_payload = {
+        "bins": bins,
+        "hist_benign_density": n_benign,
+        "hist_phish_density": n_phish,
+        "x_range": x_range,
+        "benign_pdf": benign_pdf,
+        "phish_pdf": phish_pdf,
+        "optimal_threshold": optimal_threshold,
+    }
+    with open(density_data_path, "w") as f:
+        json.dump(convert_numpy_types(density_payload), f, indent=2, ensure_ascii=False)
+    logger.info(f"Saved density histogram data to {density_data_path}")
 
     plt.figure(figsize=(12, 8))
     thresholds = [r["threshold"] for r in all_results]
     fprs = [r["fpr"] for r in all_results]
     fnrs = [r["fnr"] for r in all_results]
 
-    plt.plot(thresholds, fprs, "b-", linewidth=2, label="False Positive Rate (FPR)")
-    plt.plot(thresholds, fnrs, "r-", linewidth=2, label="False Negative Rate (FNR)")
+    plt.plot(thresholds, fprs, "b-", linewidth=2, label="Odsetek fałszywych alarmów (FPR)")
+    plt.plot(thresholds, fnrs, "r-", linewidth=2, label="Odsetek fałszywych negatywów (FNR)")
 
     optimal_result = next(r for r in all_results if r["threshold"] == optimal_threshold)
     plt.plot(
@@ -358,20 +404,37 @@ def generate_plots(
         optimal_result["fpr"],
         "go",
         markersize=10,
-        label=f"EER Point (FPR={optimal_result['fpr']:.3f}, FNR={optimal_result['fnr']:.3f})",
+        label=f"Punkt EER (FPR={fmt_pl(optimal_result['fpr'])}, FNR={fmt_pl(optimal_result['fnr'])})",
     )
 
-    plt.xlabel("Distance Threshold")
-    plt.ylabel("Error Rate")
-    plt.title("Equal Error Rate Analysis: FPR and FNR vs Threshold")
+    ax = plt.gca()
+    ax.xaxis.set_major_formatter(comma_formatter_2)
+    ax.yaxis.set_major_formatter(comma_formatter_3)
+
+    plt.xlabel("Próg odległości")
+    plt.ylabel("Współczynnik błędu")
+    plt.title("Analiza EER: FPR i FNR względem progu")
     plt.legend()
     plt.grid(True, alpha=0.3)
 
     eer_plot_path = output_dir / "eer_curve.png"
+    eer_data_path = output_dir / "eer_curve_data.json"
     plt.tight_layout()
     plt.savefig(eer_plot_path, bbox_inches="tight", dpi=300, facecolor="white")
     plt.close()
     logger.info(f"Saved EER curve to {eer_plot_path}")
+
+    eer_payload = {
+        "thresholds": thresholds,
+        "fprs": fprs,
+        "fnrs": fnrs,
+        "optimal_threshold": optimal_threshold,
+        "optimal_fpr": optimal_result["fpr"],
+        "optimal_fnr": optimal_result["fnr"],
+    }
+    with open(eer_data_path, "w") as f:
+        json.dump(convert_numpy_types(eer_payload), f, indent=2, ensure_ascii=False)
+    logger.info(f"Saved EER curve data to {eer_data_path}")
 
     return density_plot_path, eer_plot_path
 
@@ -520,25 +583,25 @@ def main():
             wandb.log(distribution_params)
 
         run.log_artifact(
-            wandb.Artifact("optimal_threshold", type="result", description="Optimal threshold configuration"),
+            wandb.Artifact("optimal_threshold", type="result", description="Optymalna konfiguracja progu"),
             str(optimal_threshold_file),
         )
 
         run.log_artifact(
-            wandb.Artifact("threshold_sweep", type="data", description="Complete threshold sweep results"),
+            wandb.Artifact("threshold_sweep", type="data", description="Pełne wyniki przeszukiwania progów"),
             str(threshold_sweep_file),
         )
 
         if args.plot and density_plot_path and eer_plot_path:
             run.log_artifact(
                 wandb.Artifact(
-                    "density_histogram", type="plot", description="Distance distribution with Gaussian fits"
+                    "density_histogram", type="plot", description="Rozkład odległości z dopasowaniem Gaussa"
                 ),
                 str(density_plot_path),
             )
 
             run.log_artifact(
-                wandb.Artifact("eer_curve", type="plot", description="EER analysis curve"), str(eer_plot_path)
+                wandb.Artifact("eer_curve", type="plot", description="Krzywa analizy EER"), str(eer_plot_path)
             )
 
     except Exception as e:
