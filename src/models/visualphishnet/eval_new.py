@@ -285,7 +285,11 @@ def evaluate_threshold(
         else:
             # Map label index to target name from targets_list
             label_index = int(all_labels[idx[0]])
-            vp_target = targets_list[label_index] if label_index < len(targets_list) else f"unknown_{label_index}"
+            if label_index >= len(targets_list):
+                raise ValueError(
+                    f"Label index {label_index} out of bounds for targets_list of size {len(targets_list)}"
+                )
+            vp_target = targets_list[label_index]
             closest_file = all_file_names[idx[0]]
 
         logger.debug(f"vp_target: {vp_target}\t{names_min_distance=}\t{only_names=}")
