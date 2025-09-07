@@ -65,64 +65,64 @@ def _read_results_txt(file_path: Path) -> pd.DataFrame:
             columns=["file", "pp_class", "pp_target", "true_class", "true_target"]
         )  # empty
 
-    if len(rows[0]) >= 8:
-        df_raw = pd.DataFrame(
-            rows,
-            columns=[
-                "folder",
-                "url",
-                "phish_category",
-                "pred_target",
-                "matched_domain",
-                "siamese_conf",
-                "logo_recog_time",
-                "logo_match_time",
-            ],
-        )
-        true_class = []
-        true_target = []
-        for folder in df_raw["folder"].astype(str):
-            if folder.startswith("benign"):
-                true_class.append(0)
-                true_target.append("benign")
-            else:
-                true_class.append(1)
-                true_target.append(folder.split("+")[0])
+    logging.info("Columns %s", rows[0])
+    df_raw = pd.DataFrame(
+        rows,
+        columns=[
+            "folder",
+            "url",
+            "phish_category",
+            "pred_target",
+            "matched_domain",
+            "siamese_conf",
+            "logo_recog_time",
+            "logo_match_time",
+        ],
+    )
+    true_class = []
+    true_target = []
+    for folder in df_raw["folder"].astype(str):
+        if folder.startswith("benign"):
+            true_class.append(0)
+            true_target.append("benign")
+        else:
+            true_class.append(1)
+            true_target.append(folder.split("+", 1)[0])
 
-        return pd.DataFrame(
-            {
-                "file": df_raw["folder"],
-                "pp_class": pd.to_numeric(df_raw["phish_category"], errors="coerce")
-                .fillna(0)
-                .astype(int),
-                "pp_target": df_raw["pred_target"].fillna("unknown").astype(str),
-                "true_class": true_class,
-                "true_target": true_target,
-            }
-        )
-
-    # Fallback minimal columns
-    try:
-        df = pd.DataFrame(
-            rows, columns=["file", "pp_class", "pp_target", "true_class", "true_target"]
-        )  # type: ignore
-        df["pp_class"] = (
-            pd.to_numeric(df["pp_class"], errors="coerce").fillna(0).astype(int)
-        )
-        df["true_class"] = (
-            pd.to_numeric(df["true_class"], errors="coerce").fillna(0).astype(int)
-        )
-        df["pp_target"] = df["pp_target"].fillna("unknown").astype(str)
-        df["true_target"] = df["true_target"].fillna("unknown").astype(str)
-        return df
-    except Exception:
-        return pd.DataFrame(
-            columns=["file", "pp_class", "pp_target", "true_class", "true_target"]
-        )  # empty
+    return pd.DataFrame(
+        {
+            "file": df_raw["folder"],
+            "pp_class": pd.to_numeric(df_raw["phish_category"], errors="coerce")
+            .fillna(0)
+            .astype(int),
+            "pp_target": (
+                df_raw["pred_target"]
+                .fillna("benign")
+                .astype(str)
+                .str.strip()
+                .replace(
+                    {
+                        "None": "benign",
+                        "": "benign",
+                        "nan": "benign",
+                        "NA": "benign",
+                        "N/A": "benign",
+                    }
+                )
+            ),
+            "true_class": true_class,
+            "true_target": true_target,
+        }
+    )
 
 
 def process_and_evaluate(
-    path_to_csv_or_results: str, plot: bool = False, out_dir: Optional[str] = None
+    path_to_csv_or_results: str,
+    plot: bool = False,
+    out_dir: Optional[str] = None,
+    is_phish: bool = False,
+    is_benign: bool = False,
+    save_csv: Optional[str] = None,
 ):
     path = Path(path_to_csv_or_results)
     if path.suffix.lower() == ".txt":
@@ -130,7 +130,59 @@ def process_and_evaluate(
     else:
         df = pd.read_csv(path)
 
-    df["pp_target"] = df["pp_target"].fillna("benign").str.split("+").str[0]
+    # Normalize pp_target: fill missing/None-like with "benign"
+    # if "pp_target" in df.columns:
+    #     s = df["pp_target"].copy()
+    #     s = s.fillna("benign")
+    #     s = s.astype(str).str.strip()
+    #     s = s.replace({"None": "benign", "": "benign", "nan": "benign", "NA": "benign", "N/A": "benign"})
+    #     df["pp_target"] = s
+
+    # Optional override of true labels based on flags
+    if is_phish and is_benign:
+        raise ValueError("Only one of --is-phish or --is-benign can be provided")
+    if is_phish:
+        logging.info(
+            "Overriding true labels: setting true_class=1 and true_target from folder name"
+        )
+        df["true_class"] = 1
+        if "file" in df.columns:
+            df["true_target"] = (
+                df["file"].astype(str).str.split("+", n=1, expand=False).str[0]
+            )
+        elif "folder" in df.columns:
+            df["true_target"] = (
+                df["folder"].astype(str).str.split("+", n=1, expand=False).str[0]
+            )
+        else:
+            logging.error(
+                "Could not find 'file' or 'folder' column to derive target; keeping existing true_target"
+            )
+            raise ValueError(
+                "Could not find 'file' or 'folder' column to derive target; keeping existing true_target"
+            )
+    elif is_benign:
+        logging.info(
+            "Overriding true labels: setting true_class=0 and true_target='benign'"
+        )
+        df["true_class"] = 0
+        df["true_target"] = "benign"
+
+    # Optional export of minimal evaluation CSV
+    if save_csv:
+        cols = ["true_target", "true_class", "pp_class", "pp_target"]
+        missing = [c for c in cols if c not in df.columns]
+        if missing:
+            raise ValueError(f"Missing columns for export: {missing}")
+        export_df = df[cols].copy()
+        Path(save_csv).parent.mkdir(parents=True, exist_ok=True)
+        export_df.to_csv(save_csv, index=False)
+        logging.info("Saved evaluation CSV to %s", save_csv)
+
+    logging.info(f"df true class: {df['true_class'].head(n=10)}")
+    logging.info(f"df pp class: {df['pp_class'].head(n=10)}")
+    logging.info(f"df true target: {df['true_target'].head(n=10)}")
+    logging.info(f"df pp target: {df['pp_target'].head(n=10)}")
 
     class_metrics, target_metrics = calculate_metrics(
         cls_true=df["true_class"],
@@ -143,12 +195,8 @@ def process_and_evaluate(
         "samples=%d, unique_pred_targets=%d", len(df), df["pp_target"].nunique()
     )
 
-    print("Class metrics:")
-    for metric, value in class_metrics.items():
-        print(f"{metric}: {value:.4f}")
-    print("\nTarget metrics:")
-    for metric, value in target_metrics.items():
-        print(f"{metric}: {value:.4f}")
+    logging.info(f"Class metrics: {class_metrics}")
+    logging.info(f"Target metrics: {target_metrics}")
 
     cm = confusion_matrix(df["true_class"], df["pp_class"], labels=[0, 1])
     cm_df = pd.DataFrame(cm, index=["true_0", "true_1"], columns=["pred_0", "pred_1"])
@@ -244,12 +292,32 @@ if __name__ == "__main__":
         default=None,
         help="Output directory for confusion matrix and LaTeX",
     )
+    parser.add_argument(
+        "--is-phish",
+        action="store_true",
+        help="Override labels: mark all samples as phishing (true_class=1) and true_target from folder name",
+    )
+    parser.add_argument(
+        "--is-benign",
+        action="store_true",
+        help="Override labels: mark all samples as benign (true_class=0) and true_target='benign'",
+    )
+    parser.add_argument(
+        "--save-csv",
+        dest="save_csv",
+        type=str,
+        default=None,
+        help="Save CSV with columns: true_target,true_class,pp_class,pp_target",
+    )
     args = parser.parse_args()
 
     if (args.path is None and args.wandb_run is None) or (
         args.path is not None and args.wandb_run is not None
     ):
         parser.error("Provide exactly one input: either a local path or --wandb-run")
+
+    if args.is_phish and args.is_benign:
+        parser.error("Provide at most one of --is-phish or --is-benign")
 
     if args.wandb_run:
         # Use a temp directory to download; if --out provided, reuse under it for traceability
@@ -262,9 +330,15 @@ if __name__ == "__main__":
         results_file = _download_wandb_results(args.wandb_run, dl_dir)
         if not results_file:
             raise SystemExit(1)
-        process_and_evaluate(str(results_file), args.plot, args.out)
+        process_and_evaluate(
+            str(results_file),
+            args.plot,
+            args.out,
+            args.is_phish,
+            args.is_benign,
+            args.save_csv,
+        )
     else:
-        process_and_evaluate(args.path, args.plot, args.out)
-
-# TODO:
-# - [ ] read csv file to get true class and true target
+        process_and_evaluate(
+            args.path, args.plot, args.out, args.is_phish, args.is_benign, args.save_csv
+        )
