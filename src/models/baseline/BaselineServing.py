@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 import os
 
-from tools.ModelServing import ModelServing
+from tools.ModelServing import ModelServing, PredictResponse
 from tools.config import setup_logging
 
 from BaselineEmbedder import BaselineEmbedder
@@ -31,22 +31,19 @@ class BaselineServing(ModelServing):
 
         # Handle error cases
         if "error" in results:
-            return {
-                "url": str(url),
-                "class": 0,
-                "target": "unknown",
-                "distance": float("inf"),
-            }
+            return PredictResponse(
+                url=str(url), class_=0, target="unknown", distance=float("inf")
+            )
 
         match = results["matches"][0]
         baseline_class = results.get("baseline_class", 0)
 
-        return {
-            "url": str(url),
-            "class": int(baseline_class),
-            "target": str(match.get("true_target", "unknown")),
-            "distance": float(match.get("distance", float("inf"))),
-        }
+        return PredictResponse(
+            url=str(url),
+            class_=int(baseline_class),
+            target=str(match.get("true_target", "unknown")),
+            distance=float(match.get("distance", float("inf"))),
+        )
 
     async def on_startup(self):
         """Startup logic - load FAISS index and target mappings"""

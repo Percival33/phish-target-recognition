@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from skimage.transform import resize
-from tools.ModelServing import ModelServing
+from tools.ModelServing import ModelServing, PredictResponse
 
 from eval_new import find_names_min_distances
 from Evaluate import Evaluate
@@ -37,12 +37,7 @@ class VisualPhishServing(ModelServing):
         cls = 1 if float(min_distances) <= self.args.threshold else 0
         target = str(only_names[0]) if cls else "unknown"
 
-        return {
-            "url": str(url),
-            "class": cls,
-            "target": target,
-            "distance": float(min_distances),
-        }
+        return PredictResponse(url=str(url), class_=cls, target=target, distance=float(min_distances))
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""
