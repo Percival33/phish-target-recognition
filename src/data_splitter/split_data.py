@@ -547,14 +547,14 @@ class DataSplitter:
 
         print(f"\n=== Split Summary for {dataset_name} ===")
         print(f"Total samples: {total}")
-        print(f"Train: {len(X_train)} ({len(X_train)/total*100:.1f}%)")
-        print(f"Val:   {len(X_val)} ({len(X_val)/total*100:.1f}%)")
-        print(f"Test:  {len(X_test)} ({len(X_test)/total*100:.1f}%)")
+        print(f"Train: {len(X_train)} ({len(X_train) / total * 100:.1f}%)")
+        print(f"Val:   {len(X_val)} ({len(X_val) / total * 100:.1f}%)")
+        print(f"Test:  {len(X_test)} ({len(X_test) / total * 100:.1f}%)")
 
         print("\n=== Class Distribution ===")
-        print(f"Train - Class 0: {sum(y_train==0)}, Class 1: {sum(y_train==1)}")
-        print(f"Val   - Class 0: {sum(y_val==0)}, Class 1: {sum(y_val==1)}")
-        print(f"Test  - Class 0: {sum(y_test==0)}, Class 1: {sum(y_test==1)}")
+        print(f"Train - Class 0: {sum(y_train == 0)}, Class 1: {sum(y_train == 1)}")
+        print(f"Val   - Class 0: {sum(y_val == 0)}, Class 1: {sum(y_val == 1)}")
+        print(f"Test  - Class 0: {sum(y_test == 0)}, Class 1: {sum(y_test == 1)}")
 
         # If data is provided, show target distribution statistics
         if data is not None:
@@ -570,9 +570,11 @@ class DataSplitter:
             total_targets = data["true_target"].nunique()
 
             print(f"Unique targets - Total: {total_targets}")
-            print(f"Train: {train_targets} ({train_targets/total_targets*100:.1f}%)")
-            print(f"Val:   {val_targets} ({val_targets/total_targets*100:.1f}%)")
-            print(f"Test:  {test_targets} ({test_targets/total_targets*100:.1f}%)")
+            print(
+                f"Train: {train_targets} ({train_targets / total_targets * 100:.1f}%)"
+            )
+            print(f"Val:   {val_targets} ({val_targets / total_targets * 100:.1f}%)")
+            print(f"Test:  {test_targets} ({test_targets / total_targets * 100:.1f}%)")
 
             # Show some examples of target preservation across splits
             print("\n=== Stratification Verification (5 sample targets) ===")

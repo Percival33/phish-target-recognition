@@ -19,6 +19,7 @@ sys.path.insert(
 )
 from organize import get_special_domain_mapping
 
+
 def build_inverse_mapping(forward_map):
     """Invert mapping, ensuring no domain collisions."""
     inverse = {}

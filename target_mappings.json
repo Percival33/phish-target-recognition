@@ -1,35 +1,30 @@
 {
+  "abn_amro": [
+    "ABN AMRO",
+    "abn_amro"
+  ],
   "absa": [
     "Absa Group",
     "absa"
   ],
-  "ADP": [
-    "ADP",
-    "ADP, LLC",
-    "ADP, LLC."
-  ],
   "adidas": [
     "Adidas",
     "adidas"
-  ],
-  "Airbnb, Inc.": [
-    "Airbnb, Inc.",
-    "Airbnb, Inc"
-  ],
-  "AOL": [
-    "AOL",
-    "AOL Inc.",
-    "AOL Inc"
-  ],
-  "Azul": [
-    "Azul",
-    "azul"
   ],
   "Adobe": [
     "Adobe",
     "adobe",
     "Adobe Inc.",
     "Adobe Inc"
+  ],
+  "ADP": [
+    "ADP",
+    "ADP, LLC",
+    "ADP, LLC."
+  ],
+  "Airbnb, Inc.": [
+    "Airbnb, Inc.",
+    "Airbnb, Inc"
   ],
   "Alibaba": [
     "Alibaba",
@@ -45,13 +40,18 @@
     "Amazon.com Inc.",
     "Amazon.com Inc"
   ],
+  "American Express": [
+    "American Express",
+    "american_express"
+  ],
   "Americanas.com S": [
     "Americanas.com S",
     "Americanas.com S,A Comercio Electrnico"
   ],
-  "American Express": [
-    "American Express",
-    "american_express"
+  "AOL": [
+    "AOL",
+    "AOL Inc.",
+    "AOL Inc"
   ],
   "apple": [
     "Apple",
@@ -70,9 +70,25 @@
     "AT&T Inc.",
     "AT&T Inc"
   ],
+  "Azul": [
+    "Azul",
+    "azul"
+  ],
   "bahia": [
     "Bahia",
     "bahia"
+  ],
+  "Banco do Brasil S.A": [
+    "Banco do Brasil S.A",
+    "Banco do Brasil S.A."
+  ],
+  "banco_de_occidente": [
+    "Banco de Occidente",
+    "banco_de_occidente"
+  ],
+  "banco_inter": [
+    "Banco Inter",
+    "banco_inter"
   ],
   "Bankia": [
     "Bankia",
@@ -86,19 +102,27 @@
     "Barclays Bank Plc",
     "barclays"
   ],
-  "Banco do Brasil S.A": [
-    "Banco do Brasil S.A",
-    "Banco do Brasil S.A."
+  "bbt": [
+    "BB&T Corporation",
+    "bbt"
   ],
   "bcp": [
     "BCP",
     "bcp",
     "Banco de Credito del Peru"
   ],
+  "bmo": [
+    "Bank of Montreal",
+    "bmo"
+  ],
   "BNP Paribas": [
     "BNP Paribas",
     "bnp paribas",
     "bnp_paribas"
+  ],
+  "bnz": [
+    "Bank of New Zealand",
+    "bnz"
   ],
   "boa": [
     "Bank of America",
@@ -112,17 +136,13 @@
     "BT Group plc",
     "bt"
   ],
-  "Cogeco": [
-    "Cogeco",
-    "cogeco"
-  ],
-  "Credit Agricole S.A": [
-    "Credit Agricole S.A",
-    "Credit Agricole S.A."
-  ],
   "caixa_bank": [
     "CaixaBank",
     "caixa_bank"
+  ],
+  "canada": [
+    "Government of Canada",
+    "canada"
   ],
   "capital_one": [
     "Capital One Financial Corporation",
@@ -135,6 +155,22 @@
   "cibc": [
     "Canadian Imperial Bank of Commerce",
     "cibc"
+  ],
+  "Cogeco": [
+    "Cogeco",
+    "cogeco"
+  ],
+  "commonwealth_bank": [
+    "Commonwealth Bank of Australia",
+    "commonwealth_bank"
+  ],
+  "Credit Agricole S.A": [
+    "Credit Agricole S.A",
+    "Credit Agricole S.A."
+  ],
+  "credit_agricole": [
+    "Credit Agricole",
+    "credit_agricole"
   ],
   "Deutsche Bank AG": [
     "Deutsche Bank AG",
@@ -161,6 +197,10 @@
     "Dropbox, Inc.",
     "Dropbox, Inc"
   ],
+  "dt": [
+    "Deutsche Telekom",
+    "dt"
+  ],
   "eBay": [
     "eBay",
     "ebay",
@@ -179,6 +219,14 @@
     "Facebook, Inc.",
     "Facebook, Inc"
   ],
+  "fifth_third": [
+    "Fifth Third Bank",
+    "fifth_third"
+  ],
+  "fnb": [
+    "First National Bank SA",
+    "fnb"
+  ],
   "Free ISP": [
     "Free ISP",
     "Free (ISP)"
@@ -190,10 +238,6 @@
   "Global Sources HK": [
     "Global Sources HK",
     "Global Sources (HK)"
-  ],
-  "Government of Canada": [
-    "Government of Canada",
-    "Canada Revenue Agency"
   ],
   "Google": [
     "Google",
@@ -211,6 +255,10 @@
     "Government of the United Kingdom",
     "gov_uk"
   ],
+  "Government of Canada": [
+    "Government of Canada",
+    "Canada Revenue Agency"
+  ],
   "grupo_bancolombia": [
     "Bancolombia",
     "Grupo Bancolombia",
@@ -221,10 +269,18 @@
     "HSBC Bank",
     "hsbc"
   ],
+  "huntington": [
+    "Huntington Bank",
+    "huntington"
+  ],
   "impots_gov": [
     "DGI French Tax Authority",
     "impots_gov",
     "DGI (French Tax Authority)"
+  ],
+  "ing": [
+    "ING Bank",
+    "ing"
   ],
   "Instagram": [
     "Instagram",
@@ -238,6 +294,10 @@
     "Itau Unibanco S.A",
     "itau"
   ],
+  "key": [
+    "Key Bank",
+    "key"
+  ],
   "La Banque postale": [
     "La Banque postale",
     "la_banque_postale"
@@ -246,10 +306,6 @@
     "La Poste",
     "la_poste"
   ],
-  "Mastercard International": [
-    "Mastercard International",
-    "Mastercard International Incorporated"
-  ],
   "LinkedIn Corporation": [
     "LinkedIn Corporation",
     "linkedin"
@@ -257,6 +313,10 @@
   "lloyds_bank": [
     "Lloyds TSB Group",
     "lloyds_bank"
+  ],
+  "Mastercard International": [
+    "Mastercard International",
+    "Mastercard International Incorporated"
   ],
   "mdpd": [
     "mdpd"
@@ -277,6 +337,14 @@
   "nab": [
     "National Australia Bank Limited",
     "nab"
+  ],
+  "natwest": [
+    "NatWest Personal Banking",
+    "natwest"
+  ],
+  "navy_federal": [
+    "Navy Federal Credit Union",
+    "navy_federal"
   ],
   "nedbank": [
     "NedBank Limited",
@@ -306,9 +374,17 @@
     "PostFinance",
     "Swiss Post"
   ],
+  "rabobank": [
+    "Rabobank Nederland",
+    "rabobank"
+  ],
   "Raiffeisen Bank S.A.": [
     "Raiffeisen Bank S.A.",
     "Raiffeisen Bank S.A"
+  ],
+  "rbc": [
+    "Royal Bank of Canada",
+    "rbc"
   ],
   "Royal KPN N.V": [
     "Royal KPN N.V",
@@ -326,14 +402,22 @@
     "SNS Bank N.V",
     "SNS Bank N.V."
   ],
+  "societe_generale": [
+    "Societe Generale",
+    "societe_generale"
+  ],
+  "sparkasse": [
+    "Sparkasse Bank",
+    "sparkasse"
+  ],
   "Square": [
     "Square",
     "Square, Inc.",
     "Square, Inc"
   ],
-  "sparkasse": [
-    "Sparkasse Bank",
-    "sparkasse"
+  "standard_bank": [
+    "Standard Chartered Bank",
+    "standard_bank"
   ],
   "Steam": [
     "Steam",
@@ -347,6 +431,14 @@
   "suntrust": [
     "SunTrust Bank",
     "suntrust"
+  ],
+  "swisscom": [
+    "Swisscom IT Services AG",
+    "swisscom"
+  ],
+  "td": [
+    "TD Bank Group",
+    "td"
   ],
   "TSB Bank Limited": [
     "TSB Bank Limited",
@@ -366,17 +458,21 @@
     "UniCredit Bank Aktiengesellschaft",
     "UniCredit Bulbank"
   ],
+  "us_bank": [
+    "U S Bank",
+    "us_bank"
+  ],
   "usaa": [
     "United Services Automobile Association",
     "usaa"
   ],
-  "Webmail Provider": [
-    "Webmail Provider",
-    "Webmail Providers"
-  ],
   "walmart": [
     "Walmart",
     "walmart"
+  ],
+  "Webmail Provider": [
+    "Webmail Provider",
+    "Webmail Providers"
   ],
   "Wells Fargo & Company": [
     "Wells Fargo & Company",
