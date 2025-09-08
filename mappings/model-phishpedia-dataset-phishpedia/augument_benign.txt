@@ -1,282 +1,1233 @@
-uv run augment_data.py \
-  /home/phish-target-recognition/data/interim/pp-for-vp-augumented \
-  --label-strategy directory \
-  --output /home/phish-target-recognition/data/interim/pp-for-vp-augumented \
-  --threshold 25
-Reading inline script metadata from `augment_data.py`
-Found 54 targets that need augmentation:
-  Office365: phish=2059→25 (+0), benign=1→25 (+24)
-  ADP: phish=25→25 (+0), benign=1→25 (+24)
-  capital_one: phish=25→25 (+0), benign=1→25 (+24)
-  Match: phish=115→25 (+0), benign=3→25 (+22)
-  Navy Federal Credit Union: phish=47→25 (+0), benign=1→25 (+24)
-  Amazon: phish=807→25 (+0), benign=11→25 (+14)
-  NatWest Personal Banking: phish=25→25 (+0), benign=1→25 (+24)
-  bcp: phish=25→25 (+0), benign=1→25 (+24)
-  Ooredoo QSC: phish=25→25 (+0), benign=1→25 (+24)
-  Discover: phish=30→25 (+0), benign=1→25 (+24)
-  Vodafone: phish=25→25 (+0), benign=2→25 (+23)
-  Steam: phish=183→25 (+0), benign=2→25 (+23)
-  1&1 Ionos: phish=159→25 (+0), benign=1→25 (+24)
-  eBay: phish=232→25 (+0), benign=17→25 (+8)
-  Yahoo!: phish=385→25 (+0), benign=4→25 (+21)
-  gov_uk: phish=25→25 (+0), benign=6→25 (+19)
-  SNS Bank N.V: phish=25→25 (+0), benign=1→25 (+24)
-  ASB Bank Limited: phish=96→25 (+0), benign=1→25 (+24)
-  PayPal: phish=4811→25 (+0), benign=2→25 (+23)
-  iiNet Limited: phish=25→25 (+0), benign=1→25 (+24)
-  DHL: phish=727→25 (+0), benign=3→25 (+22)
-  Rakuten: phish=222→25 (+0), benign=2→25 (+23)
-  Facebook: phish=993→25 (+0), benign=1→25 (+24)
-  UBS AG: phish=25→25 (+0), benign=1→25 (+24)
-  Frontier Communications: phish=25→25 (+0), benign=1→25 (+24)
-  Netflix: phish=747→25 (+0), benign=1→25 (+24)
-  AT&T: phish=252→25 (+0), benign=2→25 (+23)
-  AOL: phish=31→25 (+0), benign=4→25 (+21)
-  Itau Unibanco S.A: phish=312→25 (+0), benign=1→25 (+24)
-  Raiffeisen Bank S.A: phish=49→25 (+0), benign=2→25 (+23)
-  Banco de Chile: phish=25→25 (+0), benign=1→25 (+24)
-  American Express: phish=46→25 (+0), benign=1→25 (+24)
-  National Bank of Canada: phish=25→25 (+0), benign=1→25 (+24)
-  Orange: phish=277→25 (+0), benign=2→25 (+23)
-  AutoScout24: phish=25→25 (+0), benign=6→25 (+19)
-  VKontakte: phish=37→25 (+0), benign=3→25 (+22)
-  ATB Financial: phish=25→25 (+0), benign=2→25 (+23)
-  Visa International Service Association: phish=66→25 (+0), benign=1→25 (+24)
-  HSBC Bank: phish=25→25 (+0), benign=5→25 (+20)
-  Giffgaff: phish=25→25 (+0), benign=1→25 (+24)
-  U.S. Bank: phish=95→25 (+0), benign=1→25 (+24)
-  RuneScape: phish=231→25 (+0), benign=1→25 (+24)
-  Twitter, Inc: phish=25→25 (+0), benign=1→25 (+24)
-  Etisalat: phish=25→25 (+0), benign=2→25 (+23)
-  Deutsche Telekom: phish=25→25 (+0), benign=1→25 (+24)
-  Naver: phish=25→25 (+0), benign=2→25 (+23)
-  Fifth Third Bank: phish=25→25 (+0), benign=1→25 (+24)
-  Made-In-China: phish=52→25 (+0), benign=1→25 (+24)
-  Grupo Santander: phish=45→25 (+0), benign=2→25 (+23)
-  GMX Mail: phish=25→25 (+0), benign=3→25 (+22)
-  International Card Services B.V: phish=25→25 (+0), benign=1→25 (+24)
-  LinkedIn Corporation: phish=501→25 (+0), benign=1→25 (+24)
-  Citrix ShareFile: phish=25→25 (+0), benign=1→25 (+24)
-  db: phish=25→25 (+0), benign=1→25 (+24)
-
-Processing target: Office365
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: ADP
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: capital_one
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Match
-  Augmenting benign class: 22 images needed
-    Created 22 augmented images
-
-Processing target: Navy Federal Credit Union
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Amazon
-  Augmenting benign class: 14 images needed
-    Created 14 augmented images
-
-Processing target: NatWest Personal Banking
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: bcp
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Ooredoo QSC
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Discover
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Vodafone
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: Steam
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: 1&1 Ionos
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: eBay
-  Augmenting benign class: 8 images needed
-    Created 8 augmented images
-
-Processing target: Yahoo!
-  Augmenting benign class: 21 images needed
-    Created 21 augmented images
-
-Processing target: gov_uk
-  Augmenting benign class: 19 images needed
-    Created 19 augmented images
-
-Processing target: SNS Bank N.V
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: ASB Bank Limited
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: PayPal
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: iiNet Limited
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: DHL
-  Augmenting benign class: 22 images needed
-    Created 22 augmented images
-
-Processing target: Rakuten
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: Facebook
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: UBS AG
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Frontier Communications
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Netflix
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: AT&T
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: AOL
-  Augmenting benign class: 21 images needed
-    Created 21 augmented images
-
-Processing target: Itau Unibanco S.A
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Raiffeisen Bank S.A
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: Banco de Chile
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: American Express
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: National Bank of Canada
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Orange
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: AutoScout24
-  Augmenting benign class: 19 images needed
-    Created 19 augmented images
-
-Processing target: VKontakte
-  Augmenting benign class: 22 images needed
-    Created 22 augmented images
-
-Processing target: ATB Financial
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: Visa International Service Association
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: HSBC Bank
-  Augmenting benign class: 20 images needed
-    Created 20 augmented images
-
-Processing target: Giffgaff
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: U.S. Bank
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: RuneScape
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Twitter, Inc
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Etisalat
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: Deutsche Telekom
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Naver
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: Fifth Third Bank
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Made-In-China
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Grupo Santander
-  Augmenting benign class: 23 images needed
-    Created 23 augmented images
-
-Processing target: GMX Mail
-  Augmenting benign class: 22 images needed
-    Created 22 augmented images
-
-Processing target: International Card Services B.V
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: LinkedIn Corporation
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: Citrix ShareFile
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-Processing target: db
-  Augmenting benign class: 24 images needed
-    Created 24 augmented images
-
-=== Augmentation Complete ===
-Targets processed: 54
-Total augmented images created: 1231
-Techniques used: blur, brightness, shift, noise
+Timestamp | Target | Class | Original File | Augmented File | Parameters
+--------------------------------------------------------------------------------
+2025-08-30 22:50:02 | Office365 | benign | T33_0.png | T33_0_aug1.png | blur kernel=7
+2025-08-30 22:50:02 | Office365 | benign | T33_0.png | T33_0_aug2.png | brightness factor=0.68
+2025-08-30 22:50:03 | Office365 | benign | T33_0.png | T33_0_aug3.png | blur kernel=11
+2025-08-30 22:50:03 | Office365 | benign | T33_0.png | T33_0_aug4.png | blur kernel=3
+2025-08-30 22:50:03 | Office365 | benign | T33_0.png | T33_0_aug5.png | brightness factor=0.80
+2025-08-30 22:50:04 | Office365 | benign | T33_0.png | T33_0_aug6.png | brightness factor=1.43
+2025-08-30 22:50:04 | Office365 | benign | T33_0.png | T33_0_aug7.png | brightness factor=1.08
+2025-08-30 22:50:04 | Office365 | benign | T33_0.png | T33_0_aug8.png | blur kernel=5
+2025-08-30 22:50:04 | Office365 | benign | T33_0.png | T33_0_aug9.png | shift translate=0.08
+2025-08-30 22:50:05 | Office365 | benign | T33_0.png | T33_0_aug10.png | shift translate=0.06
+2025-08-30 22:50:05 | Office365 | benign | T33_0.png | T33_0_aug11.png | blur kernel=7
+2025-08-30 22:50:05 | Office365 | benign | T33_0.png | T33_0_aug12.png | shift translate=0.13
+2025-08-30 22:50:06 | Office365 | benign | T33_0.png | T33_0_aug13.png | blur kernel=9
+2025-08-30 22:50:06 | Office365 | benign | T33_0.png | T33_0_aug14.png | shift translate=0.13
+2025-08-30 22:50:06 | Office365 | benign | T33_0.png | T33_0_aug15.png | brightness factor=1.42
+2025-08-30 22:50:06 | Office365 | benign | T33_0.png | T33_0_aug16.png | brightness factor=1.50
+2025-08-30 22:50:07 | Office365 | benign | T33_0.png | T33_0_aug17.png | brightness factor=1.63
+2025-08-30 22:50:07 | Office365 | benign | T33_0.png | T33_0_aug18.png | shift translate=0.10
+2025-08-30 22:50:07 | Office365 | benign | T33_0.png | T33_0_aug19.png | brightness factor=0.98
+2025-08-30 22:50:07 | Office365 | benign | T33_0.png | T33_0_aug20.png | shift translate=0.12
+2025-08-30 22:50:08 | Office365 | benign | T33_0.png | T33_0_aug21.png | brightness factor=1.19
+2025-08-30 22:50:08 | Office365 | benign | T33_0.png | T33_0_aug22.png | brightness factor=1.10
+2025-08-30 22:50:08 | Office365 | benign | T33_0.png | T33_0_aug23.png | brightness factor=1.39
+2025-08-30 22:50:08 | Office365 | benign | T33_0.png | T33_0_aug24.png | brightness factor=1.57
+2025-08-30 22:50:10 | ADP | benign | T1_0.png | T1_0_aug1.png | noise std=0.021
+2025-08-30 22:50:10 | ADP | benign | T1_0.png | T1_0_aug2.png | shift translate=0.07
+2025-08-30 22:50:11 | ADP | benign | T1_0.png | T1_0_aug3.png | noise std=0.045
+2025-08-30 22:50:11 | ADP | benign | T1_0.png | T1_0_aug4.png | brightness factor=0.84
+2025-08-30 22:50:12 | ADP | benign | T1_0.png | T1_0_aug5.png | shift translate=0.12
+2025-08-30 22:50:13 | ADP | benign | T1_0.png | T1_0_aug6.png | noise std=0.024
+2025-08-30 22:50:14 | ADP | benign | T1_0.png | T1_0_aug7.png | noise std=0.014
+2025-08-30 22:50:15 | ADP | benign | T1_0.png | T1_0_aug8.png | blur kernel=5
+2025-08-30 22:50:16 | ADP | benign | T1_0.png | T1_0_aug9.png | noise std=0.034
+2025-08-30 22:50:17 | ADP | benign | T1_0.png | T1_0_aug10.png | noise std=0.034
+2025-08-30 22:50:17 | ADP | benign | T1_0.png | T1_0_aug11.png | shift translate=0.15
+2025-08-30 22:50:18 | ADP | benign | T1_0.png | T1_0_aug12.png | blur kernel=11
+2025-08-30 22:50:18 | ADP | benign | T1_0.png | T1_0_aug13.png | shift translate=0.06
+2025-08-30 22:50:18 | ADP | benign | T1_0.png | T1_0_aug14.png | brightness factor=1.09
+2025-08-30 22:50:18 | ADP | benign | T1_0.png | T1_0_aug15.png | brightness factor=1.16
+2025-08-30 22:50:19 | ADP | benign | T1_0.png | T1_0_aug16.png | shift translate=0.13
+2025-08-30 22:50:19 | ADP | benign | T1_0.png | T1_0_aug17.png | brightness factor=0.99
+2025-08-30 22:50:20 | ADP | benign | T1_0.png | T1_0_aug18.png | blur kernel=11
+2025-08-30 22:50:21 | ADP | benign | T1_0.png | T1_0_aug19.png | noise std=0.011
+2025-08-30 22:50:21 | ADP | benign | T1_0.png | T1_0_aug20.png | shift translate=0.07
+2025-08-30 22:50:22 | ADP | benign | T1_0.png | T1_0_aug21.png | blur kernel=3
+2025-08-30 22:50:22 | ADP | benign | T1_0.png | T1_0_aug22.png | blur kernel=11
+2025-08-30 22:50:23 | ADP | benign | T1_0.png | T1_0_aug23.png | brightness factor=1.36
+2025-08-30 22:50:23 | ADP | benign | T1_0.png | T1_0_aug24.png | shift translate=0.10
+2025-08-30 22:50:23 | capital_one | benign | T51_0.png | T51_0_aug1.png | brightness factor=1.71
+2025-08-30 22:50:23 | capital_one | benign | T51_0.png | T51_0_aug2.png | shift translate=0.09
+2025-08-30 22:50:24 | capital_one | benign | T51_0.png | T51_0_aug3.png | noise std=0.046
+2025-08-30 22:50:24 | capital_one | benign | T51_0.png | T51_0_aug4.png | blur kernel=5
+2025-08-30 22:50:24 | capital_one | benign | T51_0.png | T51_0_aug5.png | blur kernel=7
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug6.png | brightness factor=1.26
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug7.png | blur kernel=3
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug8.png | blur kernel=3
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug9.png | blur kernel=11
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug10.png | shift translate=0.12
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug11.png | brightness factor=1.44
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug12.png | brightness factor=1.52
+2025-08-30 22:50:25 | capital_one | benign | T51_0.png | T51_0_aug13.png | brightness factor=0.62
+2025-08-30 22:50:26 | capital_one | benign | T51_0.png | T51_0_aug14.png | shift translate=0.09
+2025-08-30 22:50:26 | capital_one | benign | T51_0.png | T51_0_aug15.png | blur kernel=3
+2025-08-30 22:50:26 | capital_one | benign | T51_0.png | T51_0_aug16.png | noise std=0.039
+2025-08-30 22:50:26 | capital_one | benign | T51_0.png | T51_0_aug17.png | brightness factor=0.75
+2025-08-30 22:50:26 | capital_one | benign | T51_0.png | T51_0_aug18.png | brightness factor=1.05
+2025-08-30 22:50:27 | capital_one | benign | T51_0.png | T51_0_aug19.png | noise std=0.020
+2025-08-30 22:50:27 | capital_one | benign | T51_0.png | T51_0_aug20.png | noise std=0.042
+2025-08-30 22:50:28 | capital_one | benign | T51_0.png | T51_0_aug21.png | blur kernel=11
+2025-08-30 22:50:28 | capital_one | benign | T51_0.png | T51_0_aug22.png | blur kernel=5
+2025-08-30 22:50:28 | capital_one | benign | T51_0.png | T51_0_aug23.png | noise std=0.029
+2025-08-30 22:50:29 | capital_one | benign | T51_0.png | T51_0_aug24.png | noise std=0.046
+2025-08-30 22:50:29 | Match | benign | T27_1.png | T27_1_aug1.png | noise std=0.010
+2025-08-30 22:50:30 | Match | benign | T27_0.png | T27_0_aug2.png | shift translate=0.14
+2025-08-30 22:50:30 | Match | benign | T27_0.png | T27_0_aug3.png | shift translate=0.09
+2025-08-30 22:50:31 | Match | benign | T27_2.png | T27_2_aug4.png | noise std=0.016
+2025-08-30 22:50:31 | Match | benign | T27_0.png | T27_0_aug5.png | brightness factor=1.76
+2025-08-30 22:50:31 | Match | benign | T27_2.png | T27_2_aug6.png | blur kernel=7
+2025-08-30 22:50:31 | Match | benign | T27_1.png | T27_1_aug7.png | blur kernel=11
+2025-08-30 22:50:31 | Match | benign | T27_0.png | T27_0_aug8.png | brightness factor=0.57
+2025-08-30 22:50:32 | Match | benign | T27_2.png | T27_2_aug9.png | blur kernel=5
+2025-08-30 22:50:32 | Match | benign | T27_1.png | T27_1_aug10.png | blur kernel=5
+2025-08-30 22:50:32 | Match | benign | T27_0.png | T27_0_aug11.png | blur kernel=11
+2025-08-30 22:50:32 | Match | benign | T27_1.png | T27_1_aug12.png | blur kernel=11
+2025-08-30 22:50:33 | Match | benign | T27_1.png | T27_1_aug13.png | noise std=0.036
+2025-08-30 22:50:33 | Match | benign | T27_2.png | T27_2_aug14.png | shift translate=0.14
+2025-08-30 22:50:33 | Match | benign | T27_1.png | T27_1_aug15.png | shift translate=0.07
+2025-08-30 22:50:34 | Match | benign | T27_0.png | T27_0_aug16.png | brightness factor=1.37
+2025-08-30 22:50:34 | Match | benign | T27_0.png | T27_0_aug17.png | noise std=0.023
+2025-08-30 22:50:34 | Match | benign | T27_1.png | T27_1_aug18.png | blur kernel=9
+2025-08-30 22:50:34 | Match | benign | T27_2.png | T27_2_aug19.png | blur kernel=3
+2025-08-30 22:50:34 | Match | benign | T27_2.png | T27_2_aug20.png | brightness factor=1.16
+2025-08-30 22:50:35 | Match | benign | T27_1.png | T27_1_aug21.png | shift translate=0.14
+2025-08-30 22:50:35 | Match | benign | T27_1.png | T27_1_aug22.png | shift translate=0.08
+2025-08-30 22:50:35 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug1.png | shift translate=0.11
+2025-08-30 22:50:35 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug2.png | shift translate=0.14
+2025-08-30 22:50:35 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug3.png | brightness factor=0.84
+2025-08-30 22:50:35 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug4.png | brightness factor=0.85
+2025-08-30 22:50:35 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug5.png | shift translate=0.07
+2025-08-30 22:50:36 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug6.png | noise std=0.020
+2025-08-30 22:50:36 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug7.png | blur kernel=9
+2025-08-30 22:50:36 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug8.png | blur kernel=3
+2025-08-30 22:50:36 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug9.png | brightness factor=1.33
+2025-08-30 22:50:36 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug10.png | brightness factor=1.46
+2025-08-30 22:50:36 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug11.png | blur kernel=3
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug12.png | brightness factor=1.21
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug13.png | brightness factor=1.06
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug14.png | shift translate=0.09
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug15.png | shift translate=0.07
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug16.png | blur kernel=7
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug17.png | brightness factor=1.70
+2025-08-30 22:50:37 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug18.png | brightness factor=1.77
+2025-08-30 22:50:38 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug19.png | noise std=0.011
+2025-08-30 22:50:38 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug20.png | noise std=0.042
+2025-08-30 22:50:38 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug21.png | shift translate=0.07
+2025-08-30 22:50:39 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug22.png | noise std=0.045
+2025-08-30 22:50:39 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug23.png | brightness factor=0.76
+2025-08-30 22:50:39 | Navy Federal Credit Union | benign | T31_0.png | T31_0_aug24.png | shift translate=0.08
+2025-08-30 22:50:39 | Amazon | benign | T6_9.png | T6_9_aug1.png | brightness factor=0.53
+2025-08-30 22:50:39 | Amazon | benign | T6_9.png | T6_9_aug2.png | noise std=0.023
+2025-08-30 22:50:40 | Amazon | benign | T6_4.png | T6_4_aug3.png | shift translate=0.09
+2025-08-30 22:50:42 | Amazon | benign | T6_1.png | T6_1_aug4.png | noise std=0.037
+2025-08-30 22:50:43 | Amazon | benign | T6_1.png | T6_1_aug5.png | shift translate=0.14
+2025-08-30 22:50:43 | Amazon | benign | T6_4.png | T6_4_aug6.png | shift translate=0.07
+2025-08-30 22:50:43 | Amazon | benign | T6_5.png | T6_5_aug7.png | blur kernel=3
+2025-08-30 22:50:45 | Amazon | benign | T6_2.png | T6_2_aug8.png | noise std=0.024
+2025-08-30 22:50:45 | Amazon | benign | T6_8.png | T6_8_aug9.png | noise std=0.034
+2025-08-30 22:50:48 | Amazon | benign | T6_1.png | T6_1_aug10.png | blur kernel=9
+2025-08-30 22:50:49 | Amazon | benign | T6_2.png | T6_2_aug11.png | brightness factor=0.83
+2025-08-30 22:50:49 | Amazon | benign | T6_7.png | T6_7_aug12.png | blur kernel=11
+2025-08-30 22:50:50 | Amazon | benign | T6_1.png | T6_1_aug13.png | brightness factor=0.97
+2025-08-30 22:50:50 | Amazon | benign | T6_4.png | T6_4_aug14.png | shift translate=0.11
+2025-08-30 22:50:50 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug1.png | shift translate=0.10
+2025-08-30 22:50:50 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug2.png | shift translate=0.09
+2025-08-30 22:50:50 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug3.png | brightness factor=0.75
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug4.png | brightness factor=1.30
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug5.png | noise std=0.032
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug6.png | shift translate=0.08
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug7.png | shift translate=0.10
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug8.png | brightness factor=1.16
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug9.png | blur kernel=7
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug10.png | blur kernel=5
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug11.png | brightness factor=1.55
+2025-08-30 22:50:51 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug12.png | blur kernel=3
+2025-08-30 22:50:52 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug13.png | noise std=0.034
+2025-08-30 22:50:52 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug14.png | noise std=0.027
+2025-08-30 22:50:52 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug15.png | noise std=0.030
+2025-08-30 22:50:52 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug16.png | brightness factor=1.35
+2025-08-30 22:50:52 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug17.png | blur kernel=9
+2025-08-30 22:50:53 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug18.png | brightness factor=1.55
+2025-08-30 22:50:53 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug19.png | blur kernel=11
+2025-08-30 22:50:53 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug20.png | blur kernel=9
+2025-08-30 22:50:53 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug21.png | noise std=0.037
+2025-08-30 22:50:53 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug22.png | noise std=0.035
+2025-08-30 22:50:54 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug23.png | noise std=0.046
+2025-08-30 22:50:54 | NatWest Personal Banking | benign | T28_0.png | T28_0_aug24.png | noise std=0.020
+2025-08-30 22:50:54 | bcp | benign | T50_0.png | T50_0_aug1.png | shift translate=0.13
+2025-08-30 22:50:55 | bcp | benign | T50_0.png | T50_0_aug2.png | brightness factor=0.86
+2025-08-30 22:50:55 | bcp | benign | T50_0.png | T50_0_aug3.png | shift translate=0.07
+2025-08-30 22:50:55 | bcp | benign | T50_0.png | T50_0_aug4.png | shift translate=0.14
+2025-08-30 22:50:56 | bcp | benign | T50_0.png | T50_0_aug5.png | brightness factor=0.70
+2025-08-30 22:50:56 | bcp | benign | T50_0.png | T50_0_aug6.png | brightness factor=1.42
+2025-08-30 22:50:57 | bcp | benign | T50_0.png | T50_0_aug7.png | noise std=0.026
+2025-08-30 22:50:57 | bcp | benign | T50_0.png | T50_0_aug8.png | noise std=0.012
+2025-08-30 22:50:58 | bcp | benign | T50_0.png | T50_0_aug9.png | noise std=0.046
+2025-08-30 22:50:58 | bcp | benign | T50_0.png | T50_0_aug10.png | noise std=0.029
+2025-08-30 22:50:59 | bcp | benign | T50_0.png | T50_0_aug11.png | shift translate=0.13
+2025-08-30 22:50:59 | bcp | benign | T50_0.png | T50_0_aug12.png | brightness factor=1.13
+2025-08-30 22:51:00 | bcp | benign | T50_0.png | T50_0_aug13.png | noise std=0.029
+2025-08-30 22:51:00 | bcp | benign | T50_0.png | T50_0_aug14.png | shift translate=0.12
+2025-08-30 22:51:00 | bcp | benign | T50_0.png | T50_0_aug15.png | brightness factor=1.59
+2025-08-30 22:51:01 | bcp | benign | T50_0.png | T50_0_aug16.png | blur kernel=9
+2025-08-30 22:51:02 | bcp | benign | T50_0.png | T50_0_aug17.png | blur kernel=9
+2025-08-30 22:51:02 | bcp | benign | T50_0.png | T50_0_aug18.png | noise std=0.017
+2025-08-30 22:51:03 | bcp | benign | T50_0.png | T50_0_aug19.png | noise std=0.023
+2025-08-30 22:51:03 | bcp | benign | T50_0.png | T50_0_aug20.png | shift translate=0.08
+2025-08-30 22:51:04 | bcp | benign | T50_0.png | T50_0_aug21.png | shift translate=0.13
+2025-08-30 22:51:04 | bcp | benign | T50_0.png | T50_0_aug22.png | shift translate=0.13
+2025-08-30 22:51:04 | bcp | benign | T50_0.png | T50_0_aug23.png | blur kernel=11
+2025-08-30 22:51:05 | bcp | benign | T50_0.png | T50_0_aug24.png | shift translate=0.07
+2025-08-30 22:51:05 | Ooredoo QSC | benign | T34_0.png | T34_0_aug1.png | blur kernel=3
+2025-08-30 22:51:05 | Ooredoo QSC | benign | T34_0.png | T34_0_aug2.png | brightness factor=1.59
+2025-08-30 22:51:05 | Ooredoo QSC | benign | T34_0.png | T34_0_aug3.png | brightness factor=0.66
+2025-08-30 22:51:05 | Ooredoo QSC | benign | T34_0.png | T34_0_aug4.png | brightness factor=1.10
+2025-08-30 22:51:06 | Ooredoo QSC | benign | T34_0.png | T34_0_aug5.png | shift translate=0.07
+2025-08-30 22:51:06 | Ooredoo QSC | benign | T34_0.png | T34_0_aug6.png | brightness factor=1.75
+2025-08-30 22:51:06 | Ooredoo QSC | benign | T34_0.png | T34_0_aug7.png | blur kernel=7
+2025-08-30 22:51:06 | Ooredoo QSC | benign | T34_0.png | T34_0_aug8.png | noise std=0.048
+2025-08-30 22:51:06 | Ooredoo QSC | benign | T34_0.png | T34_0_aug9.png | blur kernel=11
+2025-08-30 22:51:07 | Ooredoo QSC | benign | T34_0.png | T34_0_aug10.png | blur kernel=7
+2025-08-30 22:51:07 | Ooredoo QSC | benign | T34_0.png | T34_0_aug11.png | blur kernel=7
+2025-08-30 22:51:07 | Ooredoo QSC | benign | T34_0.png | T34_0_aug12.png | shift translate=0.06
+2025-08-30 22:51:07 | Ooredoo QSC | benign | T34_0.png | T34_0_aug13.png | blur kernel=9
+2025-08-30 22:51:07 | Ooredoo QSC | benign | T34_0.png | T34_0_aug14.png | blur kernel=9
+2025-08-30 22:51:08 | Ooredoo QSC | benign | T34_0.png | T34_0_aug15.png | noise std=0.038
+2025-08-30 22:51:08 | Ooredoo QSC | benign | T34_0.png | T34_0_aug16.png | brightness factor=1.45
+2025-08-30 22:51:08 | Ooredoo QSC | benign | T34_0.png | T34_0_aug17.png | noise std=0.029
+2025-08-30 22:51:08 | Ooredoo QSC | benign | T34_0.png | T34_0_aug18.png | shift translate=0.14
+2025-08-30 22:51:08 | Ooredoo QSC | benign | T34_0.png | T34_0_aug19.png | shift translate=0.14
+2025-08-30 22:51:09 | Ooredoo QSC | benign | T34_0.png | T34_0_aug20.png | noise std=0.033
+2025-08-30 22:51:09 | Ooredoo QSC | benign | T34_0.png | T34_0_aug21.png | shift translate=0.05
+2025-08-30 22:51:09 | Ooredoo QSC | benign | T34_0.png | T34_0_aug22.png | brightness factor=1.13
+2025-08-30 22:51:09 | Ooredoo QSC | benign | T34_0.png | T34_0_aug23.png | shift translate=0.08
+2025-08-30 22:51:09 | Ooredoo QSC | benign | T34_0.png | T34_0_aug24.png | blur kernel=11
+2025-08-30 22:51:09 | Discover | benign | T13_0.png | T13_0_aug1.png | blur kernel=5
+2025-08-30 22:51:10 | Discover | benign | T13_0.png | T13_0_aug2.png | noise std=0.032
+2025-08-30 22:51:11 | Discover | benign | T13_0.png | T13_0_aug3.png | noise std=0.036
+2025-08-30 22:51:11 | Discover | benign | T13_0.png | T13_0_aug4.png | noise std=0.042
+2025-08-30 22:51:11 | Discover | benign | T13_0.png | T13_0_aug5.png | shift translate=0.07
+2025-08-30 22:51:12 | Discover | benign | T13_0.png | T13_0_aug6.png | shift translate=0.12
+2025-08-30 22:51:12 | Discover | benign | T13_0.png | T13_0_aug7.png | noise std=0.032
+2025-08-30 22:51:13 | Discover | benign | T13_0.png | T13_0_aug8.png | noise std=0.050
+2025-08-30 22:51:13 | Discover | benign | T13_0.png | T13_0_aug9.png | shift translate=0.12
+2025-08-30 22:51:13 | Discover | benign | T13_0.png | T13_0_aug10.png | shift translate=0.08
+2025-08-30 22:51:13 | Discover | benign | T13_0.png | T13_0_aug11.png | brightness factor=0.91
+2025-08-30 22:51:14 | Discover | benign | T13_0.png | T13_0_aug12.png | brightness factor=0.78
+2025-08-30 22:51:14 | Discover | benign | T13_0.png | T13_0_aug13.png | shift translate=0.12
+2025-08-30 22:51:14 | Discover | benign | T13_0.png | T13_0_aug14.png | blur kernel=5
+2025-08-30 22:51:14 | Discover | benign | T13_0.png | T13_0_aug15.png | brightness factor=0.97
+2025-08-30 22:51:14 | Discover | benign | T13_0.png | T13_0_aug16.png | blur kernel=11
+2025-08-30 22:51:15 | Discover | benign | T13_0.png | T13_0_aug17.png | shift translate=0.05
+2025-08-30 22:51:15 | Discover | benign | T13_0.png | T13_0_aug18.png | shift translate=0.12
+2025-08-30 22:51:16 | Discover | benign | T13_0.png | T13_0_aug19.png | noise std=0.014
+2025-08-30 22:51:16 | Discover | benign | T13_0.png | T13_0_aug20.png | shift translate=0.10
+2025-08-30 22:51:16 | Discover | benign | T13_0.png | T13_0_aug21.png | shift translate=0.07
+2025-08-30 22:51:16 | Discover | benign | T13_0.png | T13_0_aug22.png | shift translate=0.14
+2025-08-30 22:51:16 | Discover | benign | T13_0.png | T13_0_aug23.png | blur kernel=3
+2025-08-30 22:51:17 | Discover | benign | T13_0.png | T13_0_aug24.png | noise std=0.013
+2025-08-30 22:51:17 | Vodafone | benign | T48_0.png | T48_0_aug1.png | brightness factor=0.69
+2025-08-30 22:51:18 | Vodafone | benign | T48_1.png | T48_1_aug2.png | blur kernel=5
+2025-08-30 22:51:18 | Vodafone | benign | T48_0.png | T48_0_aug3.png | noise std=0.034
+2025-08-30 22:51:19 | Vodafone | benign | T48_0.png | T48_0_aug4.png | noise std=0.028
+2025-08-30 22:51:20 | Vodafone | benign | T48_1.png | T48_1_aug5.png | shift translate=0.14
+2025-08-30 22:51:20 | Vodafone | benign | T48_1.png | T48_1_aug6.png | shift translate=0.11
+2025-08-30 22:51:20 | Vodafone | benign | T48_0.png | T48_0_aug7.png | blur kernel=5
+2025-08-30 22:51:21 | Vodafone | benign | T48_0.png | T48_0_aug8.png | shift translate=0.12
+2025-08-30 22:51:21 | Vodafone | benign | T48_0.png | T48_0_aug9.png | brightness factor=0.73
+2025-08-30 22:51:21 | Vodafone | benign | T48_0.png | T48_0_aug10.png | brightness factor=0.50
+2025-08-30 22:51:22 | Vodafone | benign | T48_1.png | T48_1_aug11.png | noise std=0.022
+2025-08-30 22:51:22 | Vodafone | benign | T48_0.png | T48_0_aug12.png | shift translate=0.12
+2025-08-30 22:51:22 | Vodafone | benign | T48_1.png | T48_1_aug13.png | blur kernel=5
+2025-08-30 22:51:22 | Vodafone | benign | T48_1.png | T48_1_aug14.png | brightness factor=1.05
+2025-08-30 22:51:23 | Vodafone | benign | T48_0.png | T48_0_aug15.png | brightness factor=1.68
+2025-08-30 22:51:23 | Vodafone | benign | T48_0.png | T48_0_aug16.png | blur kernel=3
+2025-08-30 22:51:23 | Vodafone | benign | T48_0.png | T48_0_aug17.png | shift translate=0.11
+2025-08-30 22:51:24 | Vodafone | benign | T48_1.png | T48_1_aug18.png | noise std=0.015
+2025-08-30 22:51:24 | Vodafone | benign | T48_1.png | T48_1_aug19.png | noise std=0.048
+2025-08-30 22:51:25 | Vodafone | benign | T48_1.png | T48_1_aug20.png | noise std=0.013
+2025-08-30 22:51:25 | Vodafone | benign | T48_0.png | T48_0_aug21.png | noise std=0.039
+2025-08-30 22:51:26 | Vodafone | benign | T48_1.png | T48_1_aug22.png | blur kernel=3
+2025-08-30 22:51:26 | Vodafone | benign | T48_0.png | T48_0_aug23.png | blur kernel=7
+2025-08-30 22:51:26 | Steam | benign | T42_1.png | T42_1_aug1.png | brightness factor=1.11
+2025-08-30 22:51:26 | Steam | benign | T42_0.png | T42_0_aug2.png | shift translate=0.07
+2025-08-30 22:51:27 | Steam | benign | T42_0.png | T42_0_aug3.png | noise std=0.049
+2025-08-30 22:51:27 | Steam | benign | T42_0.png | T42_0_aug4.png | shift translate=0.09
+2025-08-30 22:51:27 | Steam | benign | T42_0.png | T42_0_aug5.png | blur kernel=5
+2025-08-30 22:51:27 | Steam | benign | T42_0.png | T42_0_aug6.png | noise std=0.038
+2025-08-30 22:51:28 | Steam | benign | T42_0.png | T42_0_aug7.png | noise std=0.043
+2025-08-30 22:51:28 | Steam | benign | T42_1.png | T42_1_aug8.png | noise std=0.014
+2025-08-30 22:51:29 | Steam | benign | T42_0.png | T42_0_aug9.png | shift translate=0.06
+2025-08-30 22:51:29 | Steam | benign | T42_0.png | T42_0_aug10.png | blur kernel=11
+2025-08-30 22:51:29 | Steam | benign | T42_0.png | T42_0_aug11.png | noise std=0.012
+2025-08-30 22:51:30 | Steam | benign | T42_0.png | T42_0_aug12.png | noise std=0.035
+2025-08-30 22:51:30 | Steam | benign | T42_1.png | T42_1_aug13.png | brightness factor=0.85
+2025-08-30 22:51:30 | Steam | benign | T42_1.png | T42_1_aug14.png | shift translate=0.09
+2025-08-30 22:51:30 | Steam | benign | T42_0.png | T42_0_aug15.png | blur kernel=3
+2025-08-30 22:51:30 | Steam | benign | T42_1.png | T42_1_aug16.png | brightness factor=0.90
+2025-08-30 22:51:31 | Steam | benign | T42_1.png | T42_1_aug17.png | noise std=0.014
+2025-08-30 22:51:31 | Steam | benign | T42_1.png | T42_1_aug18.png | noise std=0.048
+2025-08-30 22:51:32 | Steam | benign | T42_1.png | T42_1_aug19.png | noise std=0.047
+2025-08-30 22:51:32 | Steam | benign | T42_0.png | T42_0_aug20.png | shift translate=0.09
+2025-08-30 22:51:33 | Steam | benign | T42_0.png | T42_0_aug21.png | noise std=0.020
+2025-08-30 22:51:33 | Steam | benign | T42_1.png | T42_1_aug22.png | noise std=0.018
+2025-08-30 22:51:33 | Steam | benign | T42_1.png | T42_1_aug23.png | blur kernel=7
+2025-08-30 22:51:33 | 1&1 Ionos | benign | T0_0.png | T0_0_aug1.png | shift translate=0.14
+2025-08-30 22:51:33 | 1&1 Ionos | benign | T0_0.png | T0_0_aug2.png | blur kernel=7
+2025-08-30 22:51:34 | 1&1 Ionos | benign | T0_0.png | T0_0_aug3.png | noise std=0.045
+2025-08-30 22:51:34 | 1&1 Ionos | benign | T0_0.png | T0_0_aug4.png | noise std=0.024
+2025-08-30 22:51:34 | 1&1 Ionos | benign | T0_0.png | T0_0_aug5.png | noise std=0.047
+2025-08-30 22:51:34 | 1&1 Ionos | benign | T0_0.png | T0_0_aug6.png | brightness factor=1.24
+2025-08-30 22:51:35 | 1&1 Ionos | benign | T0_0.png | T0_0_aug7.png | noise std=0.012
+2025-08-30 22:51:35 | 1&1 Ionos | benign | T0_0.png | T0_0_aug8.png | noise std=0.025
+2025-08-30 22:51:35 | 1&1 Ionos | benign | T0_0.png | T0_0_aug9.png | noise std=0.049
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug10.png | shift translate=0.14
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug11.png | blur kernel=11
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug12.png | blur kernel=5
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug13.png | brightness factor=0.60
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug14.png | shift translate=0.11
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug15.png | blur kernel=7
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug16.png | shift translate=0.11
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug17.png | blur kernel=11
+2025-08-30 22:51:36 | 1&1 Ionos | benign | T0_0.png | T0_0_aug18.png | brightness factor=1.32
+2025-08-30 22:51:37 | 1&1 Ionos | benign | T0_0.png | T0_0_aug19.png | brightness factor=1.47
+2025-08-30 22:51:37 | 1&1 Ionos | benign | T0_0.png | T0_0_aug20.png | blur kernel=3
+2025-08-30 22:51:37 | 1&1 Ionos | benign | T0_0.png | T0_0_aug21.png | brightness factor=1.40
+2025-08-30 22:51:37 | 1&1 Ionos | benign | T0_0.png | T0_0_aug22.png | blur kernel=7
+2025-08-30 22:51:37 | 1&1 Ionos | benign | T0_0.png | T0_0_aug23.png | shift translate=0.09
+2025-08-30 22:51:37 | 1&1 Ionos | benign | T0_0.png | T0_0_aug24.png | brightness factor=0.82
+2025-08-30 22:51:37 | eBay | benign | T53_1.png | T53_1_aug1.png | brightness factor=0.72
+2025-08-30 22:51:38 | eBay | benign | T53_16.png | T53_16_aug2.png | noise std=0.035
+2025-08-30 22:51:38 | eBay | benign | T53_3.png | T53_3_aug3.png | noise std=0.047
+2025-08-30 22:51:38 | eBay | benign | T53_13.png | T53_13_aug4.png | brightness factor=1.10
+2025-08-30 22:51:39 | eBay | benign | T53_15.png | T53_15_aug5.png | noise std=0.020
+2025-08-30 22:51:40 | eBay | benign | T53_2.png | T53_2_aug6.png | noise std=0.046
+2025-08-30 22:51:40 | eBay | benign | T53_8.png | T53_8_aug7.png | blur kernel=9
+2025-08-30 22:51:40 | eBay | benign | T53_14.png | T53_14_aug8.png | shift translate=0.11
+2025-08-30 22:51:40 | Yahoo! | benign | T49_1.png | T49_1_aug1.png | shift translate=0.10
+2025-08-30 22:51:41 | Yahoo! | benign | T49_3.png | T49_3_aug2.png | brightness factor=1.80
+2025-08-30 22:51:41 | Yahoo! | benign | T49_1.png | T49_1_aug3.png | blur kernel=5
+2025-08-30 22:51:41 | Yahoo! | benign | T49_1.png | T49_1_aug4.png | shift translate=0.11
+2025-08-30 22:51:41 | Yahoo! | benign | T49_3.png | T49_3_aug5.png | blur kernel=9
+2025-08-30 22:51:42 | Yahoo! | benign | T49_3.png | T49_3_aug6.png | blur kernel=11
+2025-08-30 22:51:42 | Yahoo! | benign | T49_0.png | T49_0_aug7.png | noise std=0.043
+2025-08-30 22:51:42 | Yahoo! | benign | T49_3.png | T49_3_aug8.png | brightness factor=1.29
+2025-08-30 22:51:42 | Yahoo! | benign | T49_3.png | T49_3_aug9.png | brightness factor=1.33
+2025-08-30 22:51:42 | Yahoo! | benign | T49_3.png | T49_3_aug10.png | brightness factor=1.32
+2025-08-30 22:51:43 | Yahoo! | benign | T49_0.png | T49_0_aug11.png | shift translate=0.13
+2025-08-30 22:51:43 | Yahoo! | benign | T49_0.png | T49_0_aug12.png | shift translate=0.12
+2025-08-30 22:51:43 | Yahoo! | benign | T49_0.png | T49_0_aug13.png | shift translate=0.08
+2025-08-30 22:51:43 | Yahoo! | benign | T49_1.png | T49_1_aug14.png | brightness factor=0.76
+2025-08-30 22:51:43 | Yahoo! | benign | T49_3.png | T49_3_aug15.png | shift translate=0.13
+2025-08-30 22:51:44 | Yahoo! | benign | T49_3.png | T49_3_aug16.png | noise std=0.049
+2025-08-30 22:51:44 | Yahoo! | benign | T49_3.png | T49_3_aug17.png | shift translate=0.13
+2025-08-30 22:51:44 | Yahoo! | benign | T49_1.png | T49_1_aug18.png | blur kernel=5
+2025-08-30 22:51:45 | Yahoo! | benign | T49_2.png | T49_2_aug19.png | noise std=0.049
+2025-08-30 22:51:45 | Yahoo! | benign | T49_3.png | T49_3_aug20.png | blur kernel=9
+2025-08-30 22:51:45 | Yahoo! | benign | T49_0.png | T49_0_aug21.png | shift translate=0.10
+2025-08-30 22:51:45 | gov_uk | benign | T54_1.png | T54_1_aug1.png | shift translate=0.12
+2025-08-30 22:51:46 | gov_uk | benign | T54_3.png | T54_3_aug2.png | shift translate=0.11
+2025-08-30 22:51:47 | gov_uk | benign | T54_3.png | T54_3_aug3.png | shift translate=0.06
+2025-08-30 22:51:49 | gov_uk | benign | T54_0.png | T54_0_aug4.png | noise std=0.011
+2025-08-30 22:51:49 | gov_uk | benign | T54_2.png | T54_2_aug5.png | shift translate=0.14
+2025-08-30 22:51:50 | gov_uk | benign | T54_0.png | T54_0_aug6.png | blur kernel=9
+2025-08-30 22:51:51 | gov_uk | benign | T54_3.png | T54_3_aug7.png | shift translate=0.11
+2025-08-30 22:51:51 | gov_uk | benign | T54_4.png | T54_4_aug8.png | brightness factor=0.56
+2025-08-30 22:51:52 | gov_uk | benign | T54_4.png | T54_4_aug9.png | shift translate=0.15
+2025-08-30 22:51:53 | gov_uk | benign | T54_4.png | T54_4_aug10.png | blur kernel=5
+2025-08-30 22:51:53 | gov_uk | benign | T54_2.png | T54_2_aug11.png | brightness factor=1.01
+2025-08-30 22:51:54 | gov_uk | benign | T54_5.png | T54_5_aug12.png | noise std=0.033
+2025-08-30 22:51:54 | gov_uk | benign | T54_3.png | T54_3_aug13.png | brightness factor=1.65
+2025-08-30 22:51:55 | gov_uk | benign | T54_3.png | T54_3_aug14.png | blur kernel=9
+2025-08-30 22:51:55 | gov_uk | benign | T54_2.png | T54_2_aug15.png | noise std=0.048
+2025-08-30 22:51:56 | gov_uk | benign | T54_5.png | T54_5_aug16.png | blur kernel=7
+2025-08-30 22:51:58 | gov_uk | benign | T54_0.png | T54_0_aug17.png | noise std=0.028
+2025-08-30 22:51:58 | gov_uk | benign | T54_0.png | T54_0_aug18.png | shift translate=0.06
+2025-08-30 22:51:59 | gov_uk | benign | T54_3.png | T54_3_aug19.png | shift translate=0.10
+2025-08-30 22:51:59 | SNS Bank N.V | benign | T40_0.png | T40_0_aug1.png | blur kernel=9
+2025-08-30 22:51:59 | SNS Bank N.V | benign | T40_0.png | T40_0_aug2.png | brightness factor=1.76
+2025-08-30 22:51:59 | SNS Bank N.V | benign | T40_0.png | T40_0_aug3.png | blur kernel=5
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug4.png | blur kernel=7
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug5.png | brightness factor=1.52
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug6.png | blur kernel=11
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug7.png | brightness factor=1.56
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug8.png | shift translate=0.13
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug9.png | shift translate=0.14
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug10.png | brightness factor=1.20
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug11.png | blur kernel=3
+2025-08-30 22:52:00 | SNS Bank N.V | benign | T40_0.png | T40_0_aug12.png | blur kernel=7
+2025-08-30 22:52:01 | SNS Bank N.V | benign | T40_0.png | T40_0_aug13.png | shift translate=0.05
+2025-08-30 22:52:01 | SNS Bank N.V | benign | T40_0.png | T40_0_aug14.png | blur kernel=5
+2025-08-30 22:52:01 | SNS Bank N.V | benign | T40_0.png | T40_0_aug15.png | blur kernel=3
+2025-08-30 22:52:01 | SNS Bank N.V | benign | T40_0.png | T40_0_aug16.png | noise std=0.041
+2025-08-30 22:52:01 | SNS Bank N.V | benign | T40_0.png | T40_0_aug17.png | noise std=0.030
+2025-08-30 22:52:02 | SNS Bank N.V | benign | T40_0.png | T40_0_aug18.png | shift translate=0.10
+2025-08-30 22:52:02 | SNS Bank N.V | benign | T40_0.png | T40_0_aug19.png | blur kernel=9
+2025-08-30 22:52:02 | SNS Bank N.V | benign | T40_0.png | T40_0_aug20.png | noise std=0.037
+2025-08-30 22:52:03 | SNS Bank N.V | benign | T40_0.png | T40_0_aug21.png | noise std=0.013
+2025-08-30 22:52:03 | SNS Bank N.V | benign | T40_0.png | T40_0_aug22.png | shift translate=0.11
+2025-08-30 22:52:03 | SNS Bank N.V | benign | T40_0.png | T40_0_aug23.png | brightness factor=0.86
+2025-08-30 22:52:03 | SNS Bank N.V | benign | T40_0.png | T40_0_aug24.png | noise std=0.050
+2025-08-30 22:52:04 | ASB Bank Limited | benign | T3_0.png | T3_0_aug1.png | noise std=0.030
+2025-08-30 22:52:04 | ASB Bank Limited | benign | T3_0.png | T3_0_aug2.png | blur kernel=3
+2025-08-30 22:52:04 | ASB Bank Limited | benign | T3_0.png | T3_0_aug3.png | noise std=0.028
+2025-08-30 22:52:05 | ASB Bank Limited | benign | T3_0.png | T3_0_aug4.png | noise std=0.024
+2025-08-30 22:52:05 | ASB Bank Limited | benign | T3_0.png | T3_0_aug5.png | noise std=0.027
+2025-08-30 22:52:05 | ASB Bank Limited | benign | T3_0.png | T3_0_aug6.png | shift translate=0.09
+2025-08-30 22:52:05 | ASB Bank Limited | benign | T3_0.png | T3_0_aug7.png | shift translate=0.15
+2025-08-30 22:52:05 | ASB Bank Limited | benign | T3_0.png | T3_0_aug8.png | blur kernel=3
+2025-08-30 22:52:05 | ASB Bank Limited | benign | T3_0.png | T3_0_aug9.png | blur kernel=9
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug10.png | shift translate=0.13
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug11.png | shift translate=0.12
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug12.png | shift translate=0.14
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug13.png | blur kernel=7
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug14.png | shift translate=0.06
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug15.png | brightness factor=1.35
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug16.png | blur kernel=7
+2025-08-30 22:52:06 | ASB Bank Limited | benign | T3_0.png | T3_0_aug17.png | blur kernel=7
+2025-08-30 22:52:07 | ASB Bank Limited | benign | T3_0.png | T3_0_aug18.png | noise std=0.044
+2025-08-30 22:52:07 | ASB Bank Limited | benign | T3_0.png | T3_0_aug19.png | shift translate=0.05
+2025-08-30 22:52:07 | ASB Bank Limited | benign | T3_0.png | T3_0_aug20.png | shift translate=0.14
+2025-08-30 22:52:07 | ASB Bank Limited | benign | T3_0.png | T3_0_aug21.png | blur kernel=5
+2025-08-30 22:52:07 | ASB Bank Limited | benign | T3_0.png | T3_0_aug22.png | noise std=0.013
+2025-08-30 22:52:07 | ASB Bank Limited | benign | T3_0.png | T3_0_aug23.png | blur kernel=11
+2025-08-30 22:52:08 | ASB Bank Limited | benign | T3_0.png | T3_0_aug24.png | noise std=0.027
+2025-08-30 22:52:08 | PayPal | benign | T36_1.png | T36_1_aug1.png | brightness factor=0.98
+2025-08-30 22:52:08 | PayPal | benign | T36_1.png | T36_1_aug2.png | blur kernel=3
+2025-08-30 22:52:08 | PayPal | benign | T36_0.png | T36_0_aug3.png | brightness factor=1.48
+2025-08-30 22:52:08 | PayPal | benign | T36_0.png | T36_0_aug4.png | blur kernel=7
+2025-08-30 22:52:09 | PayPal | benign | T36_1.png | T36_1_aug5.png | noise std=0.029
+2025-08-30 22:52:09 | PayPal | benign | T36_1.png | T36_1_aug6.png | noise std=0.021
+2025-08-30 22:52:09 | PayPal | benign | T36_0.png | T36_0_aug7.png | shift translate=0.09
+2025-08-30 22:52:10 | PayPal | benign | T36_1.png | T36_1_aug8.png | noise std=0.031
+2025-08-30 22:52:10 | PayPal | benign | T36_1.png | T36_1_aug9.png | blur kernel=5
+2025-08-30 22:52:10 | PayPal | benign | T36_1.png | T36_1_aug10.png | blur kernel=3
+2025-08-30 22:52:10 | PayPal | benign | T36_0.png | T36_0_aug11.png | shift translate=0.14
+2025-08-30 22:52:10 | PayPal | benign | T36_0.png | T36_0_aug12.png | shift translate=0.08
+2025-08-30 22:52:10 | PayPal | benign | T36_0.png | T36_0_aug13.png | blur kernel=9
+2025-08-30 22:52:10 | PayPal | benign | T36_1.png | T36_1_aug14.png | brightness factor=0.67
+2025-08-30 22:52:10 | PayPal | benign | T36_0.png | T36_0_aug15.png | shift translate=0.06
+2025-08-30 22:52:11 | PayPal | benign | T36_0.png | T36_0_aug16.png | noise std=0.011
+2025-08-30 22:52:11 | PayPal | benign | T36_0.png | T36_0_aug17.png | shift translate=0.11
+2025-08-30 22:52:11 | PayPal | benign | T36_1.png | T36_1_aug18.png | noise std=0.022
+2025-08-30 22:52:11 | PayPal | benign | T36_1.png | T36_1_aug19.png | blur kernel=7
+2025-08-30 22:52:12 | PayPal | benign | T36_0.png | T36_0_aug20.png | noise std=0.043
+2025-08-30 22:52:12 | PayPal | benign | T36_1.png | T36_1_aug21.png | blur kernel=9
+2025-08-30 22:52:12 | PayPal | benign | T36_0.png | T36_0_aug22.png | brightness factor=1.07
+2025-08-30 22:52:12 | PayPal | benign | T36_1.png | T36_1_aug23.png | blur kernel=9
+2025-08-30 22:52:12 | iiNet Limited | benign | T55_0.png | T55_0_aug1.png | shift translate=0.07
+2025-08-30 22:52:12 | iiNet Limited | benign | T55_0.png | T55_0_aug2.png | blur kernel=11
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug3.png | brightness factor=1.68
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug4.png | shift translate=0.12
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug5.png | brightness factor=0.63
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug6.png | brightness factor=0.73
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug7.png | blur kernel=5
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug8.png | noise std=0.040
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug9.png | shift translate=0.14
+2025-08-30 22:52:13 | iiNet Limited | benign | T55_0.png | T55_0_aug10.png | brightness factor=1.07
+2025-08-30 22:52:14 | iiNet Limited | benign | T55_0.png | T55_0_aug11.png | noise std=0.035
+2025-08-30 22:52:14 | iiNet Limited | benign | T55_0.png | T55_0_aug12.png | blur kernel=7
+2025-08-30 22:52:14 | iiNet Limited | benign | T55_0.png | T55_0_aug13.png | shift translate=0.10
+2025-08-30 22:52:14 | iiNet Limited | benign | T55_0.png | T55_0_aug14.png | blur kernel=7
+2025-08-30 22:52:14 | iiNet Limited | benign | T55_0.png | T55_0_aug15.png | blur kernel=3
+2025-08-30 22:52:15 | iiNet Limited | benign | T55_0.png | T55_0_aug16.png | noise std=0.033
+2025-08-30 22:52:15 | iiNet Limited | benign | T55_0.png | T55_0_aug17.png | noise std=0.046
+2025-08-30 22:52:15 | iiNet Limited | benign | T55_0.png | T55_0_aug18.png | shift translate=0.11
+2025-08-30 22:52:15 | iiNet Limited | benign | T55_0.png | T55_0_aug19.png | blur kernel=9
+2025-08-30 22:52:15 | iiNet Limited | benign | T55_0.png | T55_0_aug20.png | shift translate=0.15
+2025-08-30 22:52:15 | iiNet Limited | benign | T55_0.png | T55_0_aug21.png | brightness factor=0.55
+2025-08-30 22:52:16 | iiNet Limited | benign | T55_0.png | T55_0_aug22.png | noise std=0.031
+2025-08-30 22:52:16 | iiNet Limited | benign | T55_0.png | T55_0_aug23.png | shift translate=0.09
+2025-08-30 22:52:16 | iiNet Limited | benign | T55_0.png | T55_0_aug24.png | noise std=0.026
+2025-08-30 22:52:17 | DHL | benign | T11_2.png | T11_2_aug1.png | blur kernel=7
+2025-08-30 22:52:17 | DHL | benign | T11_0.png | T11_0_aug2.png | shift translate=0.06
+2025-08-30 22:52:19 | DHL | benign | T11_1.png | T11_1_aug3.png | noise std=0.021
+2025-08-30 22:52:19 | DHL | benign | T11_1.png | T11_1_aug4.png | brightness factor=0.93
+2025-08-30 22:52:20 | DHL | benign | T11_1.png | T11_1_aug5.png | brightness factor=1.69
+2025-08-30 22:52:20 | DHL | benign | T11_2.png | T11_2_aug6.png | noise std=0.015
+2025-08-30 22:52:22 | DHL | benign | T11_1.png | T11_1_aug7.png | blur kernel=7
+2025-08-30 22:52:23 | DHL | benign | T11_1.png | T11_1_aug8.png | noise std=0.036
+2025-08-30 22:52:24 | DHL | benign | T11_2.png | T11_2_aug9.png | brightness factor=1.37
+2025-08-30 22:52:24 | DHL | benign | T11_1.png | T11_1_aug10.png | blur kernel=9
+2025-08-30 22:52:25 | DHL | benign | T11_1.png | T11_1_aug11.png | shift translate=0.05
+2025-08-30 22:52:25 | DHL | benign | T11_2.png | T11_2_aug12.png | brightness factor=1.74
+2025-08-30 22:52:26 | DHL | benign | T11_2.png | T11_2_aug13.png | noise std=0.018
+2025-08-30 22:52:26 | DHL | benign | T11_0.png | T11_0_aug14.png | brightness factor=0.60
+2025-08-30 22:52:27 | DHL | benign | T11_0.png | T11_0_aug15.png | blur kernel=7
+2025-08-30 22:52:27 | DHL | benign | T11_1.png | T11_1_aug16.png | brightness factor=1.28
+2025-08-30 22:52:28 | DHL | benign | T11_0.png | T11_0_aug17.png | brightness factor=0.74
+2025-08-30 22:52:28 | DHL | benign | T11_1.png | T11_1_aug18.png | brightness factor=1.44
+2025-08-30 22:52:29 | DHL | benign | T11_0.png | T11_0_aug19.png | noise std=0.025
+2025-08-30 22:52:29 | DHL | benign | T11_1.png | T11_1_aug20.png | brightness factor=1.76
+2025-08-30 22:52:30 | DHL | benign | T11_1.png | T11_1_aug21.png | shift translate=0.13
+2025-08-30 22:52:30 | DHL | benign | T11_2.png | T11_2_aug22.png | brightness factor=1.19
+2025-08-30 22:52:32 | Rakuten | benign | T38_0.png | T38_0_aug1.png | noise std=0.046
+2025-08-30 22:52:33 | Rakuten | benign | T38_1.png | T38_1_aug2.png | shift translate=0.12
+2025-08-30 22:52:35 | Rakuten | benign | T38_0.png | T38_0_aug3.png | noise std=0.041
+2025-08-30 22:52:37 | Rakuten | benign | T38_0.png | T38_0_aug4.png | noise std=0.049
+2025-08-30 22:52:37 | Rakuten | benign | T38_1.png | T38_1_aug5.png | brightness factor=1.63
+2025-08-30 22:52:39 | Rakuten | benign | T38_1.png | T38_1_aug6.png | noise std=0.045
+2025-08-30 22:52:39 | Rakuten | benign | T38_1.png | T38_1_aug7.png | blur kernel=7
+2025-08-30 22:52:39 | Rakuten | benign | T38_1.png | T38_1_aug8.png | brightness factor=0.85
+2025-08-30 22:52:41 | Rakuten | benign | T38_1.png | T38_1_aug9.png | noise std=0.014
+2025-08-30 22:52:43 | Rakuten | benign | T38_1.png | T38_1_aug10.png | noise std=0.045
+2025-08-30 22:52:45 | Rakuten | benign | T38_1.png | T38_1_aug11.png | noise std=0.012
+2025-08-30 22:52:45 | Rakuten | benign | T38_0.png | T38_0_aug12.png | brightness factor=1.00
+2025-08-30 22:52:46 | Rakuten | benign | T38_1.png | T38_1_aug13.png | shift translate=0.07
+2025-08-30 22:52:47 | Rakuten | benign | T38_0.png | T38_0_aug14.png | blur kernel=7
+2025-08-30 22:52:48 | Rakuten | benign | T38_1.png | T38_1_aug15.png | brightness factor=0.55
+2025-08-30 22:52:48 | Rakuten | benign | T38_0.png | T38_0_aug16.png | brightness factor=1.49
+2025-08-30 22:52:50 | Rakuten | benign | T38_0.png | T38_0_aug17.png | noise std=0.035
+2025-08-30 22:52:50 | Rakuten | benign | T38_1.png | T38_1_aug18.png | blur kernel=7
+2025-08-30 22:52:51 | Rakuten | benign | T38_1.png | T38_1_aug19.png | brightness factor=1.21
+2025-08-30 22:52:51 | Rakuten | benign | T38_0.png | T38_0_aug20.png | blur kernel=7
+2025-08-30 22:52:52 | Rakuten | benign | T38_1.png | T38_1_aug21.png | shift translate=0.06
+2025-08-30 22:52:53 | Rakuten | benign | T38_1.png | T38_1_aug22.png | noise std=0.036
+2025-08-30 22:52:54 | Rakuten | benign | T38_0.png | T38_0_aug23.png | blur kernel=3
+2025-08-30 22:52:54 | Facebook | benign | T15_0.png | T15_0_aug1.png | blur kernel=11
+2025-08-30 22:52:54 | Facebook | benign | T15_0.png | T15_0_aug2.png | brightness factor=0.88
+2025-08-30 22:52:54 | Facebook | benign | T15_0.png | T15_0_aug3.png | shift translate=0.07
+2025-08-30 22:52:54 | Facebook | benign | T15_0.png | T15_0_aug4.png | brightness factor=1.36
+2025-08-30 22:52:55 | Facebook | benign | T15_0.png | T15_0_aug5.png | shift translate=0.06
+2025-08-30 22:52:55 | Facebook | benign | T15_0.png | T15_0_aug6.png | noise std=0.045
+2025-08-30 22:52:55 | Facebook | benign | T15_0.png | T15_0_aug7.png | noise std=0.049
+2025-08-30 22:52:56 | Facebook | benign | T15_0.png | T15_0_aug8.png | blur kernel=7
+2025-08-30 22:52:56 | Facebook | benign | T15_0.png | T15_0_aug9.png | shift translate=0.07
+2025-08-30 22:52:56 | Facebook | benign | T15_0.png | T15_0_aug10.png | shift translate=0.06
+2025-08-30 22:52:56 | Facebook | benign | T15_0.png | T15_0_aug11.png | shift translate=0.13
+2025-08-30 22:52:56 | Facebook | benign | T15_0.png | T15_0_aug12.png | noise std=0.049
+2025-08-30 22:52:56 | Facebook | benign | T15_0.png | T15_0_aug13.png | brightness factor=1.55
+2025-08-30 22:52:57 | Facebook | benign | T15_0.png | T15_0_aug14.png | noise std=0.011
+2025-08-30 22:52:57 | Facebook | benign | T15_0.png | T15_0_aug15.png | blur kernel=5
+2025-08-30 22:52:57 | Facebook | benign | T15_0.png | T15_0_aug16.png | shift translate=0.14
+2025-08-30 22:52:58 | Facebook | benign | T15_0.png | T15_0_aug17.png | noise std=0.020
+2025-08-30 22:52:58 | Facebook | benign | T15_0.png | T15_0_aug18.png | shift translate=0.09
+2025-08-30 22:52:58 | Facebook | benign | T15_0.png | T15_0_aug19.png | shift translate=0.08
+2025-08-30 22:52:58 | Facebook | benign | T15_0.png | T15_0_aug20.png | noise std=0.046
+2025-08-30 22:52:59 | Facebook | benign | T15_0.png | T15_0_aug21.png | noise std=0.024
+2025-08-30 22:52:59 | Facebook | benign | T15_0.png | T15_0_aug22.png | noise std=0.038
+2025-08-30 22:52:59 | Facebook | benign | T15_0.png | T15_0_aug23.png | shift translate=0.13
+2025-08-30 22:52:59 | Facebook | benign | T15_0.png | T15_0_aug24.png | blur kernel=9
+2025-08-30 22:53:00 | UBS AG | benign | T45_0.png | T45_0_aug1.png | shift translate=0.08
+2025-08-30 22:53:00 | UBS AG | benign | T45_0.png | T45_0_aug2.png | shift translate=0.12
+2025-08-30 22:53:00 | UBS AG | benign | T45_0.png | T45_0_aug3.png | noise std=0.034
+2025-08-30 22:53:00 | UBS AG | benign | T45_0.png | T45_0_aug4.png | brightness factor=1.40
+2025-08-30 22:53:01 | UBS AG | benign | T45_0.png | T45_0_aug5.png | noise std=0.012
+2025-08-30 22:53:01 | UBS AG | benign | T45_0.png | T45_0_aug6.png | noise std=0.021
+2025-08-30 22:53:02 | UBS AG | benign | T45_0.png | T45_0_aug7.png | blur kernel=9
+2025-08-30 22:53:02 | UBS AG | benign | T45_0.png | T45_0_aug8.png | brightness factor=1.74
+2025-08-30 22:53:02 | UBS AG | benign | T45_0.png | T45_0_aug9.png | noise std=0.011
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug10.png | brightness factor=1.51
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug11.png | shift translate=0.09
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug12.png | brightness factor=1.38
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug13.png | shift translate=0.09
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug14.png | brightness factor=1.19
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug15.png | shift translate=0.11
+2025-08-30 22:53:03 | UBS AG | benign | T45_0.png | T45_0_aug16.png | blur kernel=3
+2025-08-30 22:53:04 | UBS AG | benign | T45_0.png | T45_0_aug17.png | noise std=0.031
+2025-08-30 22:53:04 | UBS AG | benign | T45_0.png | T45_0_aug18.png | shift translate=0.13
+2025-08-30 22:53:04 | UBS AG | benign | T45_0.png | T45_0_aug19.png | brightness factor=1.80
+2025-08-30 22:53:05 | UBS AG | benign | T45_0.png | T45_0_aug20.png | noise std=0.018
+2025-08-30 22:53:05 | UBS AG | benign | T45_0.png | T45_0_aug21.png | blur kernel=9
+2025-08-30 22:53:05 | UBS AG | benign | T45_0.png | T45_0_aug22.png | noise std=0.050
+2025-08-30 22:53:05 | UBS AG | benign | T45_0.png | T45_0_aug23.png | shift translate=0.12
+2025-08-30 22:53:06 | UBS AG | benign | T45_0.png | T45_0_aug24.png | shift translate=0.14
+2025-08-30 22:53:06 | Frontier Communications | benign | T17_0.png | T17_0_aug1.png | shift translate=0.10
+2025-08-30 22:53:06 | Frontier Communications | benign | T17_0.png | T17_0_aug2.png | brightness factor=1.53
+2025-08-30 22:53:06 | Frontier Communications | benign | T17_0.png | T17_0_aug3.png | noise std=0.011
+2025-08-30 22:53:07 | Frontier Communications | benign | T17_0.png | T17_0_aug4.png | noise std=0.042
+2025-08-30 22:53:07 | Frontier Communications | benign | T17_0.png | T17_0_aug5.png | blur kernel=3
+2025-08-30 22:53:08 | Frontier Communications | benign | T17_0.png | T17_0_aug6.png | noise std=0.050
+2025-08-30 22:53:08 | Frontier Communications | benign | T17_0.png | T17_0_aug7.png | noise std=0.041
+2025-08-30 22:53:08 | Frontier Communications | benign | T17_0.png | T17_0_aug8.png | brightness factor=1.76
+2025-08-30 22:53:09 | Frontier Communications | benign | T17_0.png | T17_0_aug9.png | noise std=0.029
+2025-08-30 22:53:09 | Frontier Communications | benign | T17_0.png | T17_0_aug10.png | brightness factor=1.64
+2025-08-30 22:53:09 | Frontier Communications | benign | T17_0.png | T17_0_aug11.png | brightness factor=1.06
+2025-08-30 22:53:09 | Frontier Communications | benign | T17_0.png | T17_0_aug12.png | blur kernel=11
+2025-08-30 22:53:09 | Frontier Communications | benign | T17_0.png | T17_0_aug13.png | shift translate=0.07
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug14.png | brightness factor=0.95
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug15.png | blur kernel=7
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug16.png | shift translate=0.06
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug17.png | blur kernel=11
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug18.png | brightness factor=0.72
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug19.png | blur kernel=3
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug20.png | blur kernel=11
+2025-08-30 22:53:10 | Frontier Communications | benign | T17_0.png | T17_0_aug21.png | brightness factor=1.50
+2025-08-30 22:53:11 | Frontier Communications | benign | T17_0.png | T17_0_aug22.png | blur kernel=9
+2025-08-30 22:53:11 | Frontier Communications | benign | T17_0.png | T17_0_aug23.png | shift translate=0.10
+2025-08-30 22:53:11 | Frontier Communications | benign | T17_0.png | T17_0_aug24.png | shift translate=0.10
+2025-08-30 22:53:11 | Netflix | benign | T32_0.png | T32_0_aug1.png | brightness factor=1.07
+2025-08-30 22:53:12 | Netflix | benign | T32_0.png | T32_0_aug2.png | noise std=0.018
+2025-08-30 22:53:12 | Netflix | benign | T32_0.png | T32_0_aug3.png | shift translate=0.14
+2025-08-30 22:53:12 | Netflix | benign | T32_0.png | T32_0_aug4.png | shift translate=0.15
+2025-08-30 22:53:13 | Netflix | benign | T32_0.png | T32_0_aug5.png | shift translate=0.10
+2025-08-30 22:53:13 | Netflix | benign | T32_0.png | T32_0_aug6.png | shift translate=0.07
+2025-08-30 22:53:13 | Netflix | benign | T32_0.png | T32_0_aug7.png | shift translate=0.09
+2025-08-30 22:53:14 | Netflix | benign | T32_0.png | T32_0_aug8.png | blur kernel=3
+2025-08-30 22:53:14 | Netflix | benign | T32_0.png | T32_0_aug9.png | noise std=0.045
+2025-08-30 22:53:15 | Netflix | benign | T32_0.png | T32_0_aug10.png | brightness factor=1.75
+2025-08-30 22:53:15 | Netflix | benign | T32_0.png | T32_0_aug11.png | shift translate=0.14
+2025-08-30 22:53:15 | Netflix | benign | T32_0.png | T32_0_aug12.png | brightness factor=1.49
+2025-08-30 22:53:16 | Netflix | benign | T32_0.png | T32_0_aug13.png | noise std=0.030
+2025-08-30 22:53:16 | Netflix | benign | T32_0.png | T32_0_aug14.png | noise std=0.011
+2025-08-30 22:53:17 | Netflix | benign | T32_0.png | T32_0_aug15.png | noise std=0.049
+2025-08-30 22:53:17 | Netflix | benign | T32_0.png | T32_0_aug16.png | shift translate=0.05
+2025-08-30 22:53:17 | Netflix | benign | T32_0.png | T32_0_aug17.png | noise std=0.034
+2025-08-30 22:53:18 | Netflix | benign | T32_0.png | T32_0_aug18.png | shift translate=0.10
+2025-08-30 22:53:18 | Netflix | benign | T32_0.png | T32_0_aug19.png | noise std=0.015
+2025-08-30 22:53:19 | Netflix | benign | T32_0.png | T32_0_aug20.png | shift translate=0.13
+2025-08-30 22:53:19 | Netflix | benign | T32_0.png | T32_0_aug21.png | blur kernel=9
+2025-08-30 22:53:19 | Netflix | benign | T32_0.png | T32_0_aug22.png | brightness factor=0.97
+2025-08-30 22:53:20 | Netflix | benign | T32_0.png | T32_0_aug23.png | blur kernel=9
+2025-08-30 22:53:20 | Netflix | benign | T32_0.png | T32_0_aug24.png | shift translate=0.13
+2025-08-30 22:53:20 | AT&T | benign | T4_0.png | T4_0_aug1.png | brightness factor=1.77
+2025-08-30 22:53:21 | AT&T | benign | T4_1.png | T4_1_aug2.png | shift translate=0.13
+2025-08-30 22:53:21 | AT&T | benign | T4_1.png | T4_1_aug3.png | shift translate=0.13
+2025-08-30 22:53:22 | AT&T | benign | T4_0.png | T4_0_aug4.png | noise std=0.030
+2025-08-30 22:53:22 | AT&T | benign | T4_0.png | T4_0_aug5.png | blur kernel=5
+2025-08-30 22:53:22 | AT&T | benign | T4_1.png | T4_1_aug6.png | noise std=0.031
+2025-08-30 22:53:23 | AT&T | benign | T4_0.png | T4_0_aug7.png | brightness factor=0.93
+2025-08-30 22:53:23 | AT&T | benign | T4_1.png | T4_1_aug8.png | brightness factor=1.01
+2025-08-30 22:53:23 | AT&T | benign | T4_1.png | T4_1_aug9.png | shift translate=0.10
+2025-08-30 22:53:23 | AT&T | benign | T4_1.png | T4_1_aug10.png | shift translate=0.10
+2025-08-30 22:53:24 | AT&T | benign | T4_0.png | T4_0_aug11.png | shift translate=0.08
+2025-08-30 22:53:24 | AT&T | benign | T4_0.png | T4_0_aug12.png | noise std=0.033
+2025-08-30 22:53:25 | AT&T | benign | T4_0.png | T4_0_aug13.png | noise std=0.021
+2025-08-30 22:53:26 | AT&T | benign | T4_0.png | T4_0_aug14.png | blur kernel=11
+2025-08-30 22:53:26 | AT&T | benign | T4_1.png | T4_1_aug15.png | brightness factor=1.18
+2025-08-30 22:53:26 | AT&T | benign | T4_1.png | T4_1_aug16.png | brightness factor=1.57
+2025-08-30 22:53:26 | AT&T | benign | T4_0.png | T4_0_aug17.png | blur kernel=11
+2025-08-30 22:53:27 | AT&T | benign | T4_0.png | T4_0_aug18.png | brightness factor=0.52
+2025-08-30 22:53:27 | AT&T | benign | T4_1.png | T4_1_aug19.png | noise std=0.016
+2025-08-30 22:53:28 | AT&T | benign | T4_0.png | T4_0_aug20.png | noise std=0.030
+2025-08-30 22:53:28 | AT&T | benign | T4_1.png | T4_1_aug21.png | blur kernel=5
+2025-08-30 22:53:29 | AT&T | benign | T4_0.png | T4_0_aug22.png | shift translate=0.15
+2025-08-30 22:53:29 | AT&T | benign | T4_1.png | T4_1_aug23.png | noise std=0.023
+2025-08-30 22:53:30 | AOL | benign | T2_1.png | T2_1_aug1.png | noise std=0.046
+2025-08-30 22:53:30 | AOL | benign | T2_2.png | T2_2_aug2.png | shift translate=0.12
+2025-08-30 22:53:30 | AOL | benign | T2_2.png | T2_2_aug3.png | noise std=0.018
+2025-08-30 22:53:30 | AOL | benign | T2_1.png | T2_1_aug4.png | shift translate=0.11
+2025-08-30 22:53:30 | AOL | benign | T2_1.png | T2_1_aug5.png | shift translate=0.13
+2025-08-30 22:53:31 | AOL | benign | T2_1.png | T2_1_aug6.png | noise std=0.023
+2025-08-30 22:53:31 | AOL | benign | T2_2.png | T2_2_aug7.png | shift translate=0.08
+2025-08-30 22:53:31 | AOL | benign | T2_3.png | T2_3_aug8.png | noise std=0.043
+2025-08-30 22:53:31 | AOL | benign | T2_1.png | T2_1_aug9.png | shift translate=0.05
+2025-08-30 22:53:31 | AOL | benign | T2_0.png | T2_0_aug10.png | shift translate=0.14
+2025-08-30 22:53:32 | AOL | benign | T2_2.png | T2_2_aug11.png | noise std=0.019
+2025-08-30 22:53:32 | AOL | benign | T2_2.png | T2_2_aug12.png | shift translate=0.06
+2025-08-30 22:53:32 | AOL | benign | T2_1.png | T2_1_aug13.png | brightness factor=0.57
+2025-08-30 22:53:32 | AOL | benign | T2_1.png | T2_1_aug14.png | brightness factor=0.57
+2025-08-30 22:53:32 | AOL | benign | T2_3.png | T2_3_aug15.png | shift translate=0.12
+2025-08-30 22:53:32 | AOL | benign | T2_0.png | T2_0_aug16.png | brightness factor=0.51
+2025-08-30 22:53:32 | AOL | benign | T2_1.png | T2_1_aug17.png | noise std=0.036
+2025-08-30 22:53:33 | AOL | benign | T2_3.png | T2_3_aug18.png | noise std=0.036
+2025-08-30 22:53:33 | AOL | benign | T2_2.png | T2_2_aug19.png | shift translate=0.08
+2025-08-30 22:53:33 | AOL | benign | T2_0.png | T2_0_aug20.png | blur kernel=11
+2025-08-30 22:53:33 | AOL | benign | T2_1.png | T2_1_aug21.png | blur kernel=5
+2025-08-30 22:53:33 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug1.png | brightness factor=1.71
+2025-08-30 22:53:33 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug2.png | noise std=0.042
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug3.png | shift translate=0.14
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug4.png | shift translate=0.11
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug5.png | shift translate=0.08
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug6.png | brightness factor=1.61
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug7.png | shift translate=0.07
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug8.png | shift translate=0.07
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug9.png | shift translate=0.12
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug10.png | shift translate=0.13
+2025-08-30 22:53:34 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug11.png | brightness factor=1.29
+2025-08-30 22:53:35 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug12.png | noise std=0.031
+2025-08-30 22:53:35 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug13.png | noise std=0.037
+2025-08-30 22:53:35 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug14.png | brightness factor=1.12
+2025-08-30 22:53:35 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug15.png | blur kernel=7
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug16.png | brightness factor=1.08
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug17.png | shift translate=0.08
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug18.png | shift translate=0.12
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug19.png | blur kernel=3
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug20.png | shift translate=0.07
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug21.png | blur kernel=7
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug22.png | brightness factor=0.78
+2025-08-30 22:53:36 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug23.png | noise std=0.016
+2025-08-30 22:53:37 | Itau Unibanco S.A | benign | T24_0.png | T24_0_aug24.png | noise std=0.038
+2025-08-30 22:53:37 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug1.png | brightness factor=1.49
+2025-08-30 22:53:38 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug2.png | noise std=0.031
+2025-08-30 22:53:38 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug3.png | blur kernel=11
+2025-08-30 22:53:39 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug4.png | blur kernel=11
+2025-08-30 22:53:39 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug5.png | brightness factor=0.71
+2025-08-30 22:53:39 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug6.png | blur kernel=5
+2025-08-30 22:53:39 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug7.png | blur kernel=11
+2025-08-30 22:53:39 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug8.png | blur kernel=9
+2025-08-30 22:53:40 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug9.png | noise std=0.028
+2025-08-30 22:53:41 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug10.png | noise std=0.037
+2025-08-30 22:53:41 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug11.png | blur kernel=9
+2025-08-30 22:53:41 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug12.png | blur kernel=5
+2025-08-30 22:53:41 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug13.png | blur kernel=9
+2025-08-30 22:53:42 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug14.png | blur kernel=11
+2025-08-30 22:53:42 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug15.png | blur kernel=9
+2025-08-30 22:53:42 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug16.png | shift translate=0.09
+2025-08-30 22:53:43 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug17.png | noise std=0.025
+2025-08-30 22:53:43 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug18.png | noise std=0.045
+2025-08-30 22:53:43 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug19.png | noise std=0.013
+2025-08-30 22:53:44 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug20.png | shift translate=0.06
+2025-08-30 22:53:44 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug21.png | brightness factor=1.45
+2025-08-30 22:53:44 | Raiffeisen Bank S.A | benign | T37_0.png | T37_0_aug22.png | blur kernel=3
+2025-08-30 22:53:44 | Raiffeisen Bank S.A | benign | T37_1.png | T37_1_aug23.png | noise std=0.037
+2025-08-30 22:53:45 | Banco de Chile | benign | T9_0.png | T9_0_aug1.png | noise std=0.043
+2025-08-30 22:53:45 | Banco de Chile | benign | T9_0.png | T9_0_aug2.png | noise std=0.024
+2025-08-30 22:53:45 | Banco de Chile | benign | T9_0.png | T9_0_aug3.png | brightness factor=1.72
+2025-08-30 22:53:45 | Banco de Chile | benign | T9_0.png | T9_0_aug4.png | blur kernel=9
+2025-08-30 22:53:46 | Banco de Chile | benign | T9_0.png | T9_0_aug5.png | brightness factor=0.77
+2025-08-30 22:53:46 | Banco de Chile | benign | T9_0.png | T9_0_aug6.png | blur kernel=9
+2025-08-30 22:53:46 | Banco de Chile | benign | T9_0.png | T9_0_aug7.png | brightness factor=1.46
+2025-08-30 22:53:46 | Banco de Chile | benign | T9_0.png | T9_0_aug8.png | noise std=0.019
+2025-08-30 22:53:46 | Banco de Chile | benign | T9_0.png | T9_0_aug9.png | blur kernel=5
+2025-08-30 22:53:47 | Banco de Chile | benign | T9_0.png | T9_0_aug10.png | brightness factor=1.56
+2025-08-30 22:53:47 | Banco de Chile | benign | T9_0.png | T9_0_aug11.png | shift translate=0.07
+2025-08-30 22:53:47 | Banco de Chile | benign | T9_0.png | T9_0_aug12.png | brightness factor=1.04
+2025-08-30 22:53:47 | Banco de Chile | benign | T9_0.png | T9_0_aug13.png | blur kernel=11
+2025-08-30 22:53:47 | Banco de Chile | benign | T9_0.png | T9_0_aug14.png | noise std=0.032
+2025-08-30 22:53:48 | Banco de Chile | benign | T9_0.png | T9_0_aug15.png | shift translate=0.14
+2025-08-30 22:53:48 | Banco de Chile | benign | T9_0.png | T9_0_aug16.png | shift translate=0.12
+2025-08-30 22:53:48 | Banco de Chile | benign | T9_0.png | T9_0_aug17.png | brightness factor=0.89
+2025-08-30 22:53:48 | Banco de Chile | benign | T9_0.png | T9_0_aug18.png | noise std=0.020
+2025-08-30 22:53:48 | Banco de Chile | benign | T9_0.png | T9_0_aug19.png | shift translate=0.14
+2025-08-30 22:53:49 | Banco de Chile | benign | T9_0.png | T9_0_aug20.png | noise std=0.047
+2025-08-30 22:53:49 | Banco de Chile | benign | T9_0.png | T9_0_aug21.png | noise std=0.032
+2025-08-30 22:53:49 | Banco de Chile | benign | T9_0.png | T9_0_aug22.png | noise std=0.020
+2025-08-30 22:53:50 | Banco de Chile | benign | T9_0.png | T9_0_aug23.png | shift translate=0.11
+2025-08-30 22:53:50 | Banco de Chile | benign | T9_0.png | T9_0_aug24.png | shift translate=0.06
+2025-08-30 22:53:50 | American Express | benign | T7_0.png | T7_0_aug1.png | blur kernel=7
+2025-08-30 22:53:51 | American Express | benign | T7_0.png | T7_0_aug2.png | blur kernel=3
+2025-08-30 22:53:51 | American Express | benign | T7_0.png | T7_0_aug3.png | brightness factor=1.12
+2025-08-30 22:53:51 | American Express | benign | T7_0.png | T7_0_aug4.png | shift translate=0.15
+2025-08-30 22:53:51 | American Express | benign | T7_0.png | T7_0_aug5.png | brightness factor=1.72
+2025-08-30 22:53:52 | American Express | benign | T7_0.png | T7_0_aug6.png | noise std=0.047
+2025-08-30 22:53:52 | American Express | benign | T7_0.png | T7_0_aug7.png | noise std=0.047
+2025-08-30 22:53:53 | American Express | benign | T7_0.png | T7_0_aug8.png | shift translate=0.09
+2025-08-30 22:53:53 | American Express | benign | T7_0.png | T7_0_aug9.png | shift translate=0.08
+2025-08-30 22:53:54 | American Express | benign | T7_0.png | T7_0_aug10.png | noise std=0.014
+2025-08-30 22:53:54 | American Express | benign | T7_0.png | T7_0_aug11.png | shift translate=0.14
+2025-08-30 22:53:54 | American Express | benign | T7_0.png | T7_0_aug12.png | shift translate=0.09
+2025-08-30 22:53:54 | American Express | benign | T7_0.png | T7_0_aug13.png | brightness factor=0.52
+2025-08-30 22:53:55 | American Express | benign | T7_0.png | T7_0_aug14.png | shift translate=0.07
+2025-08-30 22:53:55 | American Express | benign | T7_0.png | T7_0_aug15.png | brightness factor=0.99
+2025-08-30 22:53:55 | American Express | benign | T7_0.png | T7_0_aug16.png | noise std=0.032
+2025-08-30 22:53:56 | American Express | benign | T7_0.png | T7_0_aug17.png | shift translate=0.13
+2025-08-30 22:53:56 | American Express | benign | T7_0.png | T7_0_aug18.png | noise std=0.028
+2025-08-30 22:53:56 | American Express | benign | T7_0.png | T7_0_aug19.png | brightness factor=0.68
+2025-08-30 22:53:57 | American Express | benign | T7_0.png | T7_0_aug20.png | brightness factor=1.69
+2025-08-30 22:53:57 | American Express | benign | T7_0.png | T7_0_aug21.png | blur kernel=3
+2025-08-30 22:53:57 | American Express | benign | T7_0.png | T7_0_aug22.png | blur kernel=9
+2025-08-30 22:53:58 | American Express | benign | T7_0.png | T7_0_aug23.png | brightness factor=0.59
+2025-08-30 22:53:58 | American Express | benign | T7_0.png | T7_0_aug24.png | blur kernel=5
+2025-08-30 22:53:58 | National Bank of Canada | benign | T29_0.png | T29_0_aug1.png | shift translate=0.06
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug2.png | noise std=0.011
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug3.png | blur kernel=3
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug4.png | shift translate=0.05
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug5.png | brightness factor=0.64
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug6.png | brightness factor=0.81
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug7.png | shift translate=0.08
+2025-08-30 22:53:59 | National Bank of Canada | benign | T29_0.png | T29_0_aug8.png | blur kernel=7
+2025-08-30 22:54:00 | National Bank of Canada | benign | T29_0.png | T29_0_aug9.png | noise std=0.033
+2025-08-30 22:54:00 | National Bank of Canada | benign | T29_0.png | T29_0_aug10.png | shift translate=0.12
+2025-08-30 22:54:00 | National Bank of Canada | benign | T29_0.png | T29_0_aug11.png | blur kernel=3
+2025-08-30 22:54:00 | National Bank of Canada | benign | T29_0.png | T29_0_aug12.png | noise std=0.025
+2025-08-30 22:54:01 | National Bank of Canada | benign | T29_0.png | T29_0_aug13.png | blur kernel=3
+2025-08-30 22:54:01 | National Bank of Canada | benign | T29_0.png | T29_0_aug14.png | blur kernel=9
+2025-08-30 22:54:01 | National Bank of Canada | benign | T29_0.png | T29_0_aug15.png | shift translate=0.11
+2025-08-30 22:54:01 | National Bank of Canada | benign | T29_0.png | T29_0_aug16.png | blur kernel=5
+2025-08-30 22:54:01 | National Bank of Canada | benign | T29_0.png | T29_0_aug17.png | noise std=0.021
+2025-08-30 22:54:01 | National Bank of Canada | benign | T29_0.png | T29_0_aug18.png | shift translate=0.14
+2025-08-30 22:54:02 | National Bank of Canada | benign | T29_0.png | T29_0_aug19.png | brightness factor=1.71
+2025-08-30 22:54:02 | National Bank of Canada | benign | T29_0.png | T29_0_aug20.png | blur kernel=5
+2025-08-30 22:54:02 | National Bank of Canada | benign | T29_0.png | T29_0_aug21.png | noise std=0.047
+2025-08-30 22:54:02 | National Bank of Canada | benign | T29_0.png | T29_0_aug22.png | brightness factor=1.23
+2025-08-30 22:54:02 | National Bank of Canada | benign | T29_0.png | T29_0_aug23.png | shift translate=0.09
+2025-08-30 22:54:03 | National Bank of Canada | benign | T29_0.png | T29_0_aug24.png | blur kernel=11
+2025-08-30 22:54:03 | Orange | benign | T35_1.png | T35_1_aug1.png | blur kernel=3
+2025-08-30 22:54:04 | Orange | benign | T35_1.png | T35_1_aug2.png | brightness factor=1.59
+2025-08-30 22:54:05 | Orange | benign | T35_1.png | T35_1_aug3.png | noise std=0.049
+2025-08-30 22:54:05 | Orange | benign | T35_1.png | T35_1_aug4.png | blur kernel=7
+2025-08-30 22:54:07 | Orange | benign | T35_1.png | T35_1_aug5.png | noise std=0.019
+2025-08-30 22:54:08 | Orange | benign | T35_1.png | T35_1_aug6.png | noise std=0.017
+2025-08-30 22:54:08 | Orange | benign | T35_1.png | T35_1_aug7.png | blur kernel=11
+2025-08-30 22:54:09 | Orange | benign | T35_1.png | T35_1_aug8.png | brightness factor=1.43
+2025-08-30 22:54:09 | Orange | benign | T35_0.png | T35_0_aug9.png | shift translate=0.07
+2025-08-30 22:54:10 | Orange | benign | T35_0.png | T35_0_aug10.png | noise std=0.023
+2025-08-30 22:54:10 | Orange | benign | T35_0.png | T35_0_aug11.png | blur kernel=3
+2025-08-30 22:54:11 | Orange | benign | T35_1.png | T35_1_aug12.png | noise std=0.024
+2025-08-30 22:54:12 | Orange | benign | T35_1.png | T35_1_aug13.png | blur kernel=5
+2025-08-30 22:54:12 | Orange | benign | T35_0.png | T35_0_aug14.png | brightness factor=1.06
+2025-08-30 22:54:12 | Orange | benign | T35_1.png | T35_1_aug15.png | blur kernel=3
+2025-08-30 22:54:12 | Orange | benign | T35_0.png | T35_0_aug16.png | shift translate=0.11
+2025-08-30 22:54:14 | Orange | benign | T35_1.png | T35_1_aug17.png | noise std=0.010
+2025-08-30 22:54:15 | Orange | benign | T35_1.png | T35_1_aug18.png | noise std=0.041
+2025-08-30 22:54:15 | Orange | benign | T35_0.png | T35_0_aug19.png | brightness factor=1.39
+2025-08-30 22:54:15 | Orange | benign | T35_0.png | T35_0_aug20.png | brightness factor=0.85
+2025-08-30 22:54:17 | Orange | benign | T35_1.png | T35_1_aug21.png | noise std=0.016
+2025-08-30 22:54:18 | Orange | benign | T35_0.png | T35_0_aug22.png | noise std=0.021
+2025-08-30 22:54:19 | Orange | benign | T35_1.png | T35_1_aug23.png | noise std=0.041
+2025-08-30 22:54:19 | AutoScout24 | benign | T8_1.png | T8_1_aug1.png | shift translate=0.14
+2025-08-30 22:54:21 | AutoScout24 | benign | T8_4.png | T8_4_aug2.png | noise std=0.034
+2025-08-30 22:54:23 | AutoScout24 | benign | T8_5.png | T8_5_aug3.png | noise std=0.014
+2025-08-30 22:54:24 | AutoScout24 | benign | T8_1.png | T8_1_aug4.png | blur kernel=9
+2025-08-30 22:54:24 | AutoScout24 | benign | T8_1.png | T8_1_aug5.png | noise std=0.042
+2025-08-30 22:54:25 | AutoScout24 | benign | T8_1.png | T8_1_aug6.png | noise std=0.023
+2025-08-30 22:54:25 | AutoScout24 | benign | T8_4.png | T8_4_aug7.png | brightness factor=0.89
+2025-08-30 22:54:26 | AutoScout24 | benign | T8_0.png | T8_0_aug8.png | brightness factor=1.12
+2025-08-30 22:54:28 | AutoScout24 | benign | T8_5.png | T8_5_aug9.png | noise std=0.049
+2025-08-30 22:54:28 | AutoScout24 | benign | T8_1.png | T8_1_aug10.png | noise std=0.049
+2025-08-30 22:54:29 | AutoScout24 | benign | T8_5.png | T8_5_aug11.png | shift translate=0.09
+2025-08-30 22:54:29 | AutoScout24 | benign | T8_3.png | T8_3_aug12.png | shift translate=0.06
+2025-08-30 22:54:29 | AutoScout24 | benign | T8_0.png | T8_0_aug13.png | brightness factor=1.27
+2025-08-30 22:54:29 | AutoScout24 | benign | T8_0.png | T8_0_aug14.png | brightness factor=1.39
+2025-08-30 22:54:30 | AutoScout24 | benign | T8_0.png | T8_0_aug15.png | blur kernel=9
+2025-08-30 22:54:30 | AutoScout24 | benign | T8_4.png | T8_4_aug16.png | brightness factor=1.07
+2025-08-30 22:54:31 | AutoScout24 | benign | T8_1.png | T8_1_aug17.png | blur kernel=9
+2025-08-30 22:54:33 | AutoScout24 | benign | T8_4.png | T8_4_aug18.png | noise std=0.016
+2025-08-30 22:54:33 | AutoScout24 | benign | T8_1.png | T8_1_aug19.png | brightness factor=0.83
+2025-08-30 22:54:33 | VKontakte | benign | T46_0.png | T46_0_aug1.png | noise std=0.042
+2025-08-30 22:54:34 | VKontakte | benign | T46_0.png | T46_0_aug2.png | noise std=0.050
+2025-08-30 22:54:34 | VKontakte | benign | T46_2.png | T46_2_aug3.png | noise std=0.031
+2025-08-30 22:54:34 | VKontakte | benign | T46_1.png | T46_1_aug4.png | noise std=0.032
+2025-08-30 22:54:34 | VKontakte | benign | T46_2.png | T46_2_aug5.png | blur kernel=3
+2025-08-30 22:54:34 | VKontakte | benign | T46_0.png | T46_0_aug6.png | shift translate=0.07
+2025-08-30 22:54:35 | VKontakte | benign | T46_1.png | T46_1_aug7.png | blur kernel=11
+2025-08-30 22:54:35 | VKontakte | benign | T46_1.png | T46_1_aug8.png | noise std=0.049
+2025-08-30 22:54:35 | VKontakte | benign | T46_2.png | T46_2_aug9.png | noise std=0.014
+2025-08-30 22:54:35 | VKontakte | benign | T46_0.png | T46_0_aug10.png | shift translate=0.07
+2025-08-30 22:54:35 | VKontakte | benign | T46_1.png | T46_1_aug11.png | brightness factor=1.08
+2025-08-30 22:54:35 | VKontakte | benign | T46_2.png | T46_2_aug12.png | noise std=0.041
+2025-08-30 22:54:35 | VKontakte | benign | T46_1.png | T46_1_aug13.png | brightness factor=0.95
+2025-08-30 22:54:36 | VKontakte | benign | T46_0.png | T46_0_aug14.png | noise std=0.014
+2025-08-30 22:54:36 | VKontakte | benign | T46_2.png | T46_2_aug15.png | blur kernel=3
+2025-08-30 22:54:36 | VKontakte | benign | T46_1.png | T46_1_aug16.png | brightness factor=0.95
+2025-08-30 22:54:36 | VKontakte | benign | T46_2.png | T46_2_aug17.png | noise std=0.041
+2025-08-30 22:54:36 | VKontakte | benign | T46_1.png | T46_1_aug18.png | noise std=0.024
+2025-08-30 22:54:37 | VKontakte | benign | T46_0.png | T46_0_aug19.png | noise std=0.039
+2025-08-30 22:54:37 | VKontakte | benign | T46_2.png | T46_2_aug20.png | shift translate=0.06
+2025-08-30 22:54:37 | VKontakte | benign | T46_0.png | T46_0_aug21.png | blur kernel=3
+2025-08-30 22:54:37 | VKontakte | benign | T46_2.png | T46_2_aug22.png | blur kernel=5
+2025-08-30 22:54:37 | ATB Financial | benign | T5_0.png | T5_0_aug1.png | brightness factor=1.22
+2025-08-30 22:54:37 | ATB Financial | benign | T5_1.png | T5_1_aug2.png | noise std=0.048
+2025-08-30 22:54:38 | ATB Financial | benign | T5_0.png | T5_0_aug3.png | noise std=0.035
+2025-08-30 22:54:38 | ATB Financial | benign | T5_0.png | T5_0_aug4.png | noise std=0.026
+2025-08-30 22:54:39 | ATB Financial | benign | T5_0.png | T5_0_aug5.png | noise std=0.034
+2025-08-30 22:54:39 | ATB Financial | benign | T5_1.png | T5_1_aug6.png | blur kernel=5
+2025-08-30 22:54:39 | ATB Financial | benign | T5_0.png | T5_0_aug7.png | shift translate=0.13
+2025-08-30 22:54:39 | ATB Financial | benign | T5_0.png | T5_0_aug8.png | blur kernel=11
+2025-08-30 22:54:39 | ATB Financial | benign | T5_0.png | T5_0_aug9.png | shift translate=0.08
+2025-08-30 22:54:39 | ATB Financial | benign | T5_1.png | T5_1_aug10.png | blur kernel=7
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug11.png | shift translate=0.11
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug12.png | blur kernel=7
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug13.png | noise std=0.035
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug14.png | blur kernel=5
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug15.png | blur kernel=5
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug16.png | blur kernel=5
+2025-08-30 22:54:40 | ATB Financial | benign | T5_1.png | T5_1_aug17.png | brightness factor=1.16
+2025-08-30 22:54:41 | ATB Financial | benign | T5_1.png | T5_1_aug18.png | brightness factor=1.25
+2025-08-30 22:54:41 | ATB Financial | benign | T5_1.png | T5_1_aug19.png | brightness factor=1.13
+2025-08-30 22:54:41 | ATB Financial | benign | T5_0.png | T5_0_aug20.png | brightness factor=1.14
+2025-08-30 22:54:41 | ATB Financial | benign | T5_0.png | T5_0_aug21.png | brightness factor=0.91
+2025-08-30 22:54:41 | ATB Financial | benign | T5_1.png | T5_1_aug22.png | blur kernel=7
+2025-08-30 22:54:41 | ATB Financial | benign | T5_0.png | T5_0_aug23.png | noise std=0.015
+2025-08-30 22:54:42 | Visa International Service Association | benign | T47_0.png | T47_0_aug1.png | noise std=0.026
+2025-08-30 22:54:44 | Visa International Service Association | benign | T47_0.png | T47_0_aug2.png | noise std=0.038
+2025-08-30 22:54:45 | Visa International Service Association | benign | T47_0.png | T47_0_aug3.png | noise std=0.017
+2025-08-30 22:54:46 | Visa International Service Association | benign | T47_0.png | T47_0_aug4.png | brightness factor=0.88
+2025-08-30 22:54:46 | Visa International Service Association | benign | T47_0.png | T47_0_aug5.png | brightness factor=1.20
+2025-08-30 22:54:48 | Visa International Service Association | benign | T47_0.png | T47_0_aug6.png | noise std=0.033
+2025-08-30 22:54:49 | Visa International Service Association | benign | T47_0.png | T47_0_aug7.png | blur kernel=11
+2025-08-30 22:54:49 | Visa International Service Association | benign | T47_0.png | T47_0_aug8.png | shift translate=0.13
+2025-08-30 22:54:50 | Visa International Service Association | benign | T47_0.png | T47_0_aug9.png | blur kernel=9
+2025-08-30 22:54:52 | Visa International Service Association | benign | T47_0.png | T47_0_aug10.png | noise std=0.014
+2025-08-30 22:54:52 | Visa International Service Association | benign | T47_0.png | T47_0_aug11.png | shift translate=0.14
+2025-08-30 22:54:54 | Visa International Service Association | benign | T47_0.png | T47_0_aug12.png | noise std=0.021
+2025-08-30 22:54:55 | Visa International Service Association | benign | T47_0.png | T47_0_aug13.png | noise std=0.045
+2025-08-30 22:54:56 | Visa International Service Association | benign | T47_0.png | T47_0_aug14.png | brightness factor=0.77
+2025-08-30 22:54:57 | Visa International Service Association | benign | T47_0.png | T47_0_aug15.png | noise std=0.017
+2025-08-30 22:54:58 | Visa International Service Association | benign | T47_0.png | T47_0_aug16.png | brightness factor=1.56
+2025-08-30 22:54:58 | Visa International Service Association | benign | T47_0.png | T47_0_aug17.png | shift translate=0.10
+2025-08-30 22:54:59 | Visa International Service Association | benign | T47_0.png | T47_0_aug18.png | shift translate=0.15
+2025-08-30 22:55:00 | Visa International Service Association | benign | T47_0.png | T47_0_aug19.png | shift translate=0.11
+2025-08-30 22:55:01 | Visa International Service Association | benign | T47_0.png | T47_0_aug20.png | brightness factor=1.75
+2025-08-30 22:55:01 | Visa International Service Association | benign | T47_0.png | T47_0_aug21.png | blur kernel=7
+2025-08-30 22:55:02 | Visa International Service Association | benign | T47_0.png | T47_0_aug22.png | brightness factor=0.82
+2025-08-30 22:55:03 | Visa International Service Association | benign | T47_0.png | T47_0_aug23.png | brightness factor=1.49
+2025-08-30 22:55:04 | Visa International Service Association | benign | T47_0.png | T47_0_aug24.png | noise std=0.016
+2025-08-30 22:55:05 | HSBC Bank | benign | T22_3.png | T22_3_aug1.png | noise std=0.025
+2025-08-30 22:55:05 | HSBC Bank | benign | T22_4.png | T22_4_aug2.png | blur kernel=9
+2025-08-30 22:55:06 | HSBC Bank | benign | T22_2.png | T22_2_aug3.png | shift translate=0.12
+2025-08-30 22:55:06 | HSBC Bank | benign | T22_3.png | T22_3_aug4.png | noise std=0.048
+2025-08-30 22:55:06 | HSBC Bank | benign | T22_3.png | T22_3_aug5.png | blur kernel=3
+2025-08-30 22:55:06 | HSBC Bank | benign | T22_0.png | T22_0_aug6.png | shift translate=0.14
+2025-08-30 22:55:07 | HSBC Bank | benign | T22_2.png | T22_2_aug7.png | noise std=0.019
+2025-08-30 22:55:07 | HSBC Bank | benign | T22_0.png | T22_0_aug8.png | brightness factor=1.14
+2025-08-30 22:55:07 | HSBC Bank | benign | T22_3.png | T22_3_aug9.png | shift translate=0.08
+2025-08-30 22:55:07 | HSBC Bank | benign | T22_2.png | T22_2_aug10.png | brightness factor=1.24
+2025-08-30 22:55:07 | HSBC Bank | benign | T22_0.png | T22_0_aug11.png | shift translate=0.14
+2025-08-30 22:55:08 | HSBC Bank | benign | T22_4.png | T22_4_aug12.png | blur kernel=3
+2025-08-30 22:55:08 | HSBC Bank | benign | T22_0.png | T22_0_aug13.png | blur kernel=3
+2025-08-30 22:55:08 | HSBC Bank | benign | T22_1.png | T22_1_aug14.png | noise std=0.028
+2025-08-30 22:55:08 | HSBC Bank | benign | T22_0.png | T22_0_aug15.png | brightness factor=1.79
+2025-08-30 22:55:08 | HSBC Bank | benign | T22_1.png | T22_1_aug16.png | shift translate=0.07
+2025-08-30 22:55:09 | HSBC Bank | benign | T22_3.png | T22_3_aug17.png | blur kernel=7
+2025-08-30 22:55:09 | HSBC Bank | benign | T22_3.png | T22_3_aug18.png | blur kernel=7
+2025-08-30 22:55:09 | HSBC Bank | benign | T22_1.png | T22_1_aug19.png | blur kernel=9
+2025-08-30 22:55:09 | HSBC Bank | benign | T22_3.png | T22_3_aug20.png | brightness factor=1.06
+2025-08-30 22:55:09 | Giffgaff | benign | T19_0.png | T19_0_aug1.png | blur kernel=3
+2025-08-30 22:55:10 | Giffgaff | benign | T19_0.png | T19_0_aug2.png | noise std=0.013
+2025-08-30 22:55:12 | Giffgaff | benign | T19_0.png | T19_0_aug3.png | noise std=0.010
+2025-08-30 22:55:12 | Giffgaff | benign | T19_0.png | T19_0_aug4.png | blur kernel=9
+2025-08-30 22:55:13 | Giffgaff | benign | T19_0.png | T19_0_aug5.png | noise std=0.013
+2025-08-30 22:55:14 | Giffgaff | benign | T19_0.png | T19_0_aug6.png | blur kernel=3
+2025-08-30 22:55:14 | Giffgaff | benign | T19_0.png | T19_0_aug7.png | shift translate=0.09
+2025-08-30 22:55:14 | Giffgaff | benign | T19_0.png | T19_0_aug8.png | brightness factor=1.00
+2025-08-30 22:55:14 | Giffgaff | benign | T19_0.png | T19_0_aug9.png | brightness factor=0.59
+2025-08-30 22:55:15 | Giffgaff | benign | T19_0.png | T19_0_aug10.png | brightness factor=1.07
+2025-08-30 22:55:15 | Giffgaff | benign | T19_0.png | T19_0_aug11.png | brightness factor=1.70
+2025-08-30 22:55:15 | Giffgaff | benign | T19_0.png | T19_0_aug12.png | brightness factor=0.61
+2025-08-30 22:55:15 | Giffgaff | benign | T19_0.png | T19_0_aug13.png | brightness factor=1.48
+2025-08-30 22:55:16 | Giffgaff | benign | T19_0.png | T19_0_aug14.png | shift translate=0.15
+2025-08-30 22:55:16 | Giffgaff | benign | T19_0.png | T19_0_aug15.png | brightness factor=0.82
+2025-08-30 22:55:16 | Giffgaff | benign | T19_0.png | T19_0_aug16.png | brightness factor=1.22
+2025-08-30 22:55:17 | Giffgaff | benign | T19_0.png | T19_0_aug17.png | blur kernel=7
+2025-08-30 22:55:17 | Giffgaff | benign | T19_0.png | T19_0_aug18.png | brightness factor=1.47
+2025-08-30 22:55:17 | Giffgaff | benign | T19_0.png | T19_0_aug19.png | blur kernel=5
+2025-08-30 22:55:18 | Giffgaff | benign | T19_0.png | T19_0_aug20.png | noise std=0.015
+2025-08-30 22:55:19 | Giffgaff | benign | T19_0.png | T19_0_aug21.png | blur kernel=11
+2025-08-30 22:55:19 | Giffgaff | benign | T19_0.png | T19_0_aug22.png | shift translate=0.14
+2025-08-30 22:55:20 | Giffgaff | benign | T19_0.png | T19_0_aug23.png | noise std=0.044
+2025-08-30 22:55:21 | Giffgaff | benign | T19_0.png | T19_0_aug24.png | shift translate=0.10
+2025-08-30 22:55:21 | U.S. Bank | benign | T44_0.png | T44_0_aug1.png | noise std=0.048
+2025-08-30 22:55:21 | U.S. Bank | benign | T44_0.png | T44_0_aug2.png | blur kernel=11
+2025-08-30 22:55:22 | U.S. Bank | benign | T44_0.png | T44_0_aug3.png | blur kernel=7
+2025-08-30 22:55:22 | U.S. Bank | benign | T44_0.png | T44_0_aug4.png | blur kernel=3
+2025-08-30 22:55:22 | U.S. Bank | benign | T44_0.png | T44_0_aug5.png | shift translate=0.11
+2025-08-30 22:55:23 | U.S. Bank | benign | T44_0.png | T44_0_aug6.png | noise std=0.038
+2025-08-30 22:55:23 | U.S. Bank | benign | T44_0.png | T44_0_aug7.png | brightness factor=0.86
+2025-08-30 22:55:23 | U.S. Bank | benign | T44_0.png | T44_0_aug8.png | blur kernel=11
+2025-08-30 22:55:23 | U.S. Bank | benign | T44_0.png | T44_0_aug9.png | brightness factor=1.20
+2025-08-30 22:55:24 | U.S. Bank | benign | T44_0.png | T44_0_aug10.png | blur kernel=7
+2025-08-30 22:55:24 | U.S. Bank | benign | T44_0.png | T44_0_aug11.png | brightness factor=0.58
+2025-08-30 22:55:24 | U.S. Bank | benign | T44_0.png | T44_0_aug12.png | noise std=0.015
+2025-08-30 22:55:25 | U.S. Bank | benign | T44_0.png | T44_0_aug13.png | shift translate=0.12
+2025-08-30 22:55:25 | U.S. Bank | benign | T44_0.png | T44_0_aug14.png | blur kernel=3
+2025-08-30 22:55:25 | U.S. Bank | benign | T44_0.png | T44_0_aug15.png | blur kernel=5
+2025-08-30 22:55:25 | U.S. Bank | benign | T44_0.png | T44_0_aug16.png | shift translate=0.10
+2025-08-30 22:55:25 | U.S. Bank | benign | T44_0.png | T44_0_aug17.png | brightness factor=0.98
+2025-08-30 22:55:26 | U.S. Bank | benign | T44_0.png | T44_0_aug18.png | blur kernel=3
+2025-08-30 22:55:26 | U.S. Bank | benign | T44_0.png | T44_0_aug19.png | noise std=0.021
+2025-08-30 22:55:26 | U.S. Bank | benign | T44_0.png | T44_0_aug20.png | shift translate=0.12
+2025-08-30 22:55:27 | U.S. Bank | benign | T44_0.png | T44_0_aug21.png | noise std=0.028
+2025-08-30 22:55:27 | U.S. Bank | benign | T44_0.png | T44_0_aug22.png | blur kernel=9
+2025-08-30 22:55:27 | U.S. Bank | benign | T44_0.png | T44_0_aug23.png | shift translate=0.07
+2025-08-30 22:55:28 | U.S. Bank | benign | T44_0.png | T44_0_aug24.png | blur kernel=5
+2025-08-30 22:55:28 | RuneScape | benign | T39_0.png | T39_0_aug1.png | blur kernel=3
+2025-08-30 22:55:28 | RuneScape | benign | T39_0.png | T39_0_aug2.png | blur kernel=9
+2025-08-30 22:55:28 | RuneScape | benign | T39_0.png | T39_0_aug3.png | noise std=0.047
+2025-08-30 22:55:29 | RuneScape | benign | T39_0.png | T39_0_aug4.png | blur kernel=11
+2025-08-30 22:55:29 | RuneScape | benign | T39_0.png | T39_0_aug5.png | brightness factor=0.92
+2025-08-30 22:55:29 | RuneScape | benign | T39_0.png | T39_0_aug6.png | shift translate=0.08
+2025-08-30 22:55:30 | RuneScape | benign | T39_0.png | T39_0_aug7.png | shift translate=0.06
+2025-08-30 22:55:30 | RuneScape | benign | T39_0.png | T39_0_aug8.png | brightness factor=0.79
+2025-08-30 22:55:30 | RuneScape | benign | T39_0.png | T39_0_aug9.png | noise std=0.013
+2025-08-30 22:55:30 | RuneScape | benign | T39_0.png | T39_0_aug10.png | shift translate=0.13
+2025-08-30 22:55:31 | RuneScape | benign | T39_0.png | T39_0_aug11.png | shift translate=0.06
+2025-08-30 22:55:31 | RuneScape | benign | T39_0.png | T39_0_aug12.png | blur kernel=7
+2025-08-30 22:55:31 | RuneScape | benign | T39_0.png | T39_0_aug13.png | shift translate=0.11
+2025-08-30 22:55:31 | RuneScape | benign | T39_0.png | T39_0_aug14.png | brightness factor=1.10
+2025-08-30 22:55:32 | RuneScape | benign | T39_0.png | T39_0_aug15.png | brightness factor=1.45
+2025-08-30 22:55:32 | RuneScape | benign | T39_0.png | T39_0_aug16.png | brightness factor=0.51
+2025-08-30 22:55:32 | RuneScape | benign | T39_0.png | T39_0_aug17.png | blur kernel=5
+2025-08-30 22:55:33 | RuneScape | benign | T39_0.png | T39_0_aug18.png | blur kernel=7
+2025-08-30 22:55:33 | RuneScape | benign | T39_0.png | T39_0_aug19.png | noise std=0.044
+2025-08-30 22:55:33 | RuneScape | benign | T39_0.png | T39_0_aug20.png | blur kernel=5
+2025-08-30 22:55:34 | RuneScape | benign | T39_0.png | T39_0_aug21.png | noise std=0.030
+2025-08-30 22:55:34 | RuneScape | benign | T39_0.png | T39_0_aug22.png | brightness factor=1.43
+2025-08-30 22:55:34 | RuneScape | benign | T39_0.png | T39_0_aug23.png | blur kernel=5
+2025-08-30 22:55:34 | RuneScape | benign | T39_0.png | T39_0_aug24.png | shift translate=0.10
+2025-08-30 22:55:35 | Twitter, Inc | benign | T43_0.png | T43_0_aug1.png | blur kernel=11
+2025-08-30 22:55:35 | Twitter, Inc | benign | T43_0.png | T43_0_aug2.png | noise std=0.013
+2025-08-30 22:55:35 | Twitter, Inc | benign | T43_0.png | T43_0_aug3.png | noise std=0.036
+2025-08-30 22:55:35 | Twitter, Inc | benign | T43_0.png | T43_0_aug4.png | brightness factor=0.88
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug5.png | noise std=0.038
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug6.png | shift translate=0.10
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug7.png | blur kernel=5
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug8.png | blur kernel=5
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug9.png | brightness factor=1.08
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug10.png | noise std=0.015
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug11.png | brightness factor=1.09
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug12.png | shift translate=0.14
+2025-08-30 22:55:36 | Twitter, Inc | benign | T43_0.png | T43_0_aug13.png | brightness factor=1.55
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug14.png | blur kernel=5
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug15.png | brightness factor=0.62
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug16.png | shift translate=0.09
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug17.png | shift translate=0.08
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug18.png | blur kernel=9
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug19.png | brightness factor=0.62
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug20.png | brightness factor=0.66
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug21.png | brightness factor=0.67
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug22.png | shift translate=0.12
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug23.png | shift translate=0.14
+2025-08-30 22:55:37 | Twitter, Inc | benign | T43_0.png | T43_0_aug24.png | blur kernel=3
+2025-08-30 22:55:38 | Etisalat | benign | T14_0.png | T14_0_aug1.png | noise std=0.042
+2025-08-30 22:55:38 | Etisalat | benign | T14_0.png | T14_0_aug2.png | shift translate=0.06
+2025-08-30 22:55:38 | Etisalat | benign | T14_1.png | T14_1_aug3.png | blur kernel=5
+2025-08-30 22:55:39 | Etisalat | benign | T14_1.png | T14_1_aug4.png | noise std=0.030
+2025-08-30 22:55:39 | Etisalat | benign | T14_1.png | T14_1_aug5.png | noise std=0.017
+2025-08-30 22:55:39 | Etisalat | benign | T14_0.png | T14_0_aug6.png | brightness factor=0.86
+2025-08-30 22:55:39 | Etisalat | benign | T14_1.png | T14_1_aug7.png | brightness factor=0.55
+2025-08-30 22:55:39 | Etisalat | benign | T14_0.png | T14_0_aug8.png | shift translate=0.10
+2025-08-30 22:55:39 | Etisalat | benign | T14_1.png | T14_1_aug9.png | blur kernel=3
+2025-08-30 22:55:40 | Etisalat | benign | T14_1.png | T14_1_aug10.png | noise std=0.015
+2025-08-30 22:55:40 | Etisalat | benign | T14_0.png | T14_0_aug11.png | brightness factor=1.32
+2025-08-30 22:55:40 | Etisalat | benign | T14_0.png | T14_0_aug12.png | noise std=0.041
+2025-08-30 22:55:41 | Etisalat | benign | T14_1.png | T14_1_aug13.png | noise std=0.032
+2025-08-30 22:55:41 | Etisalat | benign | T14_1.png | T14_1_aug14.png | shift translate=0.14
+2025-08-30 22:55:41 | Etisalat | benign | T14_1.png | T14_1_aug15.png | noise std=0.021
+2025-08-30 22:55:41 | Etisalat | benign | T14_0.png | T14_0_aug16.png | shift translate=0.11
+2025-08-30 22:55:42 | Etisalat | benign | T14_0.png | T14_0_aug17.png | shift translate=0.06
+2025-08-30 22:55:42 | Etisalat | benign | T14_1.png | T14_1_aug18.png | shift translate=0.13
+2025-08-30 22:55:42 | Etisalat | benign | T14_0.png | T14_0_aug19.png | brightness factor=0.63
+2025-08-30 22:55:42 | Etisalat | benign | T14_0.png | T14_0_aug20.png | shift translate=0.10
+2025-08-30 22:55:42 | Etisalat | benign | T14_0.png | T14_0_aug21.png | brightness factor=1.25
+2025-08-30 22:55:42 | Etisalat | benign | T14_1.png | T14_1_aug22.png | shift translate=0.14
+2025-08-30 22:55:42 | Etisalat | benign | T14_0.png | T14_0_aug23.png | brightness factor=0.81
+2025-08-30 22:55:42 | Deutsche Telekom | benign | T12_0.png | T12_0_aug1.png | shift translate=0.14
+2025-08-30 22:55:42 | Deutsche Telekom | benign | T12_0.png | T12_0_aug2.png | shift translate=0.14
+2025-08-30 22:55:42 | Deutsche Telekom | benign | T12_0.png | T12_0_aug3.png | brightness factor=1.59
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug4.png | shift translate=0.07
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug5.png | blur kernel=3
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug6.png | brightness factor=0.53
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug7.png | blur kernel=7
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug8.png | brightness factor=0.94
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug9.png | shift translate=0.06
+2025-08-30 22:55:43 | Deutsche Telekom | benign | T12_0.png | T12_0_aug10.png | brightness factor=1.51
+2025-08-30 22:55:44 | Deutsche Telekom | benign | T12_0.png | T12_0_aug11.png | blur kernel=7
+2025-08-30 22:55:44 | Deutsche Telekom | benign | T12_0.png | T12_0_aug12.png | blur kernel=7
+2025-08-30 22:55:44 | Deutsche Telekom | benign | T12_0.png | T12_0_aug13.png | shift translate=0.06
+2025-08-30 22:55:44 | Deutsche Telekom | benign | T12_0.png | T12_0_aug14.png | noise std=0.042
+2025-08-30 22:55:44 | Deutsche Telekom | benign | T12_0.png | T12_0_aug15.png | shift translate=0.07
+2025-08-30 22:55:45 | Deutsche Telekom | benign | T12_0.png | T12_0_aug16.png | brightness factor=1.37
+2025-08-30 22:55:45 | Deutsche Telekom | benign | T12_0.png | T12_0_aug17.png | noise std=0.022
+2025-08-30 22:55:45 | Deutsche Telekom | benign | T12_0.png | T12_0_aug18.png | brightness factor=0.73
+2025-08-30 22:55:46 | Deutsche Telekom | benign | T12_0.png | T12_0_aug19.png | noise std=0.044
+2025-08-30 22:55:46 | Deutsche Telekom | benign | T12_0.png | T12_0_aug20.png | brightness factor=1.28
+2025-08-30 22:55:46 | Deutsche Telekom | benign | T12_0.png | T12_0_aug21.png | blur kernel=9
+2025-08-30 22:55:46 | Deutsche Telekom | benign | T12_0.png | T12_0_aug22.png | shift translate=0.12
+2025-08-30 22:55:46 | Deutsche Telekom | benign | T12_0.png | T12_0_aug23.png | shift translate=0.15
+2025-08-30 22:55:46 | Deutsche Telekom | benign | T12_0.png | T12_0_aug24.png | blur kernel=7
+2025-08-30 22:55:46 | Naver | benign | T30_0.png | T30_0_aug1.png | blur kernel=7
+2025-08-30 22:55:46 | Naver | benign | T30_1.png | T30_1_aug2.png | brightness factor=1.40
+2025-08-30 22:55:47 | Naver | benign | T30_0.png | T30_0_aug3.png | shift translate=0.13
+2025-08-30 22:55:47 | Naver | benign | T30_1.png | T30_1_aug4.png | blur kernel=9
+2025-08-30 22:55:47 | Naver | benign | T30_0.png | T30_0_aug5.png | noise std=0.049
+2025-08-30 22:55:47 | Naver | benign | T30_0.png | T30_0_aug6.png | noise std=0.045
+2025-08-30 22:55:47 | Naver | benign | T30_0.png | T30_0_aug7.png | noise std=0.014
+2025-08-30 22:55:48 | Naver | benign | T30_0.png | T30_0_aug8.png | brightness factor=0.71
+2025-08-30 22:55:48 | Naver | benign | T30_1.png | T30_1_aug9.png | blur kernel=7
+2025-08-30 22:55:48 | Naver | benign | T30_1.png | T30_1_aug10.png | shift translate=0.08
+2025-08-30 22:55:48 | Naver | benign | T30_1.png | T30_1_aug11.png | blur kernel=7
+2025-08-30 22:55:48 | Naver | benign | T30_1.png | T30_1_aug12.png | noise std=0.016
+2025-08-30 22:55:48 | Naver | benign | T30_1.png | T30_1_aug13.png | blur kernel=7
+2025-08-30 22:55:48 | Naver | benign | T30_0.png | T30_0_aug14.png | blur kernel=9
+2025-08-30 22:55:49 | Naver | benign | T30_1.png | T30_1_aug15.png | noise std=0.016
+2025-08-30 22:55:49 | Naver | benign | T30_1.png | T30_1_aug16.png | shift translate=0.07
+2025-08-30 22:55:49 | Naver | benign | T30_1.png | T30_1_aug17.png | noise std=0.038
+2025-08-30 22:55:49 | Naver | benign | T30_0.png | T30_0_aug18.png | shift translate=0.08
+2025-08-30 22:55:49 | Naver | benign | T30_1.png | T30_1_aug19.png | blur kernel=9
+2025-08-30 22:55:49 | Naver | benign | T30_0.png | T30_0_aug20.png | brightness factor=0.57
+2025-08-30 22:55:50 | Naver | benign | T30_1.png | T30_1_aug21.png | noise std=0.014
+2025-08-30 22:55:50 | Naver | benign | T30_0.png | T30_0_aug22.png | brightness factor=0.63
+2025-08-30 22:55:50 | Naver | benign | T30_1.png | T30_1_aug23.png | brightness factor=1.33
+2025-08-30 22:55:50 | Fifth Third Bank | benign | T16_0.png | T16_0_aug1.png | noise std=0.044
+2025-08-30 22:55:51 | Fifth Third Bank | benign | T16_0.png | T16_0_aug2.png | noise std=0.029
+2025-08-30 22:55:51 | Fifth Third Bank | benign | T16_0.png | T16_0_aug3.png | blur kernel=11
+2025-08-30 22:55:51 | Fifth Third Bank | benign | T16_0.png | T16_0_aug4.png | brightness factor=0.98
+2025-08-30 22:55:51 | Fifth Third Bank | benign | T16_0.png | T16_0_aug5.png | shift translate=0.07
+2025-08-30 22:55:51 | Fifth Third Bank | benign | T16_0.png | T16_0_aug6.png | shift translate=0.09
+2025-08-30 22:55:52 | Fifth Third Bank | benign | T16_0.png | T16_0_aug7.png | brightness factor=1.59
+2025-08-30 22:55:52 | Fifth Third Bank | benign | T16_0.png | T16_0_aug8.png | brightness factor=1.48
+2025-08-30 22:55:52 | Fifth Third Bank | benign | T16_0.png | T16_0_aug9.png | blur kernel=7
+2025-08-30 22:55:52 | Fifth Third Bank | benign | T16_0.png | T16_0_aug10.png | brightness factor=1.22
+2025-08-30 22:55:53 | Fifth Third Bank | benign | T16_0.png | T16_0_aug11.png | noise std=0.049
+2025-08-30 22:55:53 | Fifth Third Bank | benign | T16_0.png | T16_0_aug12.png | brightness factor=1.12
+2025-08-30 22:55:53 | Fifth Third Bank | benign | T16_0.png | T16_0_aug13.png | noise std=0.046
+2025-08-30 22:55:53 | Fifth Third Bank | benign | T16_0.png | T16_0_aug14.png | brightness factor=0.66
+2025-08-30 22:55:53 | Fifth Third Bank | benign | T16_0.png | T16_0_aug15.png | brightness factor=1.73
+2025-08-30 22:55:54 | Fifth Third Bank | benign | T16_0.png | T16_0_aug16.png | brightness factor=1.55
+2025-08-30 22:55:54 | Fifth Third Bank | benign | T16_0.png | T16_0_aug17.png | blur kernel=9
+2025-08-30 22:55:54 | Fifth Third Bank | benign | T16_0.png | T16_0_aug18.png | noise std=0.018
+2025-08-30 22:55:54 | Fifth Third Bank | benign | T16_0.png | T16_0_aug19.png | shift translate=0.08
+2025-08-30 22:55:55 | Fifth Third Bank | benign | T16_0.png | T16_0_aug20.png | blur kernel=9
+2025-08-30 22:55:55 | Fifth Third Bank | benign | T16_0.png | T16_0_aug21.png | shift translate=0.14
+2025-08-30 22:55:55 | Fifth Third Bank | benign | T16_0.png | T16_0_aug22.png | blur kernel=11
+2025-08-30 22:55:55 | Fifth Third Bank | benign | T16_0.png | T16_0_aug23.png | blur kernel=9
+2025-08-30 22:55:55 | Fifth Third Bank | benign | T16_0.png | T16_0_aug24.png | brightness factor=1.24
+2025-08-30 22:55:55 | Made-In-China | benign | T26_0.png | T26_0_aug1.png | blur kernel=11
+2025-08-30 22:55:56 | Made-In-China | benign | T26_0.png | T26_0_aug2.png | shift translate=0.14
+2025-08-30 22:55:56 | Made-In-China | benign | T26_0.png | T26_0_aug3.png | noise std=0.021
+2025-08-30 22:55:56 | Made-In-China | benign | T26_0.png | T26_0_aug4.png | noise std=0.011
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug5.png | noise std=0.016
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug6.png | blur kernel=9
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug7.png | brightness factor=0.56
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug8.png | shift translate=0.14
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug9.png | shift translate=0.13
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug10.png | shift translate=0.08
+2025-08-30 22:55:57 | Made-In-China | benign | T26_0.png | T26_0_aug11.png | blur kernel=5
+2025-08-30 22:55:58 | Made-In-China | benign | T26_0.png | T26_0_aug12.png | shift translate=0.15
+2025-08-30 22:55:58 | Made-In-China | benign | T26_0.png | T26_0_aug13.png | shift translate=0.08
+2025-08-30 22:55:58 | Made-In-China | benign | T26_0.png | T26_0_aug14.png | blur kernel=5
+2025-08-30 22:55:58 | Made-In-China | benign | T26_0.png | T26_0_aug15.png | brightness factor=1.69
+2025-08-30 22:55:58 | Made-In-China | benign | T26_0.png | T26_0_aug16.png | noise std=0.040
+2025-08-30 22:55:58 | Made-In-China | benign | T26_0.png | T26_0_aug17.png | blur kernel=11
+2025-08-30 22:55:59 | Made-In-China | benign | T26_0.png | T26_0_aug18.png | blur kernel=7
+2025-08-30 22:55:59 | Made-In-China | benign | T26_0.png | T26_0_aug19.png | brightness factor=1.51
+2025-08-30 22:55:59 | Made-In-China | benign | T26_0.png | T26_0_aug20.png | brightness factor=0.75
+2025-08-30 22:55:59 | Made-In-China | benign | T26_0.png | T26_0_aug21.png | blur kernel=5
+2025-08-30 22:55:59 | Made-In-China | benign | T26_0.png | T26_0_aug22.png | noise std=0.012
+2025-08-30 22:55:59 | Made-In-China | benign | T26_0.png | T26_0_aug23.png | brightness factor=0.86
+2025-08-30 22:56:00 | Made-In-China | benign | T26_0.png | T26_0_aug24.png | noise std=0.035
+2025-08-30 22:56:00 | Grupo Santander | benign | T21_0.png | T21_0_aug1.png | blur kernel=5
+2025-08-30 22:56:00 | Grupo Santander | benign | T21_1.png | T21_1_aug2.png | noise std=0.034
+2025-08-30 22:56:01 | Grupo Santander | benign | T21_0.png | T21_0_aug3.png | noise std=0.033
+2025-08-30 22:56:01 | Grupo Santander | benign | T21_1.png | T21_1_aug4.png | shift translate=0.07
+2025-08-30 22:56:01 | Grupo Santander | benign | T21_1.png | T21_1_aug5.png | blur kernel=7
+2025-08-30 22:56:02 | Grupo Santander | benign | T21_0.png | T21_0_aug6.png | noise std=0.012
+2025-08-30 22:56:02 | Grupo Santander | benign | T21_0.png | T21_0_aug7.png | brightness factor=1.34
+2025-08-30 22:56:02 | Grupo Santander | benign | T21_0.png | T21_0_aug8.png | shift translate=0.12
+2025-08-30 22:56:02 | Grupo Santander | benign | T21_0.png | T21_0_aug9.png | blur kernel=9
+2025-08-30 22:56:02 | Grupo Santander | benign | T21_0.png | T21_0_aug10.png | brightness factor=1.28
+2025-08-30 22:56:02 | Grupo Santander | benign | T21_0.png | T21_0_aug11.png | brightness factor=0.83
+2025-08-30 22:56:03 | Grupo Santander | benign | T21_1.png | T21_1_aug12.png | shift translate=0.09
+2025-08-30 22:56:03 | Grupo Santander | benign | T21_1.png | T21_1_aug13.png | shift translate=0.10
+2025-08-30 22:56:03 | Grupo Santander | benign | T21_0.png | T21_0_aug14.png | noise std=0.022
+2025-08-30 22:56:04 | Grupo Santander | benign | T21_1.png | T21_1_aug15.png | blur kernel=3
+2025-08-30 22:56:04 | Grupo Santander | benign | T21_1.png | T21_1_aug16.png | shift translate=0.08
+2025-08-30 22:56:05 | Grupo Santander | benign | T21_0.png | T21_0_aug17.png | noise std=0.013
+2025-08-30 22:56:05 | Grupo Santander | benign | T21_1.png | T21_1_aug18.png | shift translate=0.14
+2025-08-30 22:56:05 | Grupo Santander | benign | T21_1.png | T21_1_aug19.png | shift translate=0.07
+2025-08-30 22:56:05 | Grupo Santander | benign | T21_0.png | T21_0_aug20.png | blur kernel=11
+2025-08-30 22:56:06 | Grupo Santander | benign | T21_1.png | T21_1_aug21.png | shift translate=0.12
+2025-08-30 22:56:06 | Grupo Santander | benign | T21_0.png | T21_0_aug22.png | noise std=0.050
+2025-08-30 22:56:06 | Grupo Santander | benign | T21_1.png | T21_1_aug23.png | noise std=0.026
+2025-08-30 22:56:07 | GMX Mail | benign | T18_2.png | T18_2_aug1.png | blur kernel=11
+2025-08-30 22:56:07 | GMX Mail | benign | T18_2.png | T18_2_aug2.png | brightness factor=0.95
+2025-08-30 22:56:07 | GMX Mail | benign | T18_2.png | T18_2_aug3.png | brightness factor=1.39
+2025-08-30 22:56:09 | GMX Mail | benign | T18_2.png | T18_2_aug4.png | noise std=0.046
+2025-08-30 22:56:09 | GMX Mail | benign | T18_2.png | T18_2_aug5.png | shift translate=0.10
+2025-08-30 22:56:09 | GMX Mail | benign | T18_1.png | T18_1_aug6.png | brightness factor=0.88
+2025-08-30 22:56:10 | GMX Mail | benign | T18_0.png | T18_0_aug7.png | brightness factor=1.46
+2025-08-30 22:56:10 | GMX Mail | benign | T18_2.png | T18_2_aug8.png | brightness factor=1.73
+2025-08-30 22:56:10 | GMX Mail | benign | T18_0.png | T18_0_aug9.png | blur kernel=5
+2025-08-30 22:56:11 | GMX Mail | benign | T18_0.png | T18_0_aug10.png | brightness factor=1.47
+2025-08-30 22:56:12 | GMX Mail | benign | T18_0.png | T18_0_aug11.png | noise std=0.042
+2025-08-30 22:56:12 | GMX Mail | benign | T18_0.png | T18_0_aug12.png | shift translate=0.08
+2025-08-30 22:56:14 | GMX Mail | benign | T18_0.png | T18_0_aug13.png | noise std=0.044
+2025-08-30 22:56:14 | GMX Mail | benign | T18_0.png | T18_0_aug14.png | blur kernel=11
+2025-08-30 22:56:15 | GMX Mail | benign | T18_2.png | T18_2_aug15.png | blur kernel=9
+2025-08-30 22:56:15 | GMX Mail | benign | T18_1.png | T18_1_aug16.png | blur kernel=9
+2025-08-30 22:56:15 | GMX Mail | benign | T18_2.png | T18_2_aug17.png | shift translate=0.09
+2025-08-30 22:56:16 | GMX Mail | benign | T18_1.png | T18_1_aug18.png | brightness factor=1.79
+2025-08-30 22:56:17 | GMX Mail | benign | T18_0.png | T18_0_aug19.png | noise std=0.049
+2025-08-30 22:56:17 | GMX Mail | benign | T18_0.png | T18_0_aug20.png | brightness factor=0.91
+2025-08-30 22:56:18 | GMX Mail | benign | T18_2.png | T18_2_aug21.png | brightness factor=1.51
+2025-08-30 22:56:18 | GMX Mail | benign | T18_0.png | T18_0_aug22.png | shift translate=0.11
+2025-08-30 22:56:18 | International Card Services B.V | benign | T23_0.png | T23_0_aug1.png | shift translate=0.11
+2025-08-30 22:56:19 | International Card Services B.V | benign | T23_0.png | T23_0_aug2.png | noise std=0.021
+2025-08-30 22:56:19 | International Card Services B.V | benign | T23_0.png | T23_0_aug3.png | brightness factor=1.14
+2025-08-30 22:56:19 | International Card Services B.V | benign | T23_0.png | T23_0_aug4.png | brightness factor=1.30
+2025-08-30 22:56:19 | International Card Services B.V | benign | T23_0.png | T23_0_aug5.png | noise std=0.027
+2025-08-30 22:56:20 | International Card Services B.V | benign | T23_0.png | T23_0_aug6.png | noise std=0.010
+2025-08-30 22:56:20 | International Card Services B.V | benign | T23_0.png | T23_0_aug7.png | shift translate=0.15
+2025-08-30 22:56:20 | International Card Services B.V | benign | T23_0.png | T23_0_aug8.png | brightness factor=0.52
+2025-08-30 22:56:20 | International Card Services B.V | benign | T23_0.png | T23_0_aug9.png | brightness factor=0.79
+2025-08-30 22:56:20 | International Card Services B.V | benign | T23_0.png | T23_0_aug10.png | shift translate=0.06
+2025-08-30 22:56:20 | International Card Services B.V | benign | T23_0.png | T23_0_aug11.png | shift translate=0.07
+2025-08-30 22:56:21 | International Card Services B.V | benign | T23_0.png | T23_0_aug12.png | shift translate=0.14
+2025-08-30 22:56:21 | International Card Services B.V | benign | T23_0.png | T23_0_aug13.png | shift translate=0.09
+2025-08-30 22:56:21 | International Card Services B.V | benign | T23_0.png | T23_0_aug14.png | shift translate=0.15
+2025-08-30 22:56:21 | International Card Services B.V | benign | T23_0.png | T23_0_aug15.png | shift translate=0.13
+2025-08-30 22:56:22 | International Card Services B.V | benign | T23_0.png | T23_0_aug16.png | noise std=0.011
+2025-08-30 22:56:22 | International Card Services B.V | benign | T23_0.png | T23_0_aug17.png | brightness factor=0.77
+2025-08-30 22:56:22 | International Card Services B.V | benign | T23_0.png | T23_0_aug18.png | brightness factor=0.66
+2025-08-30 22:56:22 | International Card Services B.V | benign | T23_0.png | T23_0_aug19.png | noise std=0.045
+2025-08-30 22:56:22 | International Card Services B.V | benign | T23_0.png | T23_0_aug20.png | blur kernel=11
+2025-08-30 22:56:23 | International Card Services B.V | benign | T23_0.png | T23_0_aug21.png | blur kernel=3
+2025-08-30 22:56:23 | International Card Services B.V | benign | T23_0.png | T23_0_aug22.png | blur kernel=9
+2025-08-30 22:56:23 | International Card Services B.V | benign | T23_0.png | T23_0_aug23.png | noise std=0.015
+2025-08-30 22:56:24 | International Card Services B.V | benign | T23_0.png | T23_0_aug24.png | noise std=0.038
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug1.png | blur kernel=7
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug2.png | blur kernel=11
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug3.png | brightness factor=1.04
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug4.png | blur kernel=7
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug5.png | blur kernel=9
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug6.png | brightness factor=1.51
+2025-08-30 22:56:24 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug7.png | shift translate=0.12
+2025-08-30 22:56:25 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug8.png | brightness factor=0.55
+2025-08-30 22:56:25 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug9.png | brightness factor=1.39
+2025-08-30 22:56:25 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug10.png | shift translate=0.07
+2025-08-30 22:56:25 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug11.png | blur kernel=3
+2025-08-30 22:56:25 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug12.png | brightness factor=1.73
+2025-08-30 22:56:25 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug13.png | blur kernel=7
+2025-08-30 22:56:26 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug14.png | noise std=0.050
+2025-08-30 22:56:26 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug15.png | shift translate=0.10
+2025-08-30 22:56:26 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug16.png | brightness factor=1.64
+2025-08-30 22:56:26 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug17.png | shift translate=0.13
+2025-08-30 22:56:26 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug18.png | noise std=0.040
+2025-08-30 22:56:26 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug19.png | blur kernel=3
+2025-08-30 22:56:27 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug20.png | brightness factor=0.93
+2025-08-30 22:56:27 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug21.png | shift translate=0.14
+2025-08-30 22:56:27 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug22.png | shift translate=0.13
+2025-08-30 22:56:27 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug23.png | blur kernel=9
+2025-08-30 22:56:27 | LinkedIn Corporation | benign | T25_0.png | T25_0_aug24.png | noise std=0.021
+2025-08-30 22:56:28 | Citrix ShareFile | benign | T10_0.png | T10_0_aug1.png | noise std=0.042
+2025-08-30 22:56:28 | Citrix ShareFile | benign | T10_0.png | T10_0_aug2.png | blur kernel=5
+2025-08-30 22:56:28 | Citrix ShareFile | benign | T10_0.png | T10_0_aug3.png | brightness factor=0.63
+2025-08-30 22:56:29 | Citrix ShareFile | benign | T10_0.png | T10_0_aug4.png | noise std=0.017
+2025-08-30 22:56:29 | Citrix ShareFile | benign | T10_0.png | T10_0_aug5.png | shift translate=0.11
+2025-08-30 22:56:30 | Citrix ShareFile | benign | T10_0.png | T10_0_aug6.png | noise std=0.047
+2025-08-30 22:56:30 | Citrix ShareFile | benign | T10_0.png | T10_0_aug7.png | noise std=0.028
+2025-08-30 22:56:31 | Citrix ShareFile | benign | T10_0.png | T10_0_aug8.png | shift translate=0.12
+2025-08-30 22:56:31 | Citrix ShareFile | benign | T10_0.png | T10_0_aug9.png | brightness factor=1.77
+2025-08-30 22:56:31 | Citrix ShareFile | benign | T10_0.png | T10_0_aug10.png | blur kernel=9
+2025-08-30 22:56:32 | Citrix ShareFile | benign | T10_0.png | T10_0_aug11.png | noise std=0.024
+2025-08-30 22:56:32 | Citrix ShareFile | benign | T10_0.png | T10_0_aug12.png | brightness factor=1.59
+2025-08-30 22:56:32 | Citrix ShareFile | benign | T10_0.png | T10_0_aug13.png | blur kernel=5
+2025-08-30 22:56:33 | Citrix ShareFile | benign | T10_0.png | T10_0_aug14.png | noise std=0.045
+2025-08-30 22:56:33 | Citrix ShareFile | benign | T10_0.png | T10_0_aug15.png | noise std=0.023
+2025-08-30 22:56:33 | Citrix ShareFile | benign | T10_0.png | T10_0_aug16.png | shift translate=0.06
+2025-08-30 22:56:34 | Citrix ShareFile | benign | T10_0.png | T10_0_aug17.png | noise std=0.026
+2025-08-30 22:56:34 | Citrix ShareFile | benign | T10_0.png | T10_0_aug18.png | blur kernel=9
+2025-08-30 22:56:35 | Citrix ShareFile | benign | T10_0.png | T10_0_aug19.png | noise std=0.014
+2025-08-30 22:56:36 | Citrix ShareFile | benign | T10_0.png | T10_0_aug20.png | noise std=0.023
+2025-08-30 22:56:36 | Citrix ShareFile | benign | T10_0.png | T10_0_aug21.png | blur kernel=3
+2025-08-30 22:56:36 | Citrix ShareFile | benign | T10_0.png | T10_0_aug22.png | noise std=0.011
+2025-08-30 22:56:37 | Citrix ShareFile | benign | T10_0.png | T10_0_aug23.png | blur kernel=11
+2025-08-30 22:56:37 | Citrix ShareFile | benign | T10_0.png | T10_0_aug24.png | brightness factor=1.35
+2025-08-30 22:56:37 | db | benign | T52_0.png | T52_0_aug1.png | shift translate=0.09
+2025-08-30 22:56:37 | db | benign | T52_0.png | T52_0_aug2.png | brightness factor=1.60
+2025-08-30 22:56:37 | db | benign | T52_0.png | T52_0_aug3.png | noise std=0.039
+2025-08-30 22:56:37 | db | benign | T52_0.png | T52_0_aug4.png | noise std=0.015
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug5.png | blur kernel=7
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug6.png | shift translate=0.10
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug7.png | blur kernel=3
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug8.png | noise std=0.016
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug9.png | blur kernel=7
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug10.png | brightness factor=0.66
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug11.png | brightness factor=1.09
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug12.png | shift translate=0.06
+2025-08-30 22:56:38 | db | benign | T52_0.png | T52_0_aug13.png | blur kernel=11
+2025-08-30 22:56:39 | db | benign | T52_0.png | T52_0_aug14.png | noise std=0.028
+2025-08-30 22:56:39 | db | benign | T52_0.png | T52_0_aug15.png | noise std=0.010
+2025-08-30 22:56:39 | db | benign | T52_0.png | T52_0_aug16.png | noise std=0.044
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug17.png | brightness factor=1.40
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug18.png | brightness factor=0.63
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug19.png | noise std=0.027
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug20.png | shift translate=0.09
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug21.png | shift translate=0.10
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug22.png | brightness factor=1.04
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug23.png | shift translate=0.12
+2025-08-30 22:56:40 | db | benign | T52_0.png | T52_0_aug24.png | brightness factor=0.77
