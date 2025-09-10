@@ -385,6 +385,10 @@ def generate_plots(
         "benign_pdf": benign_pdf,
         "phish_pdf": phish_pdf,
         "optimal_threshold": optimal_threshold,
+        "benign_mu": distribution_params["benign_mu"],
+        "benign_sigma": distribution_params["benign_sigma"],
+        "phish_mu": distribution_params["phish_mu"],
+        "phish_sigma": distribution_params["phish_sigma"],
     }
     with open(density_data_path, "w") as f:
         json.dump(convert_numpy_types(density_payload), f, indent=2, ensure_ascii=False)

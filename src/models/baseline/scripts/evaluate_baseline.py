@@ -56,27 +56,21 @@ def process_and_evaluate(
         logger.info(f"Columns: {df.columns.tolist()}")
 
         # Check for NaN values in critical class columns before processing
-        critical_columns = ["baseline_class", "true_class"]
+        critical_columns = [
+            "baseline_class",
+            "true_class",
+            "true_target",
+            "baseline_target",
+        ]
         for col in critical_columns:
             if df[col].isna().any():
                 logger.error(f"Found NaN values in critical column: {col}")
                 raise ValueError(f"Found NaN values in critical column: {col}")
 
-        # Handle missing values in target columns
-        # Fill NaN values with 'unknown' placeholder
-        df["baseline_target"] = df["baseline_target"].fillna("unknown")
-        df["true_target"] = df["true_target"].fillna("unknown")
+        df["baseline_class"] = df["baseline_class"].astype(int)
+        df["true_class"] = df["true_class"].astype(int)
+        df.loc[df["true_class"] == 0, "true_target"] = "benign"
 
-        # Check for remaining NaN values in class columns
-        if df["baseline_class"].isna().any():
-            logger.warning("Found NaN values in baseline_class column")
-            df["baseline_class"] = df["baseline_class"].fillna(0)
-
-        if df["true_class"].isna().any():
-            logger.warning("Found NaN values in true_class column")
-            df["true_class"] = df["true_class"].fillna(0)
-
-        # Calculate metrics using the tools.metrics function
         logger.info("Calculating metrics...")
         class_metrics, target_metrics = calculate_metrics(
             cls_true=df["true_class"],
