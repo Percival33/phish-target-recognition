@@ -12,9 +12,12 @@ from PIL import Image
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ..database import Base, get_db
-from ..main import app
-from ..models import Prediction
+from app_factory import create_app
+from database import Base, get_db
+from models import Prediction
+
+# Create app instance for testing with absolute imports
+app = create_app(use_relative_imports=False)
 
 
 @pytest.fixture
@@ -109,7 +112,7 @@ class TestPredictEndpoint:
                 mock_post.return_value = mock_response
 
                 # Need to patch the URLS directly since MODELS is loaded at module import
-                with patch("src.api.routes.URLS", ["http://visualphish:8888/predict"]):
+                with patch("routes.URLS", ["http://visualphish:8888/predict"]):
                     # Make request
                     response = client.post(
                         "/predict",
@@ -199,45 +202,59 @@ class TestNewEndpoints:
         app.dependency_overrides = {}
 
     def test_get_prediction_by_id_endpoint(self, client, test_db):
-        """Test GET /prediction/{id} endpoint."""
+        """Test GET /predictions/{request_id} endpoint."""
         db_session_class, override_get_db = test_db
         app.dependency_overrides[get_db] = override_get_db
 
-        # Add test prediction
+        # Add test predictions with same request_id
         db = db_session_class()
-        prediction = Prediction(
-            img_hash="specific_hash",
-            method="test_method",
-            url="specific_url",
-            class_=1,
-            target="test_target",
-        )
-        db.add(prediction)
+        test_request_id = "test-request-123"
+        predictions = [
+            Prediction(
+                img_hash="specific_hash_1",
+                method="test_method_1",
+                url="specific_url",
+                class_=1,
+                target="test_target_1",
+                request_id=test_request_id,
+            ),
+            Prediction(
+                img_hash="specific_hash_2",
+                method="test_method_2",
+                url="specific_url",
+                class_=0,
+                target="test_target_2",
+                request_id=test_request_id,
+            ),
+        ]
+        for pred in predictions:
+            db.add(pred)
         db.commit()
-        db.refresh(prediction)
-        test_id = prediction.id
         db.close()
 
         # Test endpoint
-        response = client.get(f"/prediction/{test_id}")
+        response = client.get(f"/predictions/{test_request_id}")
         assert response.status_code == 200
 
         data = response.json()
-        assert data["id"] == test_id
-        assert data["img_hash"] == "specific_hash"
-        assert data["method"] == "test_method"
-        assert data["url"] == "specific_url"
-        assert data["class_"] == 1
-        assert data["target"] == "test_target"
+        assert "predictions" in data
+        assert "total" in data
+        assert data["total"] == 2
+        assert len(data["predictions"]) == 2
+
+        # Verify the predictions data
+        pred_methods = [p["method"] for p in data["predictions"]]
+        assert "test_method_1" in pred_methods
+        assert "test_method_2" in pred_methods
 
         app.dependency_overrides = {}
 
     def test_get_prediction_not_found(self, client, test_db):
-        """Test GET /prediction/{id} with non-existent ID."""
+        """Test GET /predictions/{request_id} with non-existent request ID."""
         _, override_get_db = test_db
         app.dependency_overrides[get_db] = override_get_db
 
-        response = client.get("/prediction/99999")
+        response = client.get("/predictions/non-existent-request-id")
         assert response.status_code == 404
 
         data = response.json()

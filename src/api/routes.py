@@ -8,14 +8,14 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from .database import get_db
-from .models import Prediction
-from .schemas import (
+from database import get_db
+from models import Prediction
+from schemas import (
     PredictionListResponse,
     PredictionResponse,
     PredictRequest,
 )
-from .utils import compute_image_hash, parse_prediction_response
+from utils import compute_image_hash, parse_prediction_response
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +58,10 @@ async def fetch_data(
 
         # Extract method name from URL
         method = url.split("//")[1].split(":")[0] if "//" in url else "unknown"
+
+        # Add method to the result for the frontend
+        if isinstance(result, dict):
+            result["method"] = method
 
         # Save prediction to database
         try:
@@ -161,18 +165,30 @@ async def get_predictions(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error getting predictions: {e}")
 
 
-@router.get("/prediction/{prediction_id}", response_model=PredictionResponse)
-async def get_prediction(prediction_id: int, db: Session = Depends(get_db)):
-    """Get a specific prediction by ID."""
+@router.get("/predictions/{request_id}", response_model=PredictionListResponse)
+async def get_predictions_by_request_id(request_id: str, db: Session = Depends(get_db)):
+    """Get all predictions for a specific request ID."""
     try:
-        prediction = db.query(Prediction).filter(Prediction.id == prediction_id).first()
-        if not prediction:
-            raise HTTPException(status_code=404, detail="Prediction not found")
+        predictions = (
+            db.query(Prediction)
+            .filter(Prediction.request_id == request_id)
+            .order_by(Prediction.created_at.desc())
+            .all()
+        )
+        if not predictions:
+            raise HTTPException(
+                status_code=404, detail="Predictions not found for this request ID"
+            )
 
-        return PredictionResponse.model_validate(prediction)
+        return PredictionListResponse(
+            predictions=[PredictionResponse.model_validate(p) for p in predictions],
+            total=len(predictions),
+        )
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error getting prediction {prediction_id}: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Error getting prediction: {e}")
+        logger.error(
+            f"Error getting predictions for request_id {request_id}: {e}", exc_info=True
+        )
+        raise HTTPException(status_code=500, detail=f"Error getting predictions: {e}")

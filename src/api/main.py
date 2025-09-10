@@ -2,7 +2,7 @@ import os
 
 import uvicorn
 
-from .app_factory import create_app
+from app_factory import create_app
 
 # Create app instance for local development and testing
 app = create_app(use_relative_imports=True)

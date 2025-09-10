@@ -5,12 +5,10 @@ WORKDIR /code
 
 COPY uv.lock /code/uv.lock
 COPY pyproject.toml /code/pyproject.toml
-COPY common/*.whl /code/common/
+COPY libs/*.whl /code/libs/
 RUN uv sync --frozen --no-cache --no-dev
-
-# Install baseline service dependencies
-RUN uv pip install torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 --index https://download.pytorch.org/whl/cpu
+RUN uv add "perception @ git+https://github.com/thorn-oss/perception" --frozen
 
 COPY * /code
 
-CMD ["uv", "run", "--no-dev", "BaselineServing.py"]
+CMD ["uv", "run", "--with", "perception", "--no-dev", "BaselineServing.py"]

@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from ..utils import compute_image_hash, decode_base64_image, parse_prediction_response
+from utils import compute_image_hash, decode_base64_image, parse_prediction_response
 
 
 class TestComputeImageHash:

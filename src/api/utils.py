@@ -32,6 +32,10 @@ def compute_image_hash(base64_image: str) -> str:
         # Open image with PIL
         image = Image.open(io.BytesIO(image_bytes))
 
+        # Convert to RGB if necessary (handles RGBA, grayscale, etc.)
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
         # Convert to numpy array
         image_array = np.array(image)
 
@@ -71,10 +75,51 @@ def decode_base64_image(base64_string: str) -> np.ndarray:
 
         # Open image with PIL and convert to array
         image = Image.open(io.BytesIO(image_bytes))
+
+        # Convert to RGB if necessary (handles RGBA, grayscale, etc.)
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
         return np.array(image)
 
     except Exception as e:
         raise ValueError(f"Failed to decode base64 image: {str(e)}")
+
+
+def _parse_visualphish_response(response: Dict[Any, Any]) -> Dict[str, Any]:
+    """Parse VisualPhish response format."""
+    parsed = {}
+    if "prediction" in response:
+        parsed["class_"] = 1 if response["prediction"] == "phishing" else 0
+    if "distance" in response:
+        parsed["distance"] = float(response["distance"])
+    if "target" in response:
+        parsed["target"] = response["target"]
+    return parsed
+
+
+def _parse_phishpedia_response(response: Dict[Any, Any]) -> Dict[str, Any]:
+    """Parse Phishpedia response format."""
+    parsed = {}
+    if "result" in response:
+        parsed["class_"] = 1 if response["result"] == "phish" else 0
+    if "confidence" in response:
+        parsed["distance"] = float(response["confidence"])
+    if "brand" in response:
+        parsed["target"] = response["brand"]
+    return parsed
+
+
+def _parse_baseline_response(response: Dict[Any, Any]) -> Dict[str, Any]:
+    """Parse Baseline response format."""
+    parsed = {}
+    if "class" in response:
+        parsed["class_"] = int(response["class"])
+    if "distance" in response:
+        parsed["distance"] = float(response["distance"])
+    if "target" in response:
+        parsed["target"] = response["target"]
+    return parsed
 
 
 def parse_prediction_response(response: Dict[Any, Any], method: str) -> Dict[str, Any]:
@@ -88,6 +133,7 @@ def parse_prediction_response(response: Dict[Any, Any], method: str) -> Dict[str
     Returns:
         Standardized prediction dictionary
     """
+    # Default values
     parsed = {
         "method": method,
         "class_": 0,  # Default to benign
@@ -95,23 +141,16 @@ def parse_prediction_response(response: Dict[Any, Any], method: str) -> Dict[str
         "distance": None,
     }
 
-    # Handle different response formats based on method
-    if method.lower() == "visualphish":
-        # VisualPhish response format
-        if "prediction" in response:
-            parsed["class_"] = 1 if response["prediction"] == "phishing" else 0
-        if "distance" in response:
-            parsed["distance"] = float(response["distance"])
-        if "target" in response:
-            parsed["target"] = response["target"]
+    # Method-specific parsers
+    parsers = {
+        "visualphish": _parse_visualphish_response,
+        "phishpedia": _parse_phishpedia_response,
+        "baseline": _parse_baseline_response,
+    }
 
-    elif method.lower() == "phishpedia":
-        # Phishpedia response format
-        if "result" in response:
-            parsed["class_"] = 1 if response["result"] == "phish" else 0
-        if "confidence" in response:
-            parsed["distance"] = float(response["confidence"])
-        if "brand" in response:
-            parsed["target"] = response["brand"]
+    # Get the appropriate parser and update the parsed response
+    parser = parsers.get(method.lower())
+    if parser:
+        parsed.update(parser(response))
 
     return parsed

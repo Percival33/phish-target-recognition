@@ -1,5 +1,12 @@
 # Phishing Target Recognition
 
+![Project overview](docs/img.png)
+
+This project is a system designed to compare various phishing detection methods on visual data. It was developed as part of a bachelor's thesis on Warsaw University of Technology. Methods implemented are:
+- [Phishpedia](https://github.com/lindsey98/Phishpedia) - CNN model for phishing detection based on logo
+- [VisualPhish](https://github.com/S-Abdelnabi/VisualPhishNet) - deep learning model for phishing detection based on visual features
+- Baseline - perceptual hashing and similarity search
+
 <!-- TOC -->
 * [Phishing Target Recognition](#phishing-target-recognition)
   * [Prerequisites](#prerequisites)
