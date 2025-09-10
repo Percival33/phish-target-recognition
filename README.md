@@ -2,13 +2,20 @@
 
 ![Project overview](docs/img.png)
 
-This project is a system designed to compare various phishing detection methods on visual data. It was developed as part of a bachelor's thesis on Warsaw University of Technology. Methods implemented are:
-- [Phishpedia](https://github.com/lindsey98/Phishpedia) - CNN model for phishing detection based on logo
-- [VisualPhish](https://github.com/S-Abdelnabi/VisualPhishNet) - deep learning model for phishing detection based on visual features
-- Baseline - perceptual hashing and similarity search
+> [!NOTE]
+> **TLDR**
+> This project is a system designed to compare various phishing detection methods on visual data. It was developed as part of a bachelor's thesis on Warsaw University of Technology. Methods implemented are:
+> - [Phishpedia](https://github.com/lindsey98/Phishpedia) - CNN model for phishing detection based on logo
+> - [VisualPhish](https://github.com/S-Abdelnabi/VisualPhishNet) - deep learning model for phishing detection based on visual features
+> - Baseline - perceptual hashing and similarity search
+>
+> A summary of all evaluation runs can be found in [EVALUATION_RESULTS.md](EVALUATION_RESULTS.md).
 
+## Table of Contents
 <!-- TOC -->
 * [Phishing Target Recognition](#phishing-target-recognition)
+  * [Table of Contents](#table-of-contents)
+  * [Technologies Used](#technologies-used)
   * [Prerequisites](#prerequisites)
   * [Quickstart](#quickstart)
     * [1) Prepare your CSV (if using your own dataset)](#1-prepare-your-csv-if-using-your-own-dataset)
@@ -24,6 +31,30 @@ This project is a system designed to compare various phishing detection methods 
     * [Notes](#notes)
     * [Useful scripts](#useful-scripts)
 <!-- TOC -->
+
+## Technologies Used
+
+This project is built with a modern Python stack, leveraging the following key technologies:
+
+- **Programming Language**:
+  - Python 3.9
+
+- **Machine Learning & Data Processing**:
+  - PyTorch
+  - scikit-learn
+  - NumPy & Pandas
+  - Pillow (PIL)
+  - FAISS
+
+- **API & Web Interface**:
+  - FastAPI
+  - Streamlit
+  - Docker
+
+- **Development & Tooling**:
+  - uv
+  - just
+  - WandB
 
 ## Prerequisites
 
