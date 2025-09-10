@@ -49,8 +49,8 @@ class BaselineServing(ModelServing):
         """Startup logic - load FAISS index and target mappings"""
         logger.info("Starting up BaselineServing...")
 
-        index_path = Path("/code/index/faiss_index.idx")
-        metadata_path = index_path.with_suffix(".csv")
+        index_path = Path("/code/index/index.faiss")
+        metadata_path = Path("/code/index/index.csv")
 
         self.embedder = BaselineEmbedder(
             index_path=index_path, metadata_path=metadata_path
