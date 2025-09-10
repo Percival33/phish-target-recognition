@@ -1,4 +1,4 @@
-from tools.ModelServing import ModelServing
+from tools.ModelServing import ModelServing, PredictResponse
 from phishpedia import PhishpediaWrapper
 
 
@@ -24,12 +24,12 @@ class PhishpediaServing(ModelServing):
             logo_match_time,
         ) = self.phishpedia.test_orig_phishpedia(url, None, None, img, None)
 
-        return {
-            "url": str(url),
-            "class": int(phish_category),
-            "target": str(pred_target),
-            "confidence": float(siamese_conf),
-        }
+        return PredictResponse(
+            url=str(url),
+            class_=int(phish_category),
+            target=str(pred_target),
+            confidence=float(siamese_conf),
+        )
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""

@@ -66,10 +66,10 @@ services:
     environment:
       - PORT=${BS_PORT:-8888}
       - PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR:-/code}
-      - DISTANCE_THRESHOLD=${DISTANCE_THRESHOLD:1}
+      - DISTANCE_THRESHOLD=${DISTANCE_THRESHOLD:-8.0}
     volumes:
-      - ./data/processed/baseline/faiss_index.idx:/code/index/faiss_index.idx
-      - ./data/processed/baseline/faiss_index.csv:/code/index/faiss_index.csv
+      - ./src/models/baseline/index.faiss:/code/index/index.faiss
+      - ./src/models/baseline/index.csv:/code/index/index.csv
 
 networks:
   net:

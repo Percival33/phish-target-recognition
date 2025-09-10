@@ -20,6 +20,69 @@ def get_image_base64(file):
     return base64_str
 
 
+def display_single_result(result, model_name):
+    """Display a single model result in a clean format."""
+
+    # Show overall prediction
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        # Determine if it's phishing based on class
+        is_phishing = result.get("class") == 1
+        status = "🚨 PHISHING" if is_phishing else "✅ BENIGN"
+        st.markdown(f"### {status}")
+
+    with col2:
+        target = result.get("target", "Unknown")
+        if target and target.lower() != "unknown":
+            st.markdown(f"**Target Brand:** {target}")
+        else:
+            st.markdown("**Target Brand:** Not detected")
+
+    with col3:
+        # Show confidence/distance
+        if "confidence" in result:
+            confidence = result.get("confidence")
+            if confidence is not None:
+                st.markdown(f"**Confidence:** {confidence:.2%}")
+            else:
+                st.markdown("**Confidence:** Not available")
+        elif "distance" in result:
+            distance = result.get("distance")
+            if distance is not None:
+                st.markdown(f"**Distance:** {distance:.4f}")
+            else:
+                st.markdown("**Distance:** Not available")
+
+    # Detailed results in expandable section
+    with st.expander("View Detailed Results", expanded=False):
+        # Create a clean DataFrame
+        display_data = {}
+
+        for key, value in result.items():
+            # Format the key for better display
+            formatted_key = key.replace("_", " ").title()
+
+            # Format specific values
+            if key == "class":
+                display_data["Classification"] = "Phishing" if value == 1 else "Benign"
+            elif key == "confidence" and value is not None:
+                display_data[formatted_key] = f"{value:.2%}"
+            elif key == "distance" and value is not None:
+                display_data[formatted_key] = f"{value:.6f}"
+            elif key == "confidence" and value is None:
+                display_data[formatted_key] = "Not available"
+            elif key == "distance" and value is None:
+                display_data[formatted_key] = "Not available"
+            elif value is not None:
+                display_data[formatted_key] = str(value)
+
+        # Display as a nice table
+        df = pd.DataFrame([display_data]).T
+        df.columns = ["Value"]
+        st.dataframe(df, use_container_width=True)
+
+
 # Function to analyze image
 def analyze_image():
     st.session_state.processing = True
@@ -34,9 +97,9 @@ def analyze_image():
             "http://localhost:8000/predict",
             headers={
                 "accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
-            data={"image": base64_image, "url": st.session_state.url_input},
+            json={"image": base64_image, "url": st.session_state.url_input},
         )
 
         if response.status_code == 200:
@@ -117,61 +180,58 @@ if st.session_state.results:
     # Results Section with cleaner layout
     st.write("## Analysis Results")
 
-    # Handle the array of results from the API
-    if isinstance(st.session_state.results, list):
-        models = ["VisualPhish", "Phishpedia"]
+    # Extract results from API response
+    api_response = st.session_state.results
 
-        # Create tabs for different results
-        tabs = st.tabs(
-            [
-                models[i] if i < len(models) else f"Model {i + 1}"
-                for i in range(len(st.session_state.results))
-            ]
+    # Show request ID if available
+    if isinstance(api_response, dict) and "request_id" in api_response:
+        st.caption(f"Request ID: `{api_response['request_id']}`")
+        # Add a clickable link to view prediction details
+        st.markdown(
+            f"[View Prediction Details](http://localhost:8000/predictions/{api_response['request_id']})"
         )
 
-        for i, (tab, result) in enumerate(zip(tabs, st.session_state.results)):
-            with tab:
-                # Display key metrics in an easy-to-read format
-                metric_cols = st.columns(3)
-
-                with metric_cols[0]:
-                    st.metric("Target", result.get("target", "Unknown"))
-
-                with metric_cols[1]:
-                    if "confidence" in result:
-                        st.metric("Confidence", f"{result.get('confidence', 0):.2f}")
-                    elif "distance" in result:
-                        st.metric("Distance", f"{result.get('distance', 0):.2f}")
-
-                with metric_cols[2]:
-                    st.metric("Class", result.get("class", "N/A"))
-
-                # Convert result to DataFrame for table display
-                df = pd.DataFrame([result])
-
-                # Rename columns for better display
-                column_renames = {
-                    "url": "URL",
-                    "class": "Class",
-                    "target": "Target",
-                    "distance": "Distance",
-                    "confidence": "Confidence",
-                }
-                df = df.rename(
-                    columns={k: v for k, v in column_renames.items() if k in df.columns}
-                )
-
-                # Display result as table
-                st.write("#### Detailed Results:")
-                st.dataframe(df, use_container_width=True)
-
-    elif isinstance(st.session_state.results, dict):
-        # Display dictionary results as table
-        df = pd.DataFrame([st.session_state.results])
-        st.dataframe(df, use_container_width=True)
+    # Get the actual results array
+    results_array = []
+    if isinstance(api_response, dict) and "results" in api_response:
+        results_array = api_response["results"]
+    elif isinstance(api_response, list):
+        results_array = api_response
     else:
-        # Fallback for other result types
-        st.write(st.session_state.results)
+        # Fallback - show raw response
+        st.json(api_response)
+        st.stop()
+
+    # Check if we have results to display
+    if not results_array:
+        st.info("No results returned from the models.")
+        st.stop()
+
+    # Sort results to have a consistent order of tabs
+    results_array.sort(key=lambda x: x.get("method", "unknown"))
+
+    # Create tabs for different model results
+    tab_names = [
+        result.get("method", f"Model {i + 1}").replace("_", " ").title()
+        for i, result in enumerate(results_array)
+    ]
+
+    if len(results_array) == 1:
+        # Single result - no tabs needed
+        result = results_array[0]
+        model_name = result.get("method", "Model").replace("_", " ").title()
+        display_single_result(result, model_name)
+    else:
+        # Multiple results - use tabs
+        tabs = st.tabs(tab_names)
+
+        for i, (tab, result) in enumerate(zip(tabs, results_array)):
+            with tab:
+                model_name = (
+                    result.get("method", f"Model {i + 1}").replace("_", " ").title()
+                )
+                display_single_result(result, model_name)
+
 
 # Simple footer
 st.caption("Created with Streamlit")

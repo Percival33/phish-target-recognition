@@ -2,32 +2,22 @@
 
 A fast baseline phishing detection service using perceptual hashing and similarity search for phishing target recognition.
 
-## 🚀 Quick Start - What Do You Want To Do?
+## Quick start
 
-### 🎯 **Path A: Cross-Validation Evaluation (Recommended)**
-- Use with the main project's cross-validation workflow
-- Automatically handled by main evaluation pipeline
-- **[Go to: Cross-Validation Usage](#cross-validation-usage)**
-
-### 🎯 **Path B: Quick Testing**
-- Test baseline on provided datasets quickly
-- Compare benign vs phishing images
-- **[Go to: Quick Testing](#quick-testing)**
-
-### 🎯 **Path C: Custom Dataset**
-- Use your own images for baseline evaluation
-- **[Go to: Custom Dataset Usage](#custom-dataset-usage)**
+- Cross-validation: see [Cross-Validation Usage](#cross-validation-usage)
+- Quick testing: see [Quick Testing](#quick-testing)
+- Custom dataset: see [Custom Dataset Usage](#custom-dataset-usage)
 
 ---
 
 ## How It Works
 
 The baseline model uses:
-- **Perceptual hashing**: Creates fingerprints of images that are similar for visually similar images
-- **FAISS similarity search**: Fast nearest-neighbor search to find matching images
-- **Distance threshold**: Images below threshold distance are considered matches
+- perceptual hashing to fingerprint images
+- FAISS for nearest-neighbor search
+- a distance threshold to classify matches
 
-**Key insight**: Phishing pages often visually copy legitimate pages, so similar perceptual hashes indicate potential phishing.
+Phishing pages often copy legitimate pages; similar perceptual hashes indicate potential phishing.
 
 ---
 
@@ -72,11 +62,6 @@ uv run load.py \
     --log
 ```
 
-**What this does:**
-- Processes all benign images in `trusted_list/`
-- Creates perceptual hash embeddings
-- Saves FAISS index for fast similarity search
-- Marks all images as benign (`true_class = 0`)
 
 ### Step 3: Test Against Phishing Images
 
@@ -93,20 +78,12 @@ uv run query.py \
     --log
 ```
 
-**What this does:**
-- Tests phishing images against the benign index
-- Images with distance < 0.5 are flagged as "similar to benign" (potential false negatives)
-- Images with distance ≥ 0.5 are correctly identified as "different from benign"
-- Results saved to CSV with performance metrics
 
 ### Step 4: Check Results
 
 ```bash
 # View results
 head -20 "$PROJECT_ROOT_DIR/logs/baseline/phishing_vs_benign_results.csv"
-
-# Check performance summary (if available)
-tail -10 "$PROJECT_ROOT_DIR/logs/baseline/phishing_vs_benign_results.csv"
 ```
 
 ---
