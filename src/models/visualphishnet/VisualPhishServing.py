@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from skimage.transform import resize
-from tools.ModelServing import ModelServing
+from tools.ModelServing import ModelServing, PredictResponse
 
 from eval_new import find_names_min_distances
 from Evaluate import Evaluate
@@ -34,15 +34,60 @@ class VisualPhishServing(ModelServing):
             idx, values = Evaluate.find_min_distances(np.ravel(distances_to_target), 1)
             names_min_distance, only_names, min_distances = find_names_min_distances(idx, values, self.all_file_names)
 
+        # Handle case where min_distances or only_names might be None
+        if min_distances is None:
+            min_distances = float("inf")
+
+        if only_names is None or len(only_names) == 0:
+            only_names = ["unknown"]
+
         cls = 1 if float(min_distances) <= self.args.threshold else 0
         target = str(only_names[0]) if cls else "unknown"
 
-        return {
-            "url": str(url),
-            "class": cls,
-            "target": target,
-            "distance": float(min_distances),
-        }
+        # Debug logging
+        print(f"Prediction values - cls: {cls} (type: {type(cls)}), target: {target}, distance: {min_distances}")
+
+        # Ensure cls is an integer and target is a string
+        cls = int(cls)
+        target = str(target)
+        distance_val = float(min_distances)
+
+        # Validate all required values before creating response
+        if url is None:
+            url = "unknown"
+        if cls not in [0, 1]:
+            cls = 0  # Default to benign if invalid
+        if not target or target == "":
+            target = "unknown"
+
+        print(f"Creating PredictResponse with - url: {url}, class_: {cls}, target: {target}, distance: {distance_val}")
+
+        # Create PredictResponse with proper constructor
+        # Note: PredictResponse uses 'class_' as field name but 'class' as JSON alias
+        try:
+            response = PredictResponse(
+                **{
+                    "url": str(url),
+                    "class": cls,
+                    "target": target,
+                    "distance": distance_val,
+                    "confidence": None,  # VisualPhish doesn't use confidence
+                }
+            )
+            print("Successfully created PredictResponse")
+            return response
+        except Exception as e:
+            print(f"Error creating PredictResponse: {e}")
+            print(f"Exception details: {type(e).__name__}: {str(e)}")
+
+            # Fallback with minimal required fields
+            try:
+                minimal_response = PredictResponse(url=str(url), class_=0, target="unknown")
+                print("Minimal response worked!")
+                return minimal_response
+            except Exception as e2:
+                print(f"Even minimal response failed: {e2}")
+                raise e2
 
     async def on_startup(self):
         """Startup logic (e.g., loading resources)"""

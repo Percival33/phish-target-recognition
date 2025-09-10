@@ -421,7 +421,7 @@ class BaselineEmbedder:
             return {"error": "Invalid input type"}
 
         try:
-            query_hash = self.hasher.compute_array(image)
+            query_hash = self.hasher.compute(image)
             query_vector = self.hasher.string_to_vector(query_hash)
 
             # Use appropriate data type based on hasher type

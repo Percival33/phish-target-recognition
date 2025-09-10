@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import os
 import base64
 import numpy as np
 import cv2
+from typing import Optional
 
 
 class PredictRequest(BaseModel):
@@ -13,8 +14,28 @@ class PredictRequest(BaseModel):
     image: str
 
 
+class PredictResponse(BaseModel):
+    """Unified response model for all model serving classes"""
+
+    url: str = Field(description="The URL that was analyzed")
+    class_: int = Field(
+        alias="class", description="Classification result: 0 for benign, 1 for phishing"
+    )
+    target: str = Field(description="Predicted target/brand name")
+    confidence: Optional[float] = Field(
+        None, description="Confidence score (used by Phishpedia)"
+    )
+    distance: Optional[float] = Field(
+        None, description="Distance metric (used by VisualPhish and Baseline)"
+    )
+
+    class Config:
+        populate_by_name = True
+        json_encoders = {float: lambda v: v if v != float("inf") else None}
+
+
 class ModelServing(ABC):
-    def __init__(self, port=None):
+    def __init__(self, port=None) -> None:
         self.port = port if port is not None else int(os.getenv("PORT", 8888))
         self.app = FastAPI()
 
@@ -30,11 +51,11 @@ class ModelServing(ABC):
         # Register routes - this lets subclasses define their own implementations
         self.register_routes()
 
-    def register_routes(self):
+    def register_routes(self) -> None:
         """Register routes for the FastAPI application"""
 
-        @self.app.post("/predict")
-        async def predict_route(request_data: PredictRequest):
+        @self.app.post("/predict", response_model=PredictResponse)
+        async def predict_route(request_data: PredictRequest) -> PredictResponse:
             try:
                 url = request_data.url
                 image_str = request_data.image
@@ -84,6 +105,7 @@ class ModelServing(ABC):
             }
             try:
                 result = await self.predict(prediction_data)
+                # The result should already be a PredictResponse from the subclass implementation
                 return result
             except Exception as e:
                 print(f"Error in prediction: {str(e)}")
@@ -91,21 +113,21 @@ class ModelServing(ABC):
                     status_code=500, detail=f"Prediction failed: {str(e)}"
                 )
 
-    async def on_startup(self):
+    async def on_startup(self) -> None:
         """Startup logic (e.g., loading resources)"""
         print("Starting up...")
 
-    async def on_shutdown(self):
+    async def on_shutdown(self) -> None:
         """Shutdown logic (e.g., cleaning up resources)"""
         print("Shutting down...")
 
-    def run(self):
+    def run(self) -> None:
         """Run the FastAPI application"""
         import uvicorn
 
         uvicorn.run(self.app, host="0.0.0.0", port=self.port)
 
     @abstractmethod
-    async def predict(self, data: dict):
+    async def predict(self, data: dict) -> PredictResponse:
         """Abstract method that subclasses must implement"""
         pass
