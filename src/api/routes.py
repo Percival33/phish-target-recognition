@@ -161,7 +161,7 @@ async def get_predictions(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error getting predictions: {e}")
 
 
-@router.get("/prediction/{x}", response_model=PredictionResponse)
+@router.get("/prediction/{prediction_id}", response_model=PredictionResponse)
 async def get_prediction(prediction_id: int, db: Session = Depends(get_db)):
     """Get a specific prediction by ID."""
     try:
