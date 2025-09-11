@@ -35,11 +35,9 @@ def process_and_evaluate(
         out_dir: Optional output directory to save results
     """
     try:
-        # Load the CSV file
         logger.info(f"Loading results from {csv_path}")
         df = pd.read_csv(csv_path)
 
-        # Validate required columns
         required_columns = [
             "baseline_class",
             "baseline_target",
@@ -55,7 +53,6 @@ def process_and_evaluate(
         logger.info(f"Loaded {len(df)} records")
         logger.info(f"Columns: {df.columns.tolist()}")
 
-        # Check for NaN values in critical class columns before processing
         critical_columns = [
             "baseline_class",
             "true_class",
@@ -79,7 +76,6 @@ def process_and_evaluate(
             targets_pred=df["baseline_target"],
         )
 
-        # Output metrics in a user-friendly format
         print("\n" + "=" * 50)
         print("BASELINE MODEL EVALUATION RESULTS")
         print("=" * 50)
@@ -94,11 +90,9 @@ def process_and_evaluate(
         for metric_name, value in target_metrics.items():
             print(f"{metric_name:20}: {value:.4f}")
 
-        # Save results if output directory is specified
         if out_dir:
             save_results(out_dir, class_metrics, target_metrics, df, csv_path.stem)
 
-        # Plot ROC curve if requested
         if plot_roc:
             logger.info("Generating ROC curve...")
             plot_roc_curve(df["true_class"], df["baseline_class"], out_dir)
@@ -129,7 +123,6 @@ def save_results(
     """
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Save metrics as JSON
     metrics_data = {
         "run_name": run_name,
         "class_metrics": class_metrics,
@@ -146,12 +139,10 @@ def save_results(
         json.dump(metrics_data, f, indent=2)
     logger.info(f"Saved metrics to: {metrics_file}")
 
-    # Save detailed results CSV
     results_file = out_dir / f"{run_name}_detailed_results.csv"
     df.to_csv(results_file, index=False)
     logger.info(f"Saved detailed results to: {results_file}")
 
-    # Save summary metrics as CSV for easy comparison
     summary_data = []
     for metric_name, value in class_metrics.items():
         summary_data.append(
@@ -178,11 +169,9 @@ def plot_roc_curve(y_true, y_pred, out_dir: Path = None):
         out_dir: Optional output directory to save the plot
     """
     try:
-        # Calculate ROC curve
         fpr, tpr, _ = roc_curve(y_true, y_pred)
         auc_score = roc_auc_score(y_true, y_pred)
 
-        # Create the plot
         plt.figure(figsize=(8, 6))
         plt.plot(
             fpr,
@@ -210,7 +199,6 @@ def plot_roc_curve(y_true, y_pred, out_dir: Path = None):
 
         plt.tight_layout()
 
-        # Save plot if output directory is provided
         if out_dir:
             out_dir.mkdir(parents=True, exist_ok=True)
             plot_file = out_dir / "roc_curve.png"
@@ -242,7 +230,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Convert to Path object and validate
     csv_path = Path(args.csv_path)
     if not csv_path.exists():
         logger.error(f"CSV file not found: {csv_path}")
@@ -252,13 +239,11 @@ def main():
         logger.error(f"File must be a CSV file: {csv_path}")
         sys.exit(1)
 
-    # Handle output directory
     out_dir = None
     if args.out:
         out_dir = Path(args.out)
         logger.info(f"Results will be saved to: {out_dir}")
 
-    # Run the evaluation
     process_and_evaluate(csv_path, args.plot, out_dir)
 
 

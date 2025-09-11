@@ -36,16 +36,12 @@ def estimate_distribution_params_from_histogram(bins, hist_density):
     try:
         stats = _get_scipy_stats()
 
-        # Calculate bin centers
         bin_centers = (bins[:-1] + bins[1:]) / 2
 
-        # Create sample data by repeating bin centers according to density
-        # Convert density to approximate counts for sampling
         bin_widths = np.diff(bins)
-        approx_counts = hist_density * bin_widths * 10000  # Scale factor for sampling
+        approx_counts = hist_density * bin_widths * 10000
         approx_counts = np.maximum(approx_counts, 0).astype(int)
 
-        # Create synthetic data points
         sample_data = []
         for center, count in zip(bin_centers, approx_counts):
             sample_data.extend([center] * count)
@@ -53,7 +49,6 @@ def estimate_distribution_params_from_histogram(bins, hist_density):
         if len(sample_data) < 2:
             return None, None
 
-        # Fit normal distribution
         sample_array = np.array(sample_data)
         mu, sigma = stats.norm.fit(sample_array)
 
@@ -80,11 +75,9 @@ def parse_args() -> argparse.Namespace:
 def load_hist_json(path: Path) -> dict:
     with open(path, "r") as f:
         data = json.load(f)
-    # Required keys
     bins = np.asarray(data["bins"], dtype=float)
     hist_benign = np.asarray(data["hist_benign_density"], dtype=float)
     hist_phish = np.asarray(data["hist_phish_density"], dtype=float)
-    # Optional keys
     x_range = (
         np.asarray(data.get("x_range", []), dtype=float)
         if data.get("x_range") is not None
@@ -101,7 +94,6 @@ def load_hist_json(path: Path) -> dict:
         else None
     )
     optimal_threshold = data.get("optimal_threshold")
-    # Distribution parameters for legend
     benign_mu = data.get("benign_mu")
     benign_sigma = data.get("benign_sigma")
     phish_mu = data.get("phish_mu")
@@ -135,7 +127,6 @@ def plot_one(ax, payload: dict, title: str) -> None:
     phish_mu = payload["phish_mu"]
     phish_sigma = payload["phish_sigma"]
 
-    # If distribution parameters are not available, estimate them from histogram data
     if benign_mu is None or benign_sigma is None:
         benign_mu, benign_sigma = estimate_distribution_params_from_histogram(
             bins, hist_benign
@@ -145,11 +136,9 @@ def plot_one(ax, payload: dict, title: str) -> None:
             bins, hist_phish
         )
 
-    # Bar positions and widths
     widths = np.diff(bins)
     lefts = bins[:-1]
 
-    # Histograms (densities already provided)
     ax.bar(
         lefts,
         hist_benign,
@@ -171,7 +160,6 @@ def plot_one(ax, payload: dict, title: str) -> None:
         edgecolor="black",
     )
 
-    # Optional PDFs with detailed legend labels (from threshold_optimizer.py)
     def fmt_pl(value, decimals=2):
         """Format numbers with Polish decimal notation."""
         return (f"{value:.{decimals}f}").replace(".", ",")
@@ -183,7 +171,6 @@ def plot_one(ax, payload: dict, title: str) -> None:
         and benign_pdf.size == x_range.size
     ):
         if benign_mu is not None and benign_sigma is not None:
-            # With distribution parameters
             ax.plot(
                 x_range,
                 benign_pdf,
@@ -192,7 +179,6 @@ def plot_one(ax, payload: dict, title: str) -> None:
                 label=f"Dopasowanie nieszkodliwe (μ={fmt_pl(benign_mu, 2)}, σ={fmt_pl(benign_sigma, 2)})",
             )
         else:
-            # Fallback without parameters
             ax.plot(
                 x_range, benign_pdf, "b-", linewidth=2, label="Dopasowanie nieszkodliwe"
             )
@@ -204,7 +190,6 @@ def plot_one(ax, payload: dict, title: str) -> None:
         and phish_pdf.size == x_range.size
     ):
         if phish_mu is not None and phish_sigma is not None:
-            # With distribution parameters
             ax.plot(
                 x_range,
                 phish_pdf,
@@ -213,12 +198,10 @@ def plot_one(ax, payload: dict, title: str) -> None:
                 label=f"Dopasowanie phishingowe (μ={fmt_pl(phish_mu, 2)}, σ={fmt_pl(phish_sigma, 2)})",
             )
         else:
-            # Fallback without parameters
             ax.plot(
                 x_range, phish_pdf, "r-", linewidth=2, label="Dopasowanie phishingowe"
             )
 
-    # Optional optimal threshold
     if optimal_threshold is not None:
         try:
             thr = float(optimal_threshold)
@@ -229,18 +212,15 @@ def plot_one(ax, payload: dict, title: str) -> None:
                 linewidth=2,
                 label="Optymalny próg EER",
             )
-            # Numeric annotation for EER threshold
             ymax = max(
                 float(np.max(hist_benign)) if hist_benign.size else 0.0,
                 float(np.max(hist_phish)) if hist_phish.size else 0.0,
             )
-            # Position text to avoid legend overlap
             text_y = ymax * 0.65 if ymax > 0 else 0.0
 
             def fmt_pl(v, decimals=2):
                 return (f"{v:.{decimals}f}").replace(".", ",")
 
-            # Simple left alignment to match plot_eer_from_json.py behavior
             ax.text(
                 thr,
                 text_y,
@@ -264,7 +244,6 @@ def plot_one(ax, payload: dict, title: str) -> None:
 def main():
     args = parse_args()
 
-    # Use provided folder root or default to ../scripts-data
     if args.folder_root is not None:
         repo_root = args.folder_root
     else:
@@ -294,14 +273,13 @@ def main():
         ax.xaxis.set_major_formatter(comma_formatter_2)
         ax.yaxis.set_major_formatter(comma_formatter_3)
 
-        # Add legend to individual plot
         ax.legend(loc="upper right", fontsize=get_font_size("legend"))
 
         plt.tight_layout()
         out_path = repo_root / filename
         fig.savefig(out_path, dpi=300, bbox_inches="tight", facecolor="white")
         print(f"Zapisano wykres: {out_path}")
-        plt.close(fig)  # Close figure to free memory
+        plt.close(fig)
 
 
 if __name__ == "__main__":

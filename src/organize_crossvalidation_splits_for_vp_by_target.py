@@ -53,20 +53,16 @@ def organize_vp_by_target(
 ) -> None:
     """Create symlinks organized by target from CSV data."""
 
-    # Load and validate CSV
     df = pd.read_csv(csv_path)
     required_cols = {"file", "true_target", "true_class"}
     if missing := required_cols - set(df.columns):
         raise ValueError(f"Missing columns: {missing}")
 
-    # Build domain->label mapping
     domain_to_label = build_inverse_mapping(get_special_domain_mapping())
-    # Add local overrides for domains not in the original mapping
     domain_to_label["miamidade.gov"] = (
         "mdpd"  # Map miamidade.gov to mdpd label (same as mps.it)
     )
 
-    # Setup output directories
     phishing_dir = output_dir / "phishing"
     trusted_dir = output_dir / "trusted_list"
     phishing_dir.mkdir(parents=True, exist_ok=True)
@@ -76,30 +72,25 @@ def organize_vp_by_target(
     trusted_labels = set()
     created, skipped = 0, 0
 
-    # Process rows with optional progress bar
     iterator = df.iterrows()
     if not no_progress and tqdm:
         iterator = tqdm(iterator, total=len(df))
 
     for idx, row in iterator:
-        # Validate source file
         source_path = Path(row["file"]).resolve()
         if not source_path.exists():
             raise FileNotFoundError(f"Row {idx}: File not found: {source_path}")
 
-        # Parse target and get label
         domain, identifier = parse_true_target(row["true_target"])
         if domain not in domain_to_label:
             raise ValueError(f"Row {idx}: Unknown domain: {domain}")
         label = domain_to_label[domain]
 
-        # Choose destination directory
         is_phishing = int(row["true_class"]) == 1
         dest_base = phishing_dir if is_phishing else trusted_dir
         dest_dir = dest_base / label
         dest_dir.mkdir(exist_ok=True)
 
-        # Create symlink
         dest_file = dest_dir / f"{identifier}{source_path.suffix}"
         if dest_file.exists():
             skipped += 1
@@ -107,10 +98,8 @@ def organize_vp_by_target(
             os.symlink(source_path, dest_file)
             created += 1
 
-        # Track labels
         (phishing_labels if is_phishing else trusted_labels).add(label)
 
-    # Write target files
     if phishing_labels:
         (phishing_dir / "targets2.txt").write_text(
             "\n".join(sorted(phishing_labels)) + "\n"

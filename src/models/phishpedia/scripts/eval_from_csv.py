@@ -59,7 +59,6 @@ def evaluate_from_csv(
         print(f"{metric_name:20}: {value:.4f}")
 
     cm = confusion_matrix(df["true_class"], df["pp_class"])
-    # cm = confusion_matrix(df["true_class"], df["pp_class"], labels=[0, 1])
     cm_df = pd.DataFrame(cm, index=["true_0", "true_1"], columns=["pred_0", "pred_1"])
 
     if out_dir:

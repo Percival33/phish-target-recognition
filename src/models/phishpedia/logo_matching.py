@@ -331,16 +331,12 @@ def check_domain_brand_inconsistency(
                 img=img,
             )
 
-            # print(target_this, domain_this, this_conf)
             # domain matcher to avoid FP
             if matched_target and matched_domain:
                 matched_coord = coord
                 matched_domain_parts = [
                     tldextract.extract(x).domain for x in matched_domain
                 ]
-                # matched_suffix_parts = [
-                #     tldextract.extract(x).suffix for x in matched_domain
-                # ]
 
                 # If the webpage domain exactly aligns with the target website's domain => Benign
                 if extracted_domain in matched_domain:
@@ -444,7 +440,6 @@ def get_embedding(img, model, grayscale=False):
     :param grayscale: convert image to grayscale or not
     :return feature embedding of shape (2048,)
     """
-    #     img_size = 224
     img_size = 128
     mean = [0.5, 0.5, 0.5]
     std = [0.5, 0.5, 0.5]
@@ -571,7 +566,7 @@ def pred_brand(
                 predicted_brand = top3_brandlist[j]
                 predicted_domain = top3_domainlist[j]
             else:
-                break  # no hope, do not try other lower rank logos
+                break
 
         ## If there is a prediction, do aspect ratio check
         if predicted_brand is not None:

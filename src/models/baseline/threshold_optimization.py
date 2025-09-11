@@ -33,11 +33,9 @@ def load_validation_data(val_csv_path: str) -> pd.DataFrame:
 
 def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.DataFrame:
     """Match query results with validation data to add true classes and targets."""
-    # Load results and validation data
     results_df = pd.read_csv(results_file)
     val_df = load_validation_data(val_csv_path)
 
-    # Create mapping from new_path to validation info
     val_mapping = {}
     for _, row in val_df.iterrows():
         new_path = row["new_path"]
@@ -46,22 +44,17 @@ def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.Da
             "true_target": row["true_target"],
         }
 
-    # Add true classes and targets to results
     true_classes = []
     true_targets = []
 
     for _, row in results_df.iterrows():
         full_path = row["file"]
 
-        # Extract the relative path suffix that matches new_path in validation data
-        # Look for patterns like "phishing/..." or "trusted_list/..." in the full path
         path_parts = full_path.split("/")
         relative_path = None
 
-        # Find the index of "phishing" or "trusted_list" in the path
         for i, part in enumerate(path_parts):
             if part in ["phishing", "trusted_list"]:
-                # Extract from this part onwards
                 relative_path = "/".join(path_parts[i:])
                 break
 
@@ -79,11 +72,7 @@ def match_results_with_validation(results_file: str, val_csv_path: str) -> pd.Da
                 true_targets.append("benign")
             else:
                 true_classes.append(1)
-                true_targets.append(
-                    baseline_target
-                )  # Use baseline prediction as fallback
-
-    # Add true classes and targets to results dataframe
+                true_targets.append(baseline_target)
     results_df["true_class"] = true_classes
     results_df["true_target"] = true_targets
 
@@ -108,7 +97,6 @@ def run_query_with_threshold(
 
     try:
         print("Processing phishing samples...")
-        # Run query on phishing samples with --unknown flag (blind evaluation)
         phish_cmd = [
             "uv",
             "run",
@@ -132,8 +120,7 @@ def run_query_with_threshold(
             )
             return False
 
-        print("  🔍 Processing benign samples...")
-        # Run query on trusted_list samples with --unknown flag (blind evaluation)
+        print("Processing benign samples...")
         benign_cmd = [
             "uv",
             "run",
@@ -158,19 +145,15 @@ def run_query_with_threshold(
             return False
 
         print("Combining results...")
-        # Combine raw results (without true labels)
         phish_df = pd.read_csv(phish_output)
         benign_df = pd.read_csv(benign_output)
         combined_df = pd.concat([phish_df, benign_df], ignore_index=True)
 
-        # Save raw combined results first
         combined_df.to_csv(combined_output, index=False)
 
-        # Match results with validation data to add true labels
         matched_df = match_results_with_validation(combined_output, val_csv_path)
         matched_df.to_csv(combined_output, index=False)
 
-        # Clean up temporary files
         Path(phish_output).unlink(missing_ok=True)
         Path(benign_output).unlink(missing_ok=True)
 
@@ -211,7 +194,6 @@ def calculate_metrics_from_results(results_file: str) -> tuple:
 
 def main():
     """Main threshold optimization function."""
-    # Parse command line arguments
     parser = argparse.ArgumentParser(
         description="Optimize thresholds for baseline phishing detection"
     )
@@ -237,9 +219,10 @@ def main():
 
     # mean = 7.447219
     # std = 21.387345
+    # max_value = 102.000000
 
     # thresholds = sorted(
-    #     set(range(max(0, int(mean - std)), int(mean + std))) | set(range(0, 100, 10))
+    #     set(range(max(0, int(mean - std)), int(mean + std))) | set(range(0, max_value, 10))
     # )
     thresholds = [7]
     results = []
@@ -250,7 +233,6 @@ def main():
     best_threshold_mcc = None
     best_threshold_target_mcc = None
 
-    # Use parsed arguments
     val_csv_path = args.val_csv
 
     print(
@@ -259,7 +241,6 @@ def main():
     logger.info(f"Starting threshold optimization with thresholds: {thresholds}")
     logger.info(f"Using validation CSV: {val_csv_path}")
 
-    # Change to baseline directory
     baseline_dir = Path(__file__).parent
     os.chdir(baseline_dir)
     logger.info(f"Working directory: {baseline_dir}")
@@ -298,21 +279,15 @@ def main():
             logger.info(
                 f"Threshold {threshold}: F1_weighted={class_metrics['f1_weighted']:.4f}, MCC={class_metrics['mcc']:.4f}, Target MCC={target_metrics['target_mcc']:.4f} Identification Rate={target_metrics['identification_rate']:.4f}"
             )
-
-            # Clean up temporary file
-            # Path(output_file).unlink(missing_ok=True)
         else:
             print(f"Failed to process threshold {threshold}")
             logger.error(f"Skipping threshold {threshold} due to query failure")
 
-    # Save results
     if results:
-        # Save results summary
         results_df = pd.DataFrame(results)
         results_df.to_csv("results_summary.csv", index=False)
         logger.info("Saved results_summary.csv")
 
-        # Save best thresholds
         Path("best_threshold_identification_rate.txt").write_text(
             str(best_threshold_identification_rate)
         )

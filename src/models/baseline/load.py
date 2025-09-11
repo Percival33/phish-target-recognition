@@ -75,7 +75,6 @@ Examples:
 
     args = parser.parse_args()
 
-    # Determine operation mode
     if args.append:
         operation_mode = "append"
     elif args.overwrite:
@@ -97,36 +96,24 @@ Examples:
     metadata_path = index_path.with_suffix(".csv")
     labels_path = Path(args.labels) if args.labels else None
 
-    # Mode-specific path validation
     if operation_mode == "append":
-        # Both index and metadata must exist for append mode
         validate_index_path(index_path, must_exist=True)
         validate_metadata_path(metadata_path, must_exist=True)
         logger.info(
             f"Appending to existing index: {index_path} and metadata: {metadata_path}"
         )
     elif operation_mode == "create":
-        # Both index and metadata must not exist for create mode
         validate_index_path(index_path, must_exist=False, overwrite=False)
         validate_metadata_path(metadata_path, must_exist=False, overwrite=False)
         logger.info(f"Creating new index: {index_path} and metadata: {metadata_path}")
-    else:  # overwrite mode
-        # No validation needed for overwrite - files will be replaced
+    else:
         logger.info(f"Overwriting index: {index_path} and metadata: {metadata_path}")
 
     validate_inputs(images_dir, labels_path)
     image_paths = get_image_paths(images_dir)
 
-    # Prepare true_classes_list based on args.is_phish
     num_images = len(image_paths)
     true_classes_list = [1] * num_images if args.is_phish else [0] * num_images
-
-    # target_labels = load_labels(labels_path)
-    # if target_labels and len(target_labels) != len(image_paths):
-    #     logger.error(
-    #         f"Number of labels ({len(target_labels)}) does not match number of images ({len(image_paths)})"
-    #     )
-    #     sys.exit(1)
 
     embedder = BaselineEmbedder(
         index_path=index_path if operation_mode == "append" else None,
@@ -134,9 +121,7 @@ Examples:
     )
 
     try:
-        # Compute embeddings
         logger.info(
-            # 9363
             f"Processing {len(image_paths)} images with batch size {args.batch_size}"
         )
         _, metadata = embedder.compute_embeddings(
@@ -153,7 +138,6 @@ Examples:
             logger.error("Failed to save metadata")
             sys.exit(1)
 
-        # Log artifacts as wandb artifacts if logging enabled
         if args.log:
             try:
                 logger.info(f"Load results for {len(metadata)} images")
@@ -162,7 +146,6 @@ Examples:
             except Exception as e:
                 logger.warning(f"Failed to log wandb artifacts: {e}")
 
-        # Enhanced logging based on operation mode
         if operation_mode == "append":
             total_images = embedder.index.ntotal if embedder.index else len(metadata)
             logger.info(
@@ -175,7 +158,6 @@ Examples:
                 f"Successfully processed {len(metadata)} images and saved index to {index_path} and metadata to {metadata_path}"
             )
 
-        # Finish wandb run if logging enabled
         if args.log:
             try:
                 wandb.finish()
