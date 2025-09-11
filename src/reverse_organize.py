@@ -34,7 +34,6 @@ def process_domain_folder(
     domain_name, input_dir, output_dir, inverse_mapping, csv_records, dry_run=False
 ):
     """Process a single domain folder and copy its files to the target folder."""
-    # Get target name from domain
     if domain_name not in inverse_mapping:
         raise ValueError(f"Domain '{domain_name}' not found in inverse mapping")
 
@@ -42,7 +41,6 @@ def process_domain_folder(
     input_path = os.path.join(input_dir, domain_name)
     output_path = os.path.join(output_dir, target_name)
 
-    # Get image files from input domain folder
     image_exts = {".jpg", ".jpeg", ".png"}
 
     def is_image(fname):
@@ -56,7 +54,6 @@ def process_domain_folder(
         print(f"No images found in {input_path}")
         return
 
-    # Create output directory if it doesn't exist (only if not dry run)
     if not dry_run:
         os.makedirs(output_path, exist_ok=True)
 
@@ -73,16 +70,13 @@ def process_domain_folder(
         ]
 
         if T_numbers:
-            # All files in a target folder should have the same T number
-            # Verify consistency and use the existing T number
             unique_T = set(T_numbers)
             if len(unique_T) > 1:
                 raise ValueError(
                     f"Inconsistent T numbers found in {output_path}: {unique_T}"
                 )
-            Tnum = T_numbers[0]  # Use existing T number
+            Tnum = T_numbers[0]
 
-            # Find max N for this T number
             N_re = re.compile(rf"^T{Tnum}_(\d+)\.(?:jpg|jpeg|png)$", re.IGNORECASE)
             N_used = [
                 int(m.group(1))
@@ -91,11 +85,9 @@ def process_domain_folder(
             ]
             N_start = max(N_used) + 1 if N_used else 0
         else:
-            # No existing T-numbered files, start with T1
             Tnum = 1
             N_start = 0
 
-    # Process each image
     for idx, imgname in enumerate(input_imgs):
         ext = os.path.splitext(imgname)[1]
         destfname = f"T{Tnum}_{N_start + idx}{ext.lower()}"
@@ -114,7 +106,6 @@ def process_domain_folder(
             shutil.copy2(source_path, dest_path)
             print(f"Copied: {domain_name}/{imgname} -> {target_name}/{destfname}")
 
-        # Add record to CSV data
         csv_records.append(
             {"target": target_name, "input_name": imgname, "output_name": destfname}
         )
@@ -136,21 +127,17 @@ def main():
 
     args = parser.parse_args()
 
-    # Validate input directory
     if not os.path.exists(args.input_dir) or not os.path.isdir(args.input_dir):
         raise FileNotFoundError(
             f"Input directory '{args.input_dir}' does not exist or is not a directory."
         )
 
-    # Build inverse mapping
     forward_mapping = get_special_domain_mapping()
     inverse_mapping = build_inverse_mapping(forward_mapping)
 
-    # Setup CSV file
     csv_file = os.path.join(args.output_dir, "file_operations.csv")
     csv_records = []
 
-    # Get all domain folders in input directory
     domain_folders = [
         d
         for d in os.listdir(args.input_dir)
@@ -161,7 +148,6 @@ def main():
         print(f"No domain folders found in {args.input_dir}")
         return
 
-    # Process each domain folder
     for domain_folder in domain_folders:
         print(f"Processing domain: {domain_folder}")
         try:
@@ -177,7 +163,6 @@ def main():
             print(f"Error: {e}")
             sys.exit(1)
 
-    # Save to CSV (even in dry run mode to preview what would be saved)
     if csv_records:
         if args.dry_run:
             print(
@@ -186,10 +171,8 @@ def main():
         else:
             df = pd.DataFrame(csv_records)
             if os.path.exists(csv_file):
-                # Append to existing CSV
                 df.to_csv(csv_file, mode="a", header=False, index=False)
             else:
-                # Create new CSV with headers
                 df.to_csv(csv_file, index=False)
             print(f"\nRecorded {len(csv_records)} file operations in {csv_file}")
     else:

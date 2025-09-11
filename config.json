@@ -1,68 +1,4 @@
 {
-  "dataset_names": [
-    "VisualPhish"
-  ],
-  "algorithm_names": [
-    "Phishpedia",
-    "VisualPhish",
-    "Baseline"
-  ],
-  "metric_config": {
-    "display_name": "Identification Rate (%)",
-    "python_module_path": "tools.metrics",
-    "metric_function_name": "calculate_metrics",
-    "metric_type": "target_metrics",
-    "metric_name": "identification_rate",
-    "scale_to_percentage": true,
-    "higher_scores_are_better": true
-  },
-  "data_input_config": {
-    "paths_to_csv_files": {
-      "Phishpedia": {
-        "Phishpedia": "logs/phishpedia/ccc.txt",
-        "VisualPhish": "data/results/visualphish_on_phishpedia_data.csv",
-        "Baseline": "data/results/baseline_on_phishpedia_data.csv"
-      },
-      "VisualPhish": {
-        "Phishpedia": "logs/Phishpedia-VisualPhish-dataset-newly-crawled-phishing/20250511_results.csv-2",
-        "VisualPhish": "logs/VisualPhish/results_threshold_8.csv",
-        "Baseline": "data/processed/baseline/new_phishing.csv-2"
-      },
-      "PhishIRIS": {
-        "Phishpedia": "data/results/phishpedia_on_phishiris_data.csv",
-        "VisualPhish": "data/results/visualphish_on_phishiris_data.csv",
-        "Baseline": "data/results/baseline_on_phishiris_data.csv"
-      }
-    },
-    "csv_column_prefixes": {
-      "Phishpedia": "pp",
-      "VisualPhish": "vp",
-      "Baseline": "baseline"
-    },
-    "csv_column_suffixes": {
-      "true_target": "true_target",
-      "true_class": "true_class",
-      "pred_target": "_target",
-      "pred_class": "_class"
-    }
-  },
-  "cross_validation_config": {
-    "enabled": true,
-    "n_splits": 3,
-    "shuffle": true,
-    "random_state": 42,
-    "output_splits_directory": "data_splits",
-    "dataset_image_paths": {
-      "visualphish": {
-        "path": "/home/phish-target-recognition/data/interim/vp-for-vp-pp",
-        "label_strategy": "directory",
-        "target_mapping": {
-          "phishing": "phishing",
-          "benign": "trusted_list"
-        }
-      }
-    }
-  },
   "data_split": {
     "random_state": 42,
     "output_directory": "data_splits",
@@ -85,15 +21,5 @@
         }
       }
     }
-  },
-  "output_config": {
-    "results_directory": "critical_difference_analysis_results",
-    "ranked_table_image_filename": "identification_rate_rankings.png",
-    "critical_difference_plot_filename": "identification_rate_cd_diagram.png",
-    "summary_csv_filename": "identification_rate_summary.csv"
-  },
-  "plot_config": {
-    "cd_test": "nemenyi",
-    "cd_correction": "holm"
   }
 }

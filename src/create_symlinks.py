@@ -26,7 +26,6 @@ def create_symlinks_flat(source_dir, symlink_dir, prefix_folder=False, dry_run=F
     for folder_name in sorted(target_folders):
         folder_path = os.path.join(source_dir, folder_name)
 
-        # Get all image files in the folder
         image_files = [
             f
             for f in os.listdir(folder_path)
@@ -36,7 +35,6 @@ def create_symlinks_flat(source_dir, symlink_dir, prefix_folder=False, dry_run=F
         for image_file in sorted(image_files):
             source_file = os.path.join(folder_path, image_file)
 
-            # Determine symlink name
             if prefix_folder:
                 symlink_name = f"{folder_name}_{image_file}"
             else:
@@ -44,7 +42,6 @@ def create_symlinks_flat(source_dir, symlink_dir, prefix_folder=False, dry_run=F
 
             symlink_path = os.path.join(symlink_dir, symlink_name)
 
-            # Handle naming conflicts
             counter = 1
             original_symlink_name = symlink_name
             while os.path.exists(symlink_path) and not dry_run:
@@ -76,7 +73,6 @@ def create_symlinks_structured(source_dir, symlink_dir, dry_run=False):
     image_exts = {".jpg", ".jpeg", ".png"}
     symlink_count = 0
 
-    # Get all target folders
     target_folders = [
         d for d in os.listdir(source_dir) if os.path.isdir(os.path.join(source_dir, d))
     ]
@@ -88,7 +84,6 @@ def create_symlinks_structured(source_dir, symlink_dir, dry_run=False):
         if not dry_run:
             os.makedirs(symlink_folder, exist_ok=True)
 
-        # Get all image files in the folder
         image_files = [
             f
             for f in os.listdir(source_folder)
@@ -132,7 +127,6 @@ def create_symlinks_numbered(source_dir, symlink_dir, dry_run=False):
     symlink_count = 0
     file_counter = 0
 
-    # Get all target folders
     target_folders = [
         d for d in os.listdir(source_dir) if os.path.isdir(os.path.join(source_dir, d))
     ]
@@ -140,7 +134,6 @@ def create_symlinks_numbered(source_dir, symlink_dir, dry_run=False):
     for folder_name in sorted(target_folders):
         folder_path = os.path.join(source_dir, folder_name)
 
-        # Get all image files in the folder
         image_files = [
             f
             for f in os.listdir(folder_path)
@@ -200,14 +193,12 @@ def main():
 
     args = parser.parse_args()
 
-    # Validate source directory
     if not os.path.exists(args.source_dir) or not os.path.isdir(args.source_dir):
         print(
             f"Error: Source directory '{args.source_dir}' does not exist or is not a directory."
         )
         sys.exit(1)
 
-    # Create symlinks based on mode
     if args.mode == "flat":
         create_symlinks_flat(
             args.source_dir, args.symlink_dir, args.prefix_folder, args.dry_run
