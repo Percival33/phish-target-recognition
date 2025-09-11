@@ -21,18 +21,6 @@ Phishing pages often copy legitimate pages; similar perceptual hashes indicate p
 
 ---
 
-## Cross-Validation Usage
-
-**This is automatically handled** when you run the main project's complete evaluation workflow. The baseline will:
-
-1. **Create index** from training images in each CV split
-2. **Query validation images** against the training index
-3. **Output results** in the format expected by the evaluation system
-
-**No manual intervention needed** - just follow the main README's [Complete Evaluation Workflow](README-user-guide.md#complete-evaluation-workflow).
-
----
-
 ## Quick Testing
 
 Test the baseline quickly on provided datasets:
@@ -247,52 +235,14 @@ ls -la path/to/your/index.faiss
 # Check image directory exists and contains images
 ls -la path/to/images/
 
-# Supported formats: .jpg, .jpeg, .png, .gif, .bmp, .tiff, .webp
+# Supported formats: .jpg, .jpeg, .png
 find path/to/images/ -name "*.jpg" -o -name "*.png"
 ```
-
-**Poor performance**:
-```bash
-# Try different threshold values
-uv run query.py ... --threshold 0.3  # Stricter
-uv run query.py ... --threshold 0.7  # More lenient
-
-# Check if images are actually similar visually
-# Baseline works best when phishing pages copy legitimate designs
-```
-
-**Memory issues**:
-```bash
-# Reduce batch size
-uv run load.py ... --batch-size 128
-uv run query.py ... --batch-size 128
-```
-
-### Performance Expectations
-
-- **Speed**: Very fast (hundreds of images per second)
-- **Memory**: Low memory usage compared to deep learning models
-- **Accuracy**: Good for visually similar phishing pages, limited for sophisticated attacks
-
-### When Baseline Works Well
-
-✅ **Good for**:
-- Phishing pages that copy legitimate page layouts
-- Large-scale screening of similar-looking pages
-- Fast initial filtering before more sophisticated analysis
-
-❌ **Limited for**:
-- Sophisticated phishing with original designs
-- Pages with different layouts but same target brand
-- Text-based phishing detection
-
----
 
 ## Integration with Main Project
 
 The baseline automatically integrates with:
 
-- **Cross-validation**: Handles CV splits automatically
 - **Evaluation pipeline**: Outputs results in expected format
 - **Statistical analysis**: Results included in comparative analysis
 - **Configuration**: Reads settings from main `config.json`
