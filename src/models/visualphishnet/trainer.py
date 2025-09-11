@@ -48,9 +48,7 @@ def train_phase1(run, args):
     X_train_phish = all_imgs_test[idx_train, :]
     y_train_phish = all_labels_test[idx_train, :]
 
-    # create model
     modelHelper = ModelHelper()
-    # with tf.profiler.experimental.Trace("model_loading", step_num=1):
     gpus = 0
     if args.multi_gpu:
         strategy = tf.distribute.MirroredStrategy()
@@ -65,15 +63,12 @@ def train_phase1(run, args):
     logger.info(f"Gpus: {gpus}")
     logger.debug("Model prepared")
 
-    # order random array? -> po co?
     X_test_phish, y_test_phish = data.order_random_array(X_test_phish, y_test_phish, args.num_targets)
     X_train_phish, y_train_phish = data.order_random_array(X_train_phish, y_train_phish, args.num_targets)
     logger.debug("Phishing arrays ordered")
 
-    # labels_start_end_train_phish, labels_start_end_test_p1hish
     labels_start_end_train_phish = data.targets_start_end(args.num_targets, y_train_phish)
     labels_start_end_test_phish = data.targets_start_end(args.num_targets, y_test_phish)
-    # labels_start_end_train_legit
     labels_start_end_train_legit = data.all_targets_start_end(args.num_targets, y_train_legit, logger)
     logger.debug("Targets start and end calculated")
 
@@ -85,7 +80,6 @@ def train_phase1(run, args):
         labels_start_end_train_legit,
     )
     logger.debug("Random sampling initialized")
-    # targets_train = np.zeros([args.batch_size, 1])
     run.log({"lr": args.lr})
     logger.debug(f"Generator items: {data.get_samples_number(args.n_iter, args.batch_size, gpus)}")
 
@@ -139,24 +133,11 @@ def train_phase1(run, args):
         traceback.print_exc()
         logger.error(f"Dataset creation failed: {e}")
 
-    # print(type(dataset))
-
-    # iterator = dataset.as_numpy_iterator()
-    # for _ in range(2):
-    #     inputs, targets = next(iterator)
-    #     logger.debug(f"FIRST Inputs: {len(inputs)}, Targets: {targets.shape}")
-    #     inputs, targets = next(iterator)
-    #     logger.debug(f"SECOND Inputs: {len(inputs)}, Targets: {targets.shape}")
-
-    # training
     logger.info("Starting training process! - phase 1")
 
-    # for i in tqdm(range(1, args.n_iter), desc="Training Iterations", position=0, leave=True):
     for i, (inputs, targets) in enumerate(dataset, start=1):
         logger.debug(f"Iter: {i}")
-        # with tf.profiler.experimental.Trace("next_batch", step_num=i):
         logger.debug(f"Inputs: {len(inputs)}, Targets: {targets.shape}")
-        # with tf.profiler.experimental.Trace("training", step_num=i):
         loss_value = model.train_on_batch(inputs, targets)
 
         if i % 100 == 0:
@@ -166,8 +147,6 @@ def train_phase1(run, args):
         run.log({"loss": loss_value})
 
         if i % args.save_interval == 0:
-            # TODO: log model artifact if better accuracy
-            # with tf.profiler.experimental.Trace("get_acc", step_num=i):
             if i % (3 * args.save_interval) == 0:
                 testResults = modelHelper.get_embeddings(
                     model,
@@ -188,7 +167,6 @@ def train_phase1(run, args):
                 )
 
                 run.log({"acc": acc})
-            # with tf.profiler.experimental.Trace("save_model", step_num=i):
             modelHelper.save_model(model, args.output_dir, args.saved_model_name)
             run.log_model(args.output_dir / f"{args.saved_model_name}.h5")
 
@@ -226,8 +204,6 @@ def train_phase1(run, args):
 
 def train_phase2(run, args):
     logger.info("Trainer phase 2")
-    # TODO: log dataset hash
-    # Initialize variables
     data_path_phish = args.dataset_path / "phishing"
     (
         all_imgs_train,
@@ -241,12 +217,8 @@ def train_phase2(run, args):
 
     X_train_legit = all_imgs_train
     y_train_legit = all_labels_train
-    # Load the same train/split in phase 1
     idx_test = np.load(args.output_dir / "test_idx.npy")
     idx_train = np.load(args.output_dir / "train_idx.npy")
-
-    # X_test_phish = all_imgs_test[idx_test, :]
-    # y_test_phish = all_labels_test[idx_test, :]
 
     X_train_phish = all_imgs_test[idx_train, :]
     y_train_phish = all_labels_test[idx_train, :]
@@ -255,17 +227,14 @@ def train_phase2(run, args):
     targetHelper = TargetHelper(data_path_phish)
 
     modelHelper = ModelHelper()
-    # with tf.profiler.experimental.Trace("model_loading2", step_num=1):
 
     hard_subset_sampling = HardSubsetSampling()
     #########################################################################################
-    n = 1  # number of wrong points
+    n = 1
 
-    # all training images
     X_train = np.concatenate([X_train_legit, X_train_phish])
     y_train = np.concatenate([y_train_legit, y_train_phish])
 
-    # subset training
     X_train_new = np.zeros(
         [
             args.num_targets * 2 * n,
@@ -275,8 +244,6 @@ def train_phase2(run, args):
         ]
     )
     y_train_new = np.zeros([args.num_targets * 2 * n, 1])
-
-    # targets_train = np.zeros([args.batch_size, 1])
 
     logger.info("Starting training process! - phase 2")
     run.log({"lr": args.lr})
@@ -295,7 +262,6 @@ def train_phase2(run, args):
     assert gpus >= 1
     logger.info(f"Gpus: {gpus}")
 
-    # for k in tqdm(range(0, args.num_sets), desc="Sets"):
     for k in range(args.num_sets):
         logger.info(f"Starting a new set! - {k}")
         X_train_legit = all_imgs_train
@@ -307,9 +273,7 @@ def train_phase2(run, args):
         )
         fixed_set = X_train_legit[fixed_set_idx.astype(int), :, :, :]
 
-        # for j in tqdm(range(0, args.iter_per_set), desc="Iterations of set"):
         for j in range(0, args.iter_per_set):
-            # TODO: log iteration to wandb
             model = full_model.layers[3]
             X_train_new, y_train_new, labels_start_end_train = hard_subset_sampling.find_main_train(
                 model=model,
@@ -323,7 +287,6 @@ def train_phase2(run, args):
                 X_train_phish=X_train_phish,
             )
 
-            # for i in tqdm(range(1, args.hard_n_iter), desc="Hard Iterations"):
             def wrapper():
                 return dataset_generator(
                     targetHelper,
@@ -354,8 +317,6 @@ def train_phase2(run, args):
 
             for i, (inputs, targets) in enumerate(phase2_dataset, start=1):
                 total_iterations += 1
-                # with tf.profiler.experimental.Trace("next_batch2", step_num=tot_count):
-                # with tf.profiler.experimental.Trace("training2", step_num=tot_count):
                 loss_iteration = full_model.train_on_batch(inputs, targets)
 
                 if total_iterations % 100 == 0:
@@ -364,8 +325,6 @@ def train_phase2(run, args):
                 run.log({"loss": loss_iteration})
 
                 if total_iterations % (3 * args.save_interval) == 0:
-                    # TODO: log model artifact if better accuracy
-                    # with tf.profiler.experimental.Trace("get_acc2", step_num=i):
                     testResults = modelHelper.get_embeddings(
                         full_model,
                         X_train_legit,
@@ -385,7 +344,6 @@ def train_phase2(run, args):
                     )
 
                     run.log({"acc": acc})
-                    # with tf.profiler.experimental.Trace("save_model2", step_num=i):
                     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
                     run.log_model(args.output_dir / f"{args.new_saved_model_name}.h5")
 
@@ -395,10 +353,6 @@ def train_phase2(run, args):
                     logger.info(f"Learning rate changed to: {args.lr}")
                     run.log({"lr": args.lr})
 
-            # del X_train_new
-            # X_train_new
-            # del y_train_new
-            # del labels_start_end_train
             reset_keras(model)
 
     modelHelper.save_model(full_model, args.output_dir, args.new_saved_model_name)
@@ -430,41 +384,12 @@ def train_phase2(run, args):
 
 def reset_keras(model):
     if hasattr(K, "clear_session"):
-        K.clear_session()  # This is the proper way to reset in TF2.x
+        K.clear_session()
 
-    # try:
-    #     gpus = tf.config.list_physical_devices("GPU")
-    #     for gpu in gpus:
-    #         tf.config.experimental.set_memory_growth(gpu, True)
-    # except:
-    #     # No GPUs available or other error
-    #     pass
-    #
-    #     # Clean up the model
-    # try:
-    #     del model  # this is from global space - change this as you need
-    # except:  # noqa: E722
-    #     pass
-
-    # Force garbage collection
     print(gc.collect())
-
-    # In TF 2.x, GPU memory management is different
-    # Use the following if you need explicit GPU memory management
-    # gpus = tf.config.experimental.list_physical_devices('GPU')
-    # if gpus:
-    #     try:
-    #         # Restrict TensorFlow to only allocate as much GPU memory as needed
-    #         for gpu in gpus:
-    #             tf.config.experimental.set_memory_growth(gpu, True)
-    #     except RuntimeError as e:
-    #         print(e)
 
 
 if __name__ == "__main__":
-    # gpus = tf.config.experimental.list_physical_devices("GPU")
-    # for gpu in gpus:
-    #     tf.config.experimental.set_memory_growth(gpu, True)
     setup_logging()
     logger = logging.getLogger(__name__)
     logger.info("VisualPhish - trainer")
@@ -472,23 +397,15 @@ if __name__ == "__main__":
     tf.keras.utils.set_random_seed(42)
 
     init_parser = ArgumentParser(add_help=False)
-    # TODO: enable wandb sweep
     init_parser.add_argument("--use-sweep", action="store_true", default=False)
     init_args, _ = init_parser.parse_known_args()
 
     if init_args.use_sweep:
-        # TODO: wandb sweep
-        # with open(LOGS_PATH("sweep_config.yaml")) as f:
-        #     sweep_config = yaml.safe_load(f)
-        # sweep_id = wandb.sweep(sweep=sweep_config, project=WANDB_PROJECT)
-        # wandb.agent(sweep_id, function=train, count=12)
         pass
     else:
         parser = ArgumentParser(parents=[init_parser])
-        # Profiling parameters
         parser.add_argument("--logdir", type=Path, default=LOGS_DIR)
         parser.add_argument("--profile-batch", type=int, default=100)
-        # Dataset parameters
         parser.add_argument(
             "--dataset-path",
             type=Path,
@@ -504,14 +421,14 @@ if __name__ == "__main__":
         parser.add_argument("--margin", type=float, default=2.2)
         parser.add_argument("--new-conv-params", default=[5, 5, 512])
         # Training parameters
-        parser.add_argument("--lr", type=float, default=2e-5)  # 0.00002
+        parser.add_argument("--lr", type=float, default=2e-5)
         parser.add_argument("--output-dir", type=Path, default=PROCESSED_DATA_DIR / "VisualPhish")
-        parser.add_argument("--saved-model-name", type=str, default="model")  # from first training
+        parser.add_argument("--saved-model-name", type=str, default="model")
         parser.add_argument("--new-saved-model-name", type=str, default="model2")
-        parser.add_argument("--save-interval", type=int, default=2000)  # 2000
+        parser.add_argument("--save-interval", type=int, default=2000)
         parser.add_argument("--batch-size", type=int, default=32)
-        parser.add_argument("--n-iter", type=int, default=21000)  # p1: 21000, p2: 50000
-        parser.add_argument("--lr-interval", type=int, default=100)  # p1: 100, p2: 250
+        parser.add_argument("--n-iter", type=int, default=21000)
+        parser.add_argument("--lr-interval", type=int, default=100)
         # hard examples training
         parser.add_argument("--num-sets", type=int, default=75)
         parser.add_argument("--iter-per-set", type=int, default=8)
@@ -527,20 +444,7 @@ if __name__ == "__main__":
             tags=["jarvis", "phase-1"],
         )
         try:
-            # debug_dump_dir = args.logdir / "debug_dump"
-            # debug_dump_dir.mkdir(parents=True, exist_ok=True)
-            # tensorboard_callback = tf.keras.callbacks.TensorBoard(
-            #     log_dir=str(args.logdir), profile_batch=args.profile_batch
-            # )
-            # tf.debugging.experimental.enable_dump_debug_info(
-            #     str(debug_dump_dir), tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1
-            # )
-            # options = tf.profiler.experimental.ProfilerOptions(
-            #     host_tracer_level=3, python_tracer_level=1, device_tracer_level=1
-            # )
-            # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase1(run, args)
-            # tf.profiler.experimental.stop()
             run.finish()
             args.lr_interval = 250
             args.lr = 2e-5
@@ -552,18 +456,13 @@ if __name__ == "__main__":
                 config=args,
                 tags=["jarvis", "phase-2"],
             )
-            # artifact = run.use_artifact("jarcin/VisualPhish/run-t7jhr5z6-model.h5:v10", type="model")
-            # artifact_dir = artifact.download(args.output_dir)
 
-            # tf.profiler.experimental.start(str(args.logdir), options=options)
             train_phase2(run, args)
-            # tf.profiler.experimental.stop()
         except Exception as e:
             logger.error(e)
             tb = e.__traceback__
             while tb is not None:
                 logger.error(f"File: {tb.tb_frame.f_code.co_filename}, Line: {tb.tb_lineno}")
                 tb = tb.tb_next
-            # run.save()
         finally:
             run.finish()
