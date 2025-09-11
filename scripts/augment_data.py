@@ -166,7 +166,6 @@ def augment_target_class(
 
         try:
             pil_image = Image.open(orig_file)
-            # Convert RGBA to RGB if needed
             if pil_image.mode == "RGBA":
                 pil_image = pil_image.convert("RGB")
             augmented_pil, params = apply_augmentation(pil_image, aug_type)

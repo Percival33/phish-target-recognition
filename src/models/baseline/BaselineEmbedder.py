@@ -30,7 +30,6 @@ class BaselineEmbedder:
 
         if index_path is not None and index_path.exists():
             try:
-                # Try loading as binary index first, then as regular index
                 try:
                     self.index = faiss.read_index_binary(str(index_path))
                 except:  # noqa: E722
@@ -111,7 +110,6 @@ class BaselineEmbedder:
         try:
             index_path.parent.mkdir(parents=True, exist_ok=True)
 
-            # Use appropriate save method based on index type
             if isinstance(self.index, faiss.IndexBinaryFlat):
                 faiss.write_index_binary(self.index, str(index_path))
             else:
@@ -150,11 +148,9 @@ class BaselineEmbedder:
             )
             return self.index, []
 
-        # Initialize metadata list if index is None (creating new index)
         if self.index is None:
             self.image_metadata = []
 
-        # Track newly processed metadata separately
         new_metadata = []
         batch_embeddings = []
 
@@ -194,14 +190,11 @@ class BaselineEmbedder:
 
                     phash_vector = self.hasher.string_to_vector(phash_str)
 
-                    # Use appropriate data type based on hasher type
                     if isinstance(self.hasher, hashers.PHashF):
-                        # Floating point hash - use float32 for Euclidean distance
                         phash_array = np.array(phash_vector, dtype=np.float32).reshape(
                             1, -1
                         )
                     else:
-                        # Binary hash - pack bits for FAISS binary index
                         phash_array = (
                             np.packbits(phash_vector).astype(np.uint8).reshape(1, -1)
                         )
@@ -214,7 +207,6 @@ class BaselineEmbedder:
                         "true_target": true_target,
                     }
 
-                    # Add to both lists: internal metadata and new metadata
                     self.image_metadata.append(metadata)
                     new_metadata.append(metadata)
                     batch_embeddings.append(phash_array)
@@ -227,12 +219,9 @@ class BaselineEmbedder:
                 if self.index is None:
                     embedding_dim = batch_embeddings[0].shape[1]
 
-                    # Choose index type based on hasher type
                     if isinstance(self.hasher, hashers.PHashF):
-                        # Floating point hash - use Euclidean distance
                         self.index = faiss.IndexFlatL2(embedding_dim)
                     else:
-                        # Binary hash - use Hamming distance (dimension in bits)
                         self.index = faiss.IndexBinaryFlat(embedding_dim * 8)
 
                 embeddings_array = np.vstack(batch_embeddings)
@@ -242,7 +231,6 @@ class BaselineEmbedder:
         if not new_metadata:
             logger.warning("No images were successfully processed")
 
-        # Return only newly processed metadata
         return self.index, new_metadata
 
     def search_similar(
@@ -273,10 +261,6 @@ class BaselineEmbedder:
         if self.index is None:
             logger.error("No index loaded")
             return pd.DataFrame()
-
-        # if true_targets is not None and len(true_targets) != len(query_paths):
-        #     logger.error("Number of true_targets must match number of query paths")
-        #     return pd.DataFrame()
 
         if true_classes is not None and len(true_classes) != len(query_paths):
             logger.error("Number of true_classes must match number of query paths")
@@ -324,7 +308,6 @@ class BaselineEmbedder:
 
                     query_vector = self.hasher.string_to_vector(query_hash)
 
-                    # Use appropriate data type based on hasher type
                     if isinstance(self.hasher, hashers.PHashF):
                         # Floating point hash - use float32 for Euclidean distance
                         query_array = np.array(query_vector, dtype=np.float32).reshape(
@@ -354,18 +337,14 @@ class BaselineEmbedder:
                     closest_idx = int(indices[0])
                     closest_metadata = self.image_metadata[closest_idx]
 
-                    # Apply threshold-based classification if threshold provided
                     if threshold is not None:
                         if closest_distance < threshold:
-                            # Distance < threshold: classify as phishing with closest target
                             baseline_class = 1
                             baseline_target = closest_metadata["true_target"]
                         else:
-                            # Distance >= threshold: classify as benign
                             baseline_class = 0
                             baseline_target = "benign"
                     else:
-                        # No threshold: use closest match class and target
                         baseline_class = closest_metadata["true_class"]
                         baseline_target = closest_metadata["true_target"]
 
@@ -424,7 +403,6 @@ class BaselineEmbedder:
             query_hash = self.hasher.compute(image)
             query_vector = self.hasher.string_to_vector(query_hash)
 
-            # Use appropriate data type based on hasher type
             if isinstance(self.hasher, hashers.PHashF):
                 # Floating point hash - use float32 for Euclidean distance
                 query_array = np.array(query_vector, dtype=np.float32).reshape(1, -1)
@@ -432,10 +410,8 @@ class BaselineEmbedder:
                 # Binary hash - pack bits for FAISS binary index
                 query_array = np.packbits(query_vector).astype(np.uint8).reshape(1, -1)
 
-            # Perform similarity search
             distances, indices = self.index.search(query_array, k)
 
-            # Process results
             matches = []
             for idx, distance in zip(indices[0], distances[0]):
                 match_metadata = self.image_metadata[idx].copy()
@@ -444,7 +420,6 @@ class BaselineEmbedder:
 
             result = {"distances": distances[0].tolist(), "matches": matches}
 
-            # Add binary classification if threshold provided
             if threshold is not None:
                 result["baseline_class"] = 1 if distances[0][0] < threshold else 0
 

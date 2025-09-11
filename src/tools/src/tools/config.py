@@ -1,5 +1,3 @@
-# from pydantic import Field
-# from pydantic_settings import BaseSettings
 import logging
 import logging.config
 import os
@@ -16,8 +14,6 @@ else:
     raise ValueError("PROJECT_ROOT_DIR environment variable not set")
 
 # Paths
-# for idx, x in enumerate(Path(__file__).resolve().parents):
-#     print(f'i: {idx} {x}')
 
 print(PROJ_ROOT)
 DATA_DIR = PROJ_ROOT / "data"
