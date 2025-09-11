@@ -1,17 +1,15 @@
 # External datasets
 
 <!-- TOC -->
-
 * [External datasets](#external-datasets)
-    * [Prerequisites](#prerequisites)
-    * [How to prepare dataset to use Phishpedia model?](#how-to-prepare-dataset-to-use-phishpedia-model)
-        * [Evaluation for Phishpedia](#evaluation-for-phishpedia)
-            * [Preparing Evaluation Data with `organize.py`](#preparing-evaluation-data-with-organizepy)
-        * [Data Preparation for Phishpedia (`organize_by_sample.py`)](#data-preparation-for-phishpedia-organize_by_samplepy)
-            * [CSV File Requirements](#csv-file-requirements)
-    * [How to prepare data for VisualPhish model?](#how-to-prepare-data-for-visualphish-model)
-        * [Data Preparation for VisualPhish (`organize_by_target.py`)](#data-preparation-for-visualphish-organize_by_targetpy)
-
+  * [Prerequisites](#prerequisites)
+  * [How to prepare dataset to use Phishpedia model?](#how-to-prepare-dataset-to-use-phishpedia-model)
+    * [Evaluation for Phishpedia](#evaluation-for-phishpedia)
+      * [Preparing Evaluation Data with `organize.py`](#preparing-evaluation-data-with-organizepy)
+    * [Data Preparation for Phishpedia (`organize_by_sample.py`)](#data-preparation-for-phishpedia-organize_by_samplepy)
+      * [CSV File Requirements](#csv-file-requirements)
+  * [How to prepare data for VisualPhish model?](#how-to-prepare-data-for-visualphish-model)
+    * [Data Preparation for VisualPhish (`organize_by_target.py`)](#data-preparation-for-visualphish-organize_by_targetpy)
 <!-- TOC -->
 
 ## Prerequisites
@@ -26,7 +24,8 @@ All scripts use inline dependency declarations and can be run with `uv run` with
 
 ## How to prepare dataset to use Phishpedia model?
 
-This section covers the different methods for preparing external datasets to work with the Phishpedia model. The choice of method depends on your data format and intended use case.
+This section covers the different methods for preparing external datasets to work with the Phishpedia model. The choice
+of method depends on your data format and intended use case.
 
 ### Evaluation for Phishpedia
 
@@ -69,20 +68,25 @@ input directory.
 > [!IMPORTANT]
 > This step is required only for external datasets. Data from the _Phishpedia_ dataset do not require modification.
 
-The `organize_by_sample.py` script creates a directory structure where each sample (image + metadata) is placed in a separate folder within `phishing` or `trusted_list` directories. This format is required for Phishpedia model training and evaluation.
+The `organize_by_sample.py` script creates a directory structure where each sample (image + metadata) is placed in a
+separate folder within `phishing` or `trusted_list` directories. This format is required for Phishpedia model training
+and evaluation.
 
 #### CSV File Requirements
 
-Before using `organize_by_sample.py`, you need to prepare a CSV file containing your dataset metadata. The CSV file must include the following columns:
+Before using `organize_by_sample.py`, you need to prepare a CSV file containing your dataset metadata. The CSV file must
+include the following columns:
 
 - **`url`** (required): Full URL of the website
 - **`fqdn`** (required): Fully Qualified Domain Name extracted from the URL
 - **`screenshot_object`** (required): Filename or path to the screenshot file
 - **`affected_entity`** (required): Target brand/entity name (e.g., "apple", "paypal")
 - **`screenshot_hash`** (optional): Hash of the screenshot for deduplication
-- **`is_phishing`** (optional): Boolean (1/0 or True/False) indicating if the sample is phishing. Defaults to 1 (phishing) if not provided
+- **`is_phishing`** (optional): Boolean (1/0 or True/False) indicating if the sample is phishing. Defaults to 1 (
+  phishing) if not provided
 
 **Example CSV format:**
+
 ```csv
 url,fqdn,screenshot_object,affected_entity,screenshot_hash,is_phishing
 https://fake-apple.com/login,fake-apple.com,001.png,apple,abc123,1
@@ -98,11 +102,13 @@ uv run src/organize_by_sample.py --csv PATH_TO_CSV_FILE --screenshots PATH_TO_SC
 ```
 
 **Arguments:**
+
 - `--csv`: Path to the CSV file containing your dataset metadata
 - `--screenshots`: Path to the directory containing screenshot files
 - `--output`: Path where the organized dataset structure will be created
 
 **Example:**
+
 ```bash
 uv run src/organize_by_sample.py \
   --csv datasets/my_dataset/metadata.csv \
@@ -112,7 +118,8 @@ uv run src/organize_by_sample.py \
 
 **Generated Data Structure:**
 
-The script creates a directory structure where each sample is placed in a folder named by combining the target and sample ID:
+The script creates a directory structure where each sample is placed in a folder named by combining the target and
+sample ID:
 
 ```
 OUTPUT_DIRECTORY/
@@ -135,17 +142,20 @@ OUTPUT_DIRECTORY/
         └── shot.png
 ```
 
-Each `info.txt` file contains only the URL from the CSV. The script automatically determines whether samples are phishing or trusted based on the `is_phishing` column in the CSV.
+Each `info.txt` file contains only the URL from the CSV. The script automatically determines whether samples are
+phishing or trusted based on the `is_phishing` column in the CSV.
 
 ## How to prepare data for VisualPhish model?
 
 ### Data Preparation for VisualPhish (`organize_by_target.py`)
 
-The `organize_by_target.py` script organizes screenshots into target-based directories, which is the format required by the VisualPhish model. Images are grouped by brand/target rather than by individual samples.
+The `organize_by_target.py` script organizes screenshots into target-based directories, which is the format required by
+the VisualPhish model. Images are grouped by brand/target rather than by individual samples.
 
 **CSV File Requirements:**
 
 The CSV file must contain the same columns as described for Phishpedia:
+
 - **`url`** (required): Full URL of the website
 - **`fqdn`** (required): Fully Qualified Domain Name
 - **`screenshot_object`** (required): Filename or path to the screenshot file
@@ -162,11 +172,13 @@ uv run src/organize_by_target.py --csv PATH_TO_CSV_FILE --screenshots PATH_TO_SC
 ```
 
 **Arguments:**
+
 - `--csv`: Path to the CSV file containing your dataset metadata
 - `--screenshots`: Path to the directory containing screenshot files
 - `--output`: Path where the organized dataset structure will be created
 
 **Example:**
+
 ```bash
 uv run src/organize_by_target.py \
   --csv datasets/my_dataset/metadata.csv \
@@ -176,10 +188,14 @@ uv run src/organize_by_target.py \
 
 **Script Behavior:**
 
-- **Target naming**: Target directory names are created from the `affected_entity` column, converted to lowercase. Empty values become "unknown".
-- **File naming**: Images are renamed using a pattern `T{target_id}_{image_count}.png` where `target_id` is the target's index and `image_count` is incremented for each image of that target.
-- **Automatic separation**: Samples are automatically separated into `phishing` and `trusted_list` directories based on the `is_phishing` column value (defaults to phishing if column is missing).
-- **Target lists**: The script generates `targets2.txt` (phishing targets) and `targets.txt` (trusted targets) files containing alphabetically sorted target names.
+- **Target naming**: Target directory names are created from the `affected_entity` column, converted to lowercase. Empty
+  values become "unknown".
+- **File naming**: Images are renamed using a pattern `T{target_id}_{image_count}.png` where `target_id` is the target's
+  index and `image_count` is incremented for each image of that target.
+- **Automatic separation**: Samples are automatically separated into `phishing` and `trusted_list` directories based on
+  the `is_phishing` column value (defaults to phishing if column is missing).
+- **Target lists**: The script generates `targets2.txt` (phishing targets) and `targets.txt` (trusted targets) files
+  containing alphabetically sorted target names.
 
 **Generated Data Structure:**
 
@@ -205,4 +221,5 @@ OUTPUT_DIRECTORY/
     └── targets.txt       # List of trusted targets: apple, google, etc.
 ```
 
-This structure allows the VisualPhish model to learn target-specific features by having all images of the same brand grouped together.
+This structure allows the VisualPhish model to learn target-specific features by having all images of the same brand
+grouped together.
