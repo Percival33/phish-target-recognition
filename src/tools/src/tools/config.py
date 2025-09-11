@@ -14,7 +14,6 @@ else:
     raise ValueError("PROJECT_ROOT_DIR environment variable not set")
 
 # Paths
-
 print(PROJ_ROOT)
 DATA_DIR = PROJ_ROOT / "data"
 LOGS_DIR = PROJ_ROOT / "logs"

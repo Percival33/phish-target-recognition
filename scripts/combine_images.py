@@ -64,50 +64,42 @@ def load_and_validate_images(image_paths):
 def create_combined_plot(images, titles, layout, output_path):
     """Create combined plot with three subplots."""
 
-    # Configure subplot layout
     if layout == "horizontal":
         rows, cols = 1, 3
         # For horizontal: wider figure to accommodate 3 plots side by side
         figsize = (42, 14)  # 3 * 14 width, 14 height
-    else:  # vertical
+    else:
         rows, cols = 3, 1
         # For vertical: taller figure to accommodate 3 plots stacked
         figsize = (14, 27)  # 14 width, 3 * 9 height
 
     fig, axes = plt.subplots(rows, cols, figsize=figsize)
 
-    # Ensure axes is always a list
     if layout == "horizontal":
         axes_list = axes.flatten() if hasattr(axes, "flatten") else [axes]
     else:
         axes_list = axes.flatten() if hasattr(axes, "flatten") else [axes]
 
     for i, (img, title, ax) in enumerate(zip(images, titles, axes_list)):
-        # Display image
         ax.imshow(img)
         ax.set_title(title, fontsize=get_font_size("title"), weight="bold")
 
-        # Remove axes ticks for cleaner look
         ax.set_xticks([])
         ax.set_yticks([])
 
-        # Keep frame for better separation
         for spine in ax.spines.values():
             spine.set_visible(True)
             spine.set_linewidth(1)
             spine.set_color("black")
 
-    # Adjust layout
     if layout == "horizontal":
         plt.subplots_adjust(wspace=0.1, hspace=0.1)
     else:
         plt.subplots_adjust(wspace=0.1, hspace=0.2)
 
-    # Save with high quality
     plt.savefig(output_path, bbox_inches="tight", dpi=300, facecolor="white")
     print(f"Combined image saved to: {output_path}")
 
-    # Also save individual subplots as separate files if needed
     save_individual_plots(images, titles, output_path)
 
 
@@ -122,11 +114,9 @@ def save_individual_plots(images, titles, base_output_path):
         ax.imshow(img)
         ax.set_title(title, fontsize=get_font_size("title"), weight="bold")
 
-        # Remove axes ticks for cleaner look
         ax.set_xticks([])
         ax.set_yticks([])
 
-        # Keep frame
         for spine in ax.spines.values():
             spine.set_visible(True)
             spine.set_linewidth(1)
@@ -143,22 +133,18 @@ def save_individual_plots(images, titles, base_output_path):
 def main():
     args = parse_args()
 
-    # Convert image paths to Path objects and make them absolute if needed
     image_paths = []
     for img_path in args.images:
         path = Path(img_path)
         if not path.is_absolute():
-            # Check in current directory first, then repo root
             if not path.exists():
                 repo_root_path = Path(__file__).resolve().parents[1] / img_path
                 if repo_root_path.exists():
                     path = repo_root_path
         image_paths.append(path)
 
-    # Load images
     images = load_and_validate_images(image_paths)
 
-    # Create combined plot
     create_combined_plot(images, args.titles, args.layout, args.output)
 
     print(f"\nSuccessfully combined {len(images)} images!")

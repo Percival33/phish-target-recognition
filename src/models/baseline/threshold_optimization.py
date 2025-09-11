@@ -219,7 +219,7 @@ def main():
 
     # mean = 7.447219
     # std = 21.387345
-    # max_value = 21.387345
+    # max_value = 102.000000
 
     # thresholds = sorted(
     #     set(range(max(0, int(mean - std)), int(mean + std))) | set(range(0, max_value, 10))
