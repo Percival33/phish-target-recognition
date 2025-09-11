@@ -72,13 +72,10 @@ def load_target_mappings():
         expanded_mappings = {}
 
         for key, values in original_mappings.items():
-            # Create the full list including the key itself
             all_items = [key] + values
 
-            # Add mapping for the original key
             expanded_mappings[key] = all_items
 
-            # Add mapping for each value as a key
             for value in values:
                 expanded_mappings[value] = all_items
 
@@ -90,11 +87,8 @@ def load_target_mappings():
 
 def sanitize_folder_name(name):
     """Sanitize target name for use as folder name."""
-    # Replace problematic characters with underscores
     sanitized = re.sub(r'[<>:"/\\|?*]', "_", name)
-    # Remove multiple consecutive underscores
     sanitized = re.sub(r"_+", "_", sanitized)
-    # Remove leading/trailing underscores and dots
     sanitized = sanitized.strip("_.")
     return sanitized
 
@@ -105,14 +99,12 @@ def save_visualphish_format(
     """Save images in VisualPhish format using symlinks - trusted_list and phishing folders with target subfolders."""
     sanitized_name = sanitize_folder_name(target_name)
 
-    # Create trusted_list and phishing top-level folders
     trusted_list_dir = Path(output_dir) / "trusted_list"
     phishing_dir = Path(output_dir) / "phishing"
 
     benign_count = 0
     phishing_count = 0
 
-    # Save benign images in trusted_list/target_folder
     if benign_images:
         benign_target_folder = trusted_list_dir / sanitized_name
         benign_target_folder.mkdir(parents=True, exist_ok=True)
@@ -122,14 +114,12 @@ def save_visualphish_format(
                 link_name = f"T{target_num}_{i}.png"
                 link_path = benign_target_folder / link_name
 
-                # Remove existing symlink if it exists
                 if link_path.exists():
                     link_path.unlink()
 
                 os.symlink(str(Path(img_path).absolute()), str(link_path))
                 benign_count += 1
 
-    # Save phishing images in phishing/target_folder
     if phishing_images:
         phishing_target_folder = phishing_dir / sanitized_name
         phishing_target_folder.mkdir(parents=True, exist_ok=True)
@@ -139,7 +129,6 @@ def save_visualphish_format(
                 link_name = f"T{target_num}_{i}.png"
                 link_path = phishing_target_folder / link_name
 
-                # Remove existing symlink if it exists
                 if link_path.exists():
                     link_path.unlink()
 
@@ -185,7 +174,6 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
         print(f"Warning: Phishing directory {phishing_dir} does not exist")
         return image_paths
 
-    # Get all name variants for this target
     search_names = {
         target_name,
         target_name.replace("_", " "),
@@ -195,20 +183,16 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
         target_name.lower().replace(" ", "_"),
     }
 
-    # Add all mapped variants if target is found in mappings
     if target_name in target_mappings:
         search_names.update(target_mappings[target_name])
 
     for search_name in search_names:
-        # Find folders by splitting on '+' and comparing the first part
         for folder in phishing_path.iterdir():
             if folder.is_dir() and "+" in folder.name:
                 # Split folder name on '+' and get the first part (target name)
                 folder_target = folder.name.split("+")[0]
 
-                # Compare with search name (case-insensitive)
                 if folder_target.lower() == search_name.lower():
-                    # Find all image files in the folder
                     for img_file in folder.iterdir():
                         if img_file.is_file() and img_file.suffix.lower() in [
                             ".png",
@@ -223,7 +207,7 @@ def find_phishing_images(target_name, phishing_dir, domain_mapping, target_mappi
                     ):
                         print(f"Warning: No image files found in {folder}")
 
-        if image_paths:  # Found some matches, stop searching
+        if image_paths:
             break
 
     if not image_paths:
@@ -259,9 +243,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Load JSON file and filter phish=true entries
     try:
-        # If path is relative, make it relative to project root
         json_path = Path(args.json_file)
         if not json_path.is_absolute():
             json_path = Path(__file__).parent.parent / json_path
@@ -277,18 +259,14 @@ def main():
         print(f"Error: Invalid JSON in {args.json_file}")
         return 1
 
-    # Load domain mapping
     domain_mapping = load_domain_mapping()
     print(f"Loaded domain mapping with {len(domain_mapping)} entries")
 
-    # Load target mappings
     target_mappings = load_target_mappings()
     print(f"Loaded target mappings with {len(target_mappings)} entries")
 
-    # Create output directory
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
-    # Process each target
     total_benign = 0
     total_phishing = 0
     benign_targets = []
@@ -298,16 +276,13 @@ def main():
         target_name = target["target"]
         print(f"\nProcessing target {i}: {target_name}")
 
-        # Find benign images by domain
         domains = target["domains"].split("\n") if target.get("domains") else []
         benign_images = find_benign_images(domains, args.benign_dir)
 
-        # Find phishing images by target name
         phishing_images = find_phishing_images(
             target_name, args.phishing_dir, domain_mapping, target_mappings
         )
 
-        # Save images in VisualPhish format
         if benign_images or phishing_images:
             benign_count, phishing_count = save_visualphish_format(
                 target_name, i, benign_images, phishing_images, args.output_dir
@@ -315,7 +290,6 @@ def main():
             total_benign += benign_count
             total_phishing += phishing_count
 
-            # Track targets that have images in each category
             if benign_count > 0:
                 benign_targets.append(target_name)
             if phishing_count > 0:
@@ -325,7 +299,6 @@ def main():
         else:
             print(f"  → No images found for {target_name}")
 
-    # Create separate targets.txt files
     if benign_targets:
         trusted_targets_file = Path(args.output_dir) / "trusted_list" / "targets.txt"
         trusted_targets_file.parent.mkdir(parents=True, exist_ok=True)

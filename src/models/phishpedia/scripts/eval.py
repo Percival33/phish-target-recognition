@@ -12,13 +12,11 @@ from sklearn.metrics import roc_curve, roc_auc_score, confusion_matrix
 from tools.config import setup_logging
 from tools.metrics import calculate_metrics
 
-# Colorlog setup for colored logging
 try:
     import colorlog
 
     def setup_colorlog_logging():
         """Setup colorlog with colored output: blue for info, green for debug, yellow for warning, red for error."""
-        # Create a colored formatter
         formatter = colorlog.ColoredFormatter(
             "%(log_color)s%(asctime)s - %(levelname)-8s%(reset)s %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
@@ -32,11 +30,9 @@ try:
             },
         )
 
-        # Get the root logger and clear existing handlers
         root_logger = logging.getLogger()
         root_logger.handlers.clear()
 
-        # Create and configure handler
         handler = colorlog.StreamHandler()
         handler.setFormatter(formatter)
         root_logger.addHandler(handler)
@@ -131,13 +127,6 @@ def process_and_evaluate(
         df = pd.read_csv(path)
 
     # Normalize pp_target: fill missing/None-like with "benign"
-    # if "pp_target" in df.columns:
-    #     s = df["pp_target"].copy()
-    #     s = s.fillna("benign")
-    #     s = s.astype(str).str.strip()
-    #     s = s.replace({"None": "benign", "": "benign", "nan": "benign", "NA": "benign", "N/A": "benign"})
-    #     df["pp_target"] = s
-
     # Optional override of true labels based on flags
     if is_phish and is_benign:
         raise ValueError("Only one of --is-phish or --is-benign can be provided")

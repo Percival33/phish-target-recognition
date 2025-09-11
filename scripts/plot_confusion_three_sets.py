@@ -23,7 +23,6 @@ def parse_args() -> argparse.Namespace:
 
 def load_results(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
-    # Normalize column names across variants
     pred_col = None
     for candidate in ["vp_class", "baseline_class", "pp_class"]:
         if candidate in df.columns:

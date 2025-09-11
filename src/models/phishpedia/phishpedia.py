@@ -9,8 +9,6 @@ from logo_recog import pred_rcnn, vis
 from logo_matching import check_domain_brand_inconsistency
 import wandb
 
-# from text_recog import check_email_credential_taking
-# import pickle
 from tqdm import tqdm
 
 import re
@@ -32,7 +30,7 @@ def result_file_write(
     f.write(folder + "\t")
     f.write(url + "\t")
     f.write(str(phish_category) + "\t")
-    f.write(str(pred_target) + "\t")  # write top1 prediction only
+    f.write(str(pred_target) + "\t")
     f.write(str(matched_domain) + "\t")
     f.write(str(siamese_conf) + "\t")
     f.write(str(round(logo_recog_time, 4)) + "\t")
@@ -61,21 +59,6 @@ class PhishpediaWrapper:
     def _to_device(self):
         self.SIAMESE_MODEL.to(self._DEVICE)
 
-    """Phishpedia"""
-
-    """
-    {
-                "file"
-                "pp_class"
-                "pp_target"
-                "url"
-                "true_class"
-                "true_target"
-                "pp_conf"
-            }
-    """
-
-    # @profile
     def test_orig_phishpedia(self, url, screenshot_path, html_path, img=None, run=None):
         # 0 for benign, 1 for phish, default is benign
         phish_category = 0
@@ -86,7 +69,6 @@ class PhishpediaWrapper:
         logo_match_time = 0
         print("Entering phishpedia")
 
-        ####################### Step1: Logo detector ##############################################
         start_time = time.time()
         pred_boxes = pred_rcnn(
             im_path=screenshot_path, predictor=self.ELE_MODEL, img=img
@@ -97,7 +79,6 @@ class PhishpediaWrapper:
             pred_boxes = pred_boxes.detach().cpu().numpy()
         plotvis = vis(screenshot_path, pred_boxes)
 
-        # If no element is reported
         if pred_boxes is None or len(pred_boxes) == 0:
             print("No logo is detected")
             return (
@@ -111,7 +92,6 @@ class PhishpediaWrapper:
                 logo_match_time,
             )
 
-        ######################## Step2: Siamese (Logo matcher) ########################################
         start_time = time.time()
         pred_target, matched_domain, matched_coord, siamese_conf = (
             check_domain_brand_inconsistency(
@@ -142,28 +122,12 @@ class PhishpediaWrapper:
                 logo_match_time,
             )
 
-        ######################## Step3: Simple input box check ###############
-        # has_input_box = self.simple_input_box_regex(html_path=html_path)
-        # if not has_input_box:
-        # print('No input box')
-        # return phish_category, pred_target, matched_domain, plotvis, siamese_conf, pred_boxes, logo_recog_time, logo_match_time
-        # else:
         print(
             "Match to Target: {} with confidence {:.4f}".format(
                 pred_target, siamese_conf
             )
         )
         phish_category = 1
-        # Visualize, add annotations
-        # cv2.putText(
-        #     plotvis,
-        #     "Target: {} with confidence {:.4f}".format(pred_target, siamese_conf),
-        #     (int(matched_coord[0] + 20), int(matched_coord[1] + 20)),
-        #     cv2.FONT_HERSHEY_SIMPLEX,
-        #     0.8,
-        #     (0, 0, 0),
-        #     2,
-        # )
 
         return (
             phish_category,
@@ -178,17 +142,6 @@ class PhishpediaWrapper:
 
 
 if __name__ == "__main__":
-    """update domain map"""
-    # with open('./lib/phishpedia/models/domain_map.pkl', "rb") as handle:
-    #     domain_map = pickle.load(handle)
-    #
-    # domain_map['weibo'] = ['sina', 'weibo']
-    #
-    # with open('./lib/phishpedia/models/domain_map.pkl', "wb") as handle:
-    #     pickle.dump(domain_map, handle)
-    # exit()
-
-    """run"""
     today = datetime.now().strftime("%Y%m%d")
     run = None
 
@@ -224,11 +177,6 @@ if __name__ == "__main__":
 
         with open(info_path, "r") as file:
             url = file.read()
-
-        # if os.path.exists(result_txt):
-        #     with open(result_txt, "r", encoding="ISO-8859-1") as file:
-        #         if url in file.read():
-        #             continue
 
         _forbidden_suffixes = r"\.(mp3|wav|wma|ogg|mkv|zip|tar|xz|rar|z|deb|bin|iso|csv|tsv|dat|txt|css|log|xml|sql|mdb|apk|bat|exe|jar|wsf|fnt|fon|otf|ttf|ai|bmp|gif|ico|jp(e)?g|png|ps|psd|svg|tif|tiff|cer|rss|key|odp|pps|ppt|pptx|c|class|cpp|cs|h|java|sh|swift|vb|odf|xlr|xls|xlsx|bak|cab|cfg|cpl|cur|dll|dmp|drv|icns|ini|lnk|msi|sys|tmp|3g2|3gp|avi|flv|h264|m4v|mov|mp4|mp(e)?g|rm|swf|vob|wmv|doc(x)?|odt|rtf|tex|wks|wps|wpd)$"
         if re.search(_forbidden_suffixes, url, re.IGNORECASE):

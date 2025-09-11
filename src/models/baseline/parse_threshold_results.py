@@ -31,19 +31,16 @@ def find_best_thresholds(csv_file: str, top_n: int = 3) -> List[Tuple[float, flo
     Returns:
         List of tuples (threshold, target_f1_macro_score)
     """
-    # Read CSV
     df = pd.read_csv(csv_file)
 
     print(f"Loaded {len(df)} rows from {csv_file}")
 
-    # Parse target_metrics and extract target_f1_macro
     results = []
 
     for idx, row in df.iterrows():
         threshold = row["threshold"]
         target_metrics_str = row["target_metrics"]
 
-        # Parse the target_metrics string
         target_metrics = parse_metrics_string(target_metrics_str)
 
         if "target_f1_macro" in target_metrics:
@@ -52,10 +49,8 @@ def find_best_thresholds(csv_file: str, top_n: int = 3) -> List[Tuple[float, flo
         else:
             print(f"Warning: target_f1_macro not found in row {idx}")
 
-    # Sort by target_f1_macro in descending order
     results.sort(key=lambda x: x[1], reverse=True)
 
-    # Return top N results
     return results[:top_n]
 
 

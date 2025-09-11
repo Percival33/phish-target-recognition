@@ -60,15 +60,13 @@ def validate_inputs(
     image_paths = get_image_paths(images_dir)
     num_images = len(image_paths)
 
-    # Create true_classes_list based on flags
     if is_unknown_cli_arg:
-        true_classes_list = None  # This will make search_similar set true_class=None
+        true_classes_list = None
     elif is_phish_cli_arg:
         true_classes_list = [1] * num_images
     else:
         true_classes_list = [0] * num_images
 
-    # Handle true_targets_list (labels)
     true_targets_list = [None] * num_images
 
     if labels_path:
@@ -82,7 +80,6 @@ def validate_inputs(
             )
             true_targets_list = [p.parent.name.split("+")[0] for p in image_paths]
     else:
-        # Default: derive from directory structure
         true_targets_list = [p.parent.name.split("+")[0] for p in image_paths]
 
     return image_paths, true_targets_list, true_classes_list
@@ -139,14 +136,12 @@ def main():
             config=args,
         )
 
-    # Convert paths
     images_dir = Path(args.images)
     index_path = Path(args.index)
     metadata_path = index_path.with_suffix(".csv")
     output_path = Path(args.output)
     labels_path = Path(args.labels) if args.labels else None
 
-    # Validate inputs and get image paths and labels
     image_paths, labels, true_classes = validate_inputs(
         images_dir,
         index_path,
@@ -159,11 +154,9 @@ def main():
         args.unknown,
     )
 
-    # Initialize embedder with existing index
     embedder = BaselineEmbedder(index_path=index_path, metadata_path=metadata_path)
 
     try:
-        # Process queries and get results
         results = embedder.search_similar(
             query_paths=image_paths,
             k=args.top_k,
@@ -177,7 +170,6 @@ def main():
         if args.overwrite:
             results.to_csv(output_path, index=False)
 
-        # Log CSV as wandb artifact if logging enabled
         if args.log:
             try:
                 logger.info(f"Query results for {len(image_paths)} images")
@@ -189,7 +181,6 @@ def main():
             f"Successfully processed {len(image_paths)} queries and saved results to {output_path}"
         )
 
-        # Finish wandb run if logging enabled
         if args.log:
             try:
                 wandb.finish()

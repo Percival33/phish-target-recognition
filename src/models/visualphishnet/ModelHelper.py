@@ -193,7 +193,6 @@ class ModelHelper:
         # Connect the inputs with the outputs
         triplet_net = Model(inputs=[anchor_input, positive_input, negative_input], outputs=diff)
 
-        # return the model
         return triplet_net
 
     @staticmethod

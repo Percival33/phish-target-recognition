@@ -198,7 +198,6 @@ def read_or_load_train_test_idx(dirname, all_imgs_test, all_labels_test, phishin
     return idx_test, idx_train
 
 
-# TODO: rename as it is not clear what it does (contains embeddings and labels only)
 @dataclass
 class TrainResults:
     phish_test_idx: np.ndarray
@@ -238,7 +237,6 @@ def targets_start_end(num_target, labels):
     if not labels[0] == 0:
         start_end_each_target[0, 0] = -1
         start_end_each_target[0, 1] = -1
-    # count_target = 0
     for i in range(1, labels.shape[0]):
         if not labels[i] == prev_target:
             start_end_each_target[int(labels[i - 1]), 1] = int(i - 1)
@@ -280,22 +278,6 @@ def all_targets_start_end(num_target, labels, logger):
 
 # Order random phishing arrays per website (from 0 to 155 target)
 def order_random_array(orig_arr, y_orig_arr, targets):
-    # TODO: remove duplicate with HardSubsetSampling
-
-    # y_flat = y_orig_arr.flatten()
-
-    # Get indices that would sort the array by target
-    # sorted_indices = np.argsort(y_flat)
-
-    # Use advanced indexing to sort both arrays
-    # np_sorted_arr = orig_arr[sorted_indices]
-    # np_y_sorted_arr = y_orig_arr[sorted_indices]
-
-    # Verify that all targets are present and properly ordered
-    # unique_targets = np.unique(np_y_sorted_arr)
-    # if len(unique_targets) != targets:
-    #     raise ValueError(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
-
     sorted_arr = np.zeros(orig_arr.shape)
     y_sorted_arr = np.zeros(y_orig_arr.shape)
     count = 0
@@ -306,14 +288,7 @@ def order_random_array(orig_arr, y_orig_arr, targets):
                 y_sorted_arr[count, :] = i
                 count = count + 1
 
-    # unique_targets = np.unique(y_sorted_arr)
-    # if len(unique_targets) != targets:
-    #     raise ValueError(f"Expected {targets} targets but found {len(unique_targets)} unique targets")
-    # assert np.array_equal(sorted_arr, np_sorted_arr)
-    # assert np.array_equal(y_sorted_arr, np_y_sorted_arr)
     return sorted_arr, y_sorted_arr
-
-    # return np_sorted_arr, np_y_sorted_arr
 
 
 def get_samples_number(iters, batch_size, gpus):

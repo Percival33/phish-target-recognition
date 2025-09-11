@@ -136,7 +136,6 @@ class SimpleDataProcessor:
         df = pd.DataFrame(samples)
 
         # Validate no duplicate targets across classes
-        # self._validate_no_duplicate_targets(df, dataset_config.name)
 
         self.logger.info(
             f"{dataset_config.name}: {len(df)} samples, classes: {Counter(df['true_class'])}"

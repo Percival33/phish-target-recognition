@@ -13,10 +13,6 @@ def check_folder(folder_path):
     """Check if a folder has both required files."""
     info_exists = os.path.isfile(os.path.join(folder_path, "info.txt"))
     shot_exists = os.path.isfile(os.path.join(folder_path, "shot.png"))
-    # shot_exists = os.path.isfile(os.path.join(folder_path, "shot1.png"))
-    # if shot_exists:
-    #     return folder_path
-    # return None
     # If either file is missing, return the folder path
     if not (info_exists and shot_exists):
         return folder_path
