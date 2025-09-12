@@ -144,6 +144,7 @@ Label strategies reference:
 ### 3) Split and organize
 
 ```bash
+just setup-data-splitter
 uv run src/data_splitter/split_data.py config.json
 ```
 
