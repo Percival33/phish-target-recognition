@@ -33,3 +33,6 @@ dev = [
 
 [tool.uv.sources]
 tools = { path = "libs/tools-0.1.8-py3-none-any.whl" }
+
+[tool.uv.extra-build-dependencies]
+git = ["setuptools"]
