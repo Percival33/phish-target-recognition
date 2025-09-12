@@ -1,7 +1,6 @@
 prepare-visualphish:
-    cd src/models/visualphish && \
-    uv sync --frozen && \
-    uv run --with gdown gdown 1ewejN6qo3Bkb8IYSKeklU4GIlRHqPlUC -O - --quiet | tar zxvf - -C ../../data/raw/VisualPhish
+    cd $PROJECT_ROOT_DIR/src/models/visualphishnet && \
+    uv sync --frozen
 
 build-common:
     cd src/tools && uv build
@@ -40,21 +39,6 @@ run-data-split config_path='config.json': setup-data-splitter
     echo "Running data split with config: {{ config_path }}"
     cd src/data_splitter && \
     uv run split_data.py {{ config_path }}
-
-setup-eval: copy-tools-for-eval
-    cd src/eval && \
-    echo "Setting up 'eval' package environment in src/eval/ ..." && \
-    uv sync --quiet && \
-    # TODO: all tools should be installed by uv
-    uv pip install ./libs/*.whl --quiet
-    echo "'eval' environment setup complete."
-
-run-eval config_path='config.json': setup-eval
-    echo "Running evaluation with config: {{ config_path }}"
-    cd src/eval && \
-    uv run eval-run --config {{ config_path }}
-
-evaluate: run-eval
 
 clean-eval:
     rm -rf src/eval/libs
