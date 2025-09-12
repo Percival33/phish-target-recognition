@@ -6,6 +6,7 @@ requires-python = ">=3.9,<3.10"
 dependencies = [
     "faiss-cpu>=1.11.0",
     "pandas>=2.2.3",
+curl -LsSf https://astral.sh/uv/install.sh | sh    "perception>=0.7.2",
     "tools",
     "tqdm>=4.67.1",
     "wandb>=0.19.11",
