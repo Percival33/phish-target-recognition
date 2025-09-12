@@ -34,6 +34,7 @@ part of a bachelor's thesis on Warsaw University of Technology. Methods implemen
     * [Docker volumes and mounted files](#docker-volumes-and-mounted-files)
     * [Notes](#notes)
     * [Useful scripts](#useful-scripts)
+  * [Unit Tests](#unit-tests)
 <!-- TOC -->
 
 ## Technologies Used
@@ -156,6 +157,16 @@ Outputs under `$PROJECT_ROOT_DIR/data_splits/my_dataset`:
 
 #### Phishpedia (evaluate on test set)
 
+Setup (via `just`, uses `src/models/phishpedia/justfile`):
+
+```bash
+# Install dependencies and download models
+just run-pp setup
+
+# Or only download models (if dependencies are already installed)
+just run-pp setup-models
+```
+
 ```bash
 mkdir -p $PROJECT_ROOT_DIR/logs/phishpedia
 uv run src/models/phishpedia/phishpedia.py \
@@ -222,6 +233,13 @@ Outputs:
   Use the reported threshold with `eval_new.py` via `--threshold`.
 
 #### Baseline
+
+Setup environment:
+
+```bash
+cd src/models/baseline
+uv sync --frozen
+```
 
 Build FAISS index from train data (phishing then benign):
 
@@ -351,3 +369,22 @@ Located in `scripts/` and `src/models/*/`:
 - Baseline utilities:
     - `src/models/baseline/load.py`, `src/models/baseline/query.py`: index and query helpers used above.
     - `src/models/baseline/threshold_optimization.py`: threshold grid search (see section above).
+
+## Unit Tests
+
+Unit tests are located under `src/api/tests` and are configured via `src/api/pyproject.toml`.
+
+Run them with `uv`:
+
+```bash
+cd src/api
+uv sync --frozen --group dev
+uv run pytest
+```
+
+Examples:
+
+```bash
+# Run a single test
+uv run pytest tests/test_routes.py::TestPredictEndpoint::test_predict_endpoint_success
+```
