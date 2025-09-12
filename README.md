@@ -5,11 +5,11 @@
 > [!NOTE]
 > **TLDR**
 > This project is a system designed to compare various phishing detection methods on visual data. It was developed as
-part of a bachelor's thesis on Warsaw University of Technology. Methods implemented are:
-> - [Phishpedia](https://github.com/lindsey98/Phishpedia) - CNN model for phishing detection based on logo
-> - [VisualPhish](https://github.com/S-Abdelnabi/VisualPhishNet) - deep learning model for phishing detection based on
+> part of a bachelor's thesis at the Warsaw University of Technology. The implemented methods are:
+> - [Phishpedia](https://github.com/lindsey98/Phishpedia) - a CNN model for phishing detection based on logos
+> - [VisualPhish](https://github.com/S-Abdelnabi/VisualPhishNet) - a deep learning model for phishing detection based on
     visual features
-> - Baseline - perceptual hashing and similarity search
+> - Baseline: perceptual hashing and similarity search, custom implementation
 >
 > A summary of all evaluation runs can be found in [EVALUATION_RESULTS.md](EVALUATION_RESULTS.md).
 
@@ -34,6 +34,7 @@ part of a bachelor's thesis on Warsaw University of Technology. Methods implemen
     * [Docker volumes and mounted files](#docker-volumes-and-mounted-files)
     * [Notes](#notes)
     * [Useful scripts](#useful-scripts)
+  * [Unit Tests](#unit-tests)
 <!-- TOC -->
 
 ## Technologies Used
@@ -73,7 +74,7 @@ Before starting, install these tools:
   ```
 - **unzip**: A tool for decompressing ZIP files.
 
-**Initial Setup (Required for all paths):**
+**Initial setup (required for all paths):**
 
 1. Install development tools:
    ```bash
@@ -94,12 +95,13 @@ Before starting, install these tools:
 
 ## Quickstart
 
-This project uses the `src/data_splitter` tool to create 60:20:20 train/val/test splits and automatically organize data
+This project uses the `src/data_splitter` tool to create 60:20:20 train/val/test splits and automatically organize the
+data
 for Phishpedia and VisualPhish.
 
 ### 1) Prepare your CSV (if using your own dataset)
 
-CSV must include:
+The CSV must include:
 
 ```shell
 "url",
@@ -111,7 +113,7 @@ CSV must include:
 
 ### 2) Configure the data splitter (config.json)
 
-Add a `data_split` section. Choose `label_strategy` matching your dataset layout (`subfolders`, `labels_file`, or
+Add a `data_split` section. Choose a `label_strategy` that matches your dataset layout (`subfolders`, `labels_file`, or
 `directory`).
 
 ```json
@@ -134,15 +136,16 @@ Add a `data_split` section. Choose `label_strategy` matching your dataset layout
 }
 ```
 
-Label strategies reference:
+Reference for label strategies:
 
-- `subfolders`: each sample is its own folder with `shot.png` and `info.txt`.
-- `labels_file`: flat images with a `labels.txt` file.
-- `directory`: images grouped by target as subdirectories eg. VisualPhish dataset.
+- `subfolders`: Each sample has its own folder containing `shot.png` and `info.txt`.
+- `labels_file`: A flat directory of images with a `labels.txt` file.
+- `directory`: Images grouped by target as subdirectories, e.g., the VisualPhish dataset.
 
 ### 3) Split and organize
 
 ```bash
+just setup-data-splitter
 uv run src/data_splitter/split_data.py config.json
 ```
 
@@ -156,6 +159,16 @@ Outputs under `$PROJECT_ROOT_DIR/data_splits/my_dataset`:
 
 #### Phishpedia (evaluate on test set)
 
+Set up (via `just`; uses `src/models/phishpedia/justfile`):
+
+```bash
+# Install dependencies and download models
+just run-pp setup
+
+# Or only download models (if dependencies are already installed)
+just run-pp setup-models
+```
+
 ```bash
 mkdir -p $PROJECT_ROOT_DIR/logs/phishpedia
 uv run src/models/phishpedia/phishpedia.py \
@@ -166,10 +179,11 @@ uv run src/models/phishpedia/phishpedia.py \
 
 #### VisualPhish
 
-Setup once:
+Set up once:
 
 ```bash
-uv sync --frozen
+cd src/models/visualphishnet
+uv sync
 uv run wandb login YOUR_API_KEY
 ```
 
@@ -223,7 +237,14 @@ Outputs:
 
 #### Baseline
 
-Build FAISS index from train data (phishing then benign):
+Set up the environment:
+
+```bash
+cd src/models/baseline
+uv sync
+```
+
+Build the FAISS index from the training data (phishing, then benign):
 
 ```bash
 mkdir -p $PROJECT_ROOT_DIR/logs/baseline
@@ -244,7 +265,7 @@ uv run load.py \
   --append
 ```
 
-Query test data (run once per class):
+Query the test data (run once per class):
 
 ```bash
 uv run query.py \
@@ -267,7 +288,8 @@ uv run query.py \
 
 ##### Optimize threshold (Baseline)
 
-Run grid search on the validation set to find a good threshold. Ensure you point to the val CSV and images produced by
+Run grid search on the validation set to find a good threshold. Ensure you point to the validation CSV and images
+produced by
 the splitter.
 
 ```bash
@@ -297,7 +319,9 @@ uv run streamlit run src/website.py
 
 Paths are relative to the project root unless stated otherwise.
 
-- **api**: no host volumes mounted. Configuration via environment variables (`MODELS`, `PORT`, `VP_PORT`, `PP_PORT`, `BS_PORT`).
+- **api**: No host volumes are mounted. Configuration is via environment variables (`MODELS`, `PORT`, `VP_PORT`,
+  `PP_PORT`,
+  `BS_PORT`).
 
 - **visualphish**:
     - `./data/processed/VisualPhish/model2.h5` → `/code/model/model2.h5` (trained model)
@@ -322,14 +346,15 @@ Paths are relative to the project root unless stated otherwise.
 
 Located in `scripts/` and `src/models/*/`:
 
-- `scripts/augment_data.py`: augment benign samples per target to reach a minimum count; outputs to a mirrored structure
+- `scripts/augment_data.py`: Augment benign samples per target to reach a minimum count; outputs a mirrored structure
   with a log file.
   ```bash
   uv run scripts/augment_data.py $PROJECT_ROOT_DIR/data_splits/my_dataset/visualphish/data/train \
     --output $PROJECT_ROOT_DIR/data_splits/my_dataset_aug/visualphish/data/train \
     --threshold 20
   ```
-- `scripts/create_dataset.py`: build VisualPhish-format dataset from separate benign/phishing folders using symlinks and
+- `scripts/create_dataset.py`: Build a VisualPhish-formatted dataset from separate benign/phishing folders using
+  symlinks and
   mappings.
   ```bash
   uv run scripts/create_dataset.py \
@@ -337,17 +362,38 @@ Located in `scripts/` and `src/models/*/`:
     --phishing-dir $PROJECT_ROOT_DIR/path/to/phishing \
     --output-dir $PROJECT_ROOT_DIR/data/interim/VisualPhish
   ```
-- `scripts/combine_images.py`: combine 3 example images into a single figure (for reporting/presentations).
+- `scripts/combine_images.py`: Combine three example images into a single figure (for reporting/presentations).
   ```bash
   uv run scripts/combine_images.py --images img1.png img2.png img3.png --layout horizontal -o combined.png
   ```
-- `scripts/setup.sh`: convenience bootstrap (installs uv/just, sets PROJECT_ROOT_DIR, wandb login). Review before
+- `scripts/setup.sh`: A convenience bootstrap script (installs uv/just, sets PROJECT_ROOT_DIR, performs a wandb login).
+  Review before
   running.
 
 - VisualPhish utilities:
-    - `src/models/visualphishnet/generate_whitelist_filenames.py`: export whitelist file names from `trusted_list`.
-    - `src/models/visualphishnet/evaluate_visualphishnet.py`: evaluate results CSV to metrics and optional ROC.
+    - `src/models/visualphishnet/generate_whitelist_filenames.py`: Export whitelist filenames from `trusted_list`.
+    - `src/models/visualphishnet/evaluate_visualphishnet.py`: Evaluate a results CSV into metrics and an optional ROC
+      curve.
 
 - Baseline utilities:
     - `src/models/baseline/load.py`, `src/models/baseline/query.py`: index and query helpers used above.
     - `src/models/baseline/threshold_optimization.py`: threshold grid search (see section above).
+
+## Unit Tests
+
+Unit tests are located under `src/api/tests` and are configured via `src/api/pyproject.toml`.
+
+Run them with `uv`:
+
+```bash
+cd src/api
+uv sync --frozen --group dev
+uv run pytest
+```
+
+Examples:
+
+```bash
+# Run a single test
+uv run pytest tests/test_routes.py::TestPredictEndpoint::test_predict_endpoint_success
+```
