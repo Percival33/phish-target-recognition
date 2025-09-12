@@ -5,7 +5,7 @@
 > [!NOTE]
 > **TLDR**
 > This project is a system designed to compare various phishing detection methods on visual data. It was developed as
-part of a bachelor's thesis on Warsaw University of Technology. Methods implemented are:
+> part of a bachelor's thesis on Warsaw University of Technology. Methods implemented are:
 > - [Phishpedia](https://github.com/lindsey98/Phishpedia) - CNN model for phishing detection based on logo
 > - [VisualPhish](https://github.com/S-Abdelnabi/VisualPhishNet) - deep learning model for phishing detection based on
     visual features
@@ -180,6 +180,7 @@ uv run src/models/phishpedia/phishpedia.py \
 Setup once:
 
 ```bash
+# src/models/visualphishnet
 uv sync --frozen
 uv run wandb login YOUR_API_KEY
 ```
@@ -315,7 +316,8 @@ uv run streamlit run src/website.py
 
 Paths are relative to the project root unless stated otherwise.
 
-- **api**: no host volumes mounted. Configuration via environment variables (`MODELS`, `PORT`, `VP_PORT`, `PP_PORT`, `BS_PORT`).
+- **api**: no host volumes mounted. Configuration via environment variables (`MODELS`, `PORT`, `VP_PORT`, `PP_PORT`,
+  `BS_PORT`).
 
 - **visualphish**:
     - `./data/processed/VisualPhish/model2.h5` → `/code/model/model2.h5` (trained model)
