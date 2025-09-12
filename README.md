@@ -181,7 +181,7 @@ uv run src/models/phishpedia/phishpedia.py \
 Setup once:
 
 ```bash
-# src/models/visualphishnet
+# src/models/visualphishnet or just run-vp setup
 uv sync --frozen
 uv run wandb login YOUR_API_KEY
 ```
