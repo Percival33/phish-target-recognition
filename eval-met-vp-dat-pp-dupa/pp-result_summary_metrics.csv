@@ -1,0 +1,13 @@
+metric_type,metric_name,value
+class,f1_weighted,0.1532711487081391
+class,roc_auc,0.1017799352750809
+class,mcc,-0.6159896808415136
+class,precision,0.26178794056664356
+class,recall,0.10177993527508092
+target,target_f1_micro,0.10034278591461515
+target,target_f1_macro,0.03336671629728851
+target,target_f1_weighted,0.14521855956319832
+target,target_mcc,0.011120616867585227
+target,precision,0.08191683459025549
+target,recall,0.027061486572741846
+target,identification_rate,1.0
