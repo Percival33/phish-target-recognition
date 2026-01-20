@@ -12,9 +12,9 @@
 > - Baseline: perceptual hashing and similarity search, custom implementation
 >
 > A summary of all evaluation runs can be found in [EVALUATION_RESULTS.md](EVALUATION_RESULTS.md).
+>
+> Article published in [MDPI Applied Sciences](https://www.mdpi.com/2076-3417/16/2/640). See [Citations](#citations) for more details.
 
-
-https://www.mdpi.com/3670864
 
 ## Table of Contents
 
