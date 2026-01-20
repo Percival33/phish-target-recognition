@@ -13,6 +13,9 @@
 >
 > A summary of all evaluation runs can be found in [EVALUATION_RESULTS.md](EVALUATION_RESULTS.md).
 
+
+https://www.mdpi.com/3670864
+
 ## Table of Contents
 
 <!-- TOC -->
@@ -35,6 +38,7 @@
     * [Notes](#notes)
     * [Useful scripts](#useful-scripts)
   * [Unit Tests](#unit-tests)
+  * [Citations](#citations)
 <!-- TOC -->
 
 ## Technologies Used
@@ -396,4 +400,22 @@ Examples:
 ```bash
 # Run a single test
 uv run pytest tests/test_routes.py::TestPredictEndpoint::test_predict_endpoint_success
+```
+
+## Citations
+
+```bibtex
+@Article{app16020640,
+AUTHOR = {Jarczewski, Marcin and Białczak, Piotr and Mazurczyk, Wojciech},
+TITLE = {Phishing Website Impersonation: Comparative Analysis of Detection and Target Recognition Methods},
+JOURNAL = {Applied Sciences},
+VOLUME = {16},
+YEAR = {2026},
+NUMBER = {2},
+ARTICLE-NUMBER = {640},
+URL = {https://www.mdpi.com/2076-3417/16/2/640},
+ISSN = {2076-3417},
+ABSTRACT = {With the rapid advancements in technology, there has been a noticeable increase in phishing attacks that exploit users by impersonating trusted entities. The primary attack vectors include fraudulent websites and carefully crafted emails. Early detection of such threats enables the more effective blocking of malicious sites and timely user warnings. One of the key elements in phishing detection is identifying the entity being impersonated. In this article, we conduct a comparative analysis of methods for detecting phishing websites that rely on website screenshots and recognizing their impersonation targets. The two main research objectives include binary phishing detection to identify malicious intent and multiclass classification of impersonated targets to enable specific incident response and brand protection. Three approaches are compared: two state-of-the-art methods, Phishpedia and VisualPhishNet, and a third, proposed in this work, which uses perceptual hash similarity as a baseline. To ensure consistent evaluation conditions, a dedicated framework was developed for the study and shared with the community via GitHub. The obtained results indicate that Phishpedia and the Baseline method were the most effective in terms of detection performance, outperforming VisualPhishNet. Specifically, the proposed Baseline method achieved an F1 score of 0.95 on the Phishpedia dataset for binary classification, while Phishpedia maintained a high Identification Rate (>0.9) across all tested datasets. In contrast, VisualPhishNet struggled with dataset variability, achieving an F1 score of only 0.17 on the same benchmark. Moreover, as our proposed Baseline method demonstrated superior stability and binary classification performance, it should be considered as a robust candidate for preliminary filtering in hybrid systems.},
+DOI = {10.3390/app16020640}
+}
 ```
